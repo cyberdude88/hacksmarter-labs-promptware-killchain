@@ -13,6 +13,107 @@ const OPS = [
 
 const emptyCond = () => ({ field: 'type', op: 'eq', value: '' });
 
+const VALUE_SUGGESTIONS = [
+  '10.0.0.1',
+  '185.220.101.42',
+  '192.168.1.1',
+  'ADMIN_LOGIN',
+  'ADMIN_LOGOUT',
+  'ADMIN_PROFILE_CHANGE',
+  'ADMIN_USER_CREATE',
+  'ADMIN_USER_DELETE',
+  'ADMIN_USER_MODIFY',
+  'AS_REP_ROAST',
+  'AUDIT_DISABLED',
+  'AUTH_FAIL',
+  'AUTH_LOCKOUT',
+  'AUTH_MFA_BYPASS',
+  'AUTH_MFA_FAIL',
+  'AUTH_PASSWORD_RESET',
+  'AUTH_SUCCESS',
+  'AUTH_TOKEN_REUSE',
+  'AV_DETECTION',
+  'AV_QUARANTINE',
+  'BEACONING_PERIODIC',
+  'BRUTE_FORCE',
+  'C2_BEACON',
+  'CLOUD_API_KEY_CREATE',
+  'CLOUD_ROLE_ASSUME',
+  'CONFIG_BACKUP',
+  'CONFIG_CHANGE',
+  'CONFIG_EXPORT',
+  'CONFIG_FACTORY_RESET',
+  'CONFIG_IMPORT',
+  'CONFIG_RESTORE',
+  'CREDENTIAL_STUFFING',
+  'DLP_BLOCK',
+  'DLP_TRIGGER',
+  'DNS_QUERY',
+  'DNS_SINKHOLE',
+  'DNS_TUNNEL',
+  'EDR_ALERT',
+  'EGRESS_NEW_DEST',
+  'EVENT_LOG_CLEARED',
+  'EXFIL_LARGE_TRANSFER',
+  'FILE_DELETE_BULK',
+  'FILE_ENCRYPT_BULK',
+  'FIREWALL_RULE_ADD',
+  'FIREWALL_RULE_DELETE',
+  'FIRMWARE_DOWNGRADE',
+  'FIRMWARE_UPGRADE',
+  'GEO_ANOMALY',
+  'GOLDEN_TICKET',
+  'GROUP_MEMBERSHIP_CHANGE',
+  'HONEYPOT_HIT',
+  'HOST_SCAN',
+  'IAM_POLICY_CHANGE',
+  'IDS_ALERT',
+  'IMPOSSIBLE_TRAVEL',
+  'INTERFACE_DOWN',
+  'INTERFACE_UP',
+  'IPSEC_NEGOTIATION',
+  'IPS_BLOCK',
+  'KERBEROAST',
+  'LATERAL_MOVEMENT',
+  'LSASS_ACCESS',
+  'MALWARE_DOWNLOAD',
+  'MALWARE_EXEC',
+  'OAUTH_CONSENT_GRANT',
+  'PASS_THE_HASH',
+  'PASS_THE_TICKET',
+  'POLICY_CHANGE',
+  'PORT_SCAN',
+  'POWERSHELL_ENCODED',
+  'PRIVILEGE_ESCALATION',
+  'PROCESS_CREATE',
+  'PROCESS_INJECTION',
+  'PROXY_DETECTED',
+  'PSEXEC_EXEC',
+  'RANSOMWARE_BEHAVIOR',
+  'REGISTRY_RUN_KEY',
+  'ROLE_CHANGE',
+  'ROUTE_CHANGE',
+  'S3_PUBLIC_ACL',
+  'SCHEDULED_TASK_CREATE',
+  'SERVICE_CREATE',
+  'SERVICE_STOP',
+  'SHADOW_COPY_DELETE',
+  'SSL_VPN_LOGIN',
+  'TOR_EXIT_NODE',
+  'VPN_CONNECT',
+  'VPN_DISCONNECT',
+  'VPN_TUNNEL_DOWN',
+  'VPN_TUNNEL_UP',
+  'WAF_BLOCK',
+  'WMI_EXEC',
+  'admin',
+  'cisco-asa',
+  'fortigate',
+  'guest',
+  'palo-alto',
+  'root',
+].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
 export default function DetectionPage() {
   const { state, dispatch } = useSoc();
   const draft = state.detectionDraft;
@@ -112,10 +213,18 @@ export default function DetectionPage() {
               <select value={c.op} onChange={(e) => updateCond(i, { op: e.target.value })}>
                 {OPS.map((o) => <option key={o.k} value={o.k}>{o.label}</option>)}
               </select>
-              <input className="text-in"
-                     value={c.value}
-                     placeholder="value"
-                     onChange={(e) => updateCond(i, { value: e.target.value })} />
+              <select value={VALUE_SUGGESTIONS.includes(c.value) || c.value === '' ? c.value : '__custom__'}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        if (v === '__custom__') return;
+                        updateCond(i, { value: v });
+                      }}>
+                <option value="">— pick value —</option>
+                {VALUE_SUGGESTIONS.map((v) => <option key={v} value={v}>{v}</option>)}
+                {!VALUE_SUGGESTIONS.includes(c.value) && c.value !== '' && (
+                  <option value="__custom__">{c.value} (custom)</option>
+                )}
+              </select>
               {conds.length > 1 && (
                 <button className="remove-cond"
                         title="remove condition"

@@ -38,6 +38,9 @@ const initial = {
   detectionRules: [],
   detectionDraft: null,
 
+  // Investigation page — persists across navigation.
+  investigationQuery: '',
+
   // All pages are accessible from the start. We still track which milestones
   // the analyst has hit (first correct triage, IOC flagged, rule built, replay
   // success) for the end-of-session report — they no longer gate navigation.
@@ -71,6 +74,12 @@ const fmtTs = () => new Date().toISOString().substring(11, 19);
 const mkEvtId = () => `EVT-${Date.now().toString(36)}-${Math.floor(Math.random() * 1000)}`;
 const mkAlertId = (i) => `ALRT-${1000 + i}`;
 const cap = (arr, n) => (arr.length > n ? arr.slice(arr.length - n) : arr);
+
+// Skip the dead-air buildup before the first interesting event. The scenario's
+// first AUTH_FAIL fires at tOffset 8 and the first alert at tOffset 11, so
+// jumping the clock to 7 means students see the first event within ~1 real
+// second of reset and the first alert within ~2 seconds.
+const SESSION_HEAD_START = 7;
 const floorScore = (n) => Math.max(0, n);
 
 // Map a tOffset to its kill-chain phase using the scenario's timeline.
@@ -95,10 +104,10 @@ function reducer(s, a) {
       // If we hydrated from storage, keep the prior clock; otherwise start fresh.
       return s.startedAt
         ? { ...s, scenario: a.scenario }
-        : { ...s, scenario: a.scenario, startedAt: Date.now() };
+        : { ...s, scenario: a.scenario, startedAt: Date.now(), now: SESSION_HEAD_START };
 
     case 'RESET':
-      return { ...initial, scenario: s.scenario, startedAt: Date.now() };
+      return { ...initial, scenario: s.scenario, startedAt: Date.now(), now: SESSION_HEAD_START };
 
     // -------- 1Hz clock tick: timer + backlog penalty + risk recalc --------
     case 'TICK': {
@@ -268,6 +277,10 @@ function reducer(s, a) {
     }
     case 'SAVE_RULE_DRAFT':
       return { ...s, detectionDraft: a.draft };
+    case 'SAVE_INVESTIGATION_QUERY':
+      return { ...s, investigationQuery: a.query };
+    case 'ACK_CERTIFICATE':
+      return { ...s, certificatePending: false };
     case 'REMOVE_RULE':
       return { ...s, detectionRules: s.detectionRules.filter((r) => r.id !== a.id) };
 
@@ -386,6 +399,7 @@ function reducer(s, a) {
           passed,
           threshold: cfg.pass_threshold_pct ?? 80,
         },
+        certificatePending: passed,
         score: floorScore(s.score + total),
         scoreLog: cap(
           [...s.scoreLog, { ts: s.now, delta: total, reason: passed ? `lab PASSED (${pct}%)` : `lab submitted (${pct}%)` }],
@@ -448,17 +462,19 @@ export function SocProvider({ children }) {
     dispatch({ type: 'RESET' });
   };
 
-  // 1Hz clock — timer / backlog penalty / risk.
+  // Game runs at 2x real-time so students don't sit waiting between
+  // attack-chain phases. The relative pacing (and analyst pressure) is
+  // preserved — just compressed.
+  // Clock advances every 500ms (game-second), stream emits every 750ms.
   useEffect(() => {
     if (!state.startedAt) return;
-    const id = setInterval(() => dispatch({ type: 'TICK' }), 1000);
+    const id = setInterval(() => dispatch({ type: 'TICK' }), 500);
     return () => clearInterval(id);
   }, [state.startedAt]);
 
-  // Telemetry stream — emit one event every 1.5s.
   useEffect(() => {
     if (!state.scenario) return;
-    const id = setInterval(() => dispatch({ type: 'STREAM_TICK' }), 1500);
+    const id = setInterval(() => dispatch({ type: 'STREAM_TICK' }), 750);
     return () => clearInterval(id);
   }, [state.scenario]);
 

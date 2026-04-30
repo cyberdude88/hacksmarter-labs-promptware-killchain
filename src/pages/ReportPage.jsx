@@ -199,9 +199,16 @@ function Question({ q, value, onChange }) {
 }
 
 function Graded({ onEdit }) {
-  const { state } = useSoc();
+  const { state, dispatch } = useSoc();
   const r = state.report;
-  const [showCertificate, setShowCertificate] = useState(r.passed);
+  const [showCertificate, setShowCertificate] = useState(
+    r.passed && state.certificatePending
+  );
+  useEffect(() => {
+    if (showCertificate && state.certificatePending) {
+      dispatch({ type: 'ACK_CERTIFICATE' });
+    }
+  }, [showCertificate, state.certificatePending, dispatch]);
   const missedQuestions = r.grading.filter((g) => !g.correct);
   const missedReasons = [];
   if (missedQuestions.length > 0) {

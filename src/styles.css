@@ -465,6 +465,26 @@ input, select, textarea { font-family: inherit; }
   font-family: var(--mono);
   white-space: nowrap;
 }
+.filter-count.filter-live {
+  background: rgba(90, 164, 255, 0.18);
+  color: var(--accent-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.filter-count.filter-live::before {
+  content: '● ';
+  font-size: 8px;
+  vertical-align: middle;
+}
+.live-feed-pill {
+  margin-top: 8px;
+  width: 100%;
+  justify-content: space-between;
+}
+.live-feed-pill.is-on {
+  border-color: var(--accent-2);
+  background: rgba(90, 164, 255, 0.10);
+}
 
 .stream {
   flex: 1;

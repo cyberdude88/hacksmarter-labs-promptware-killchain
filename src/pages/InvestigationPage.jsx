@@ -117,8 +117,17 @@ export default function InvestigationPage() {
 
   const baseStream = paused ? snapshot : state.telemetry;
 
+  // ---- live activity feed toggle ----
+  // Off by default so the analyst isn't watching numbers tick by; flip on
+  // when they actually want to peek at the firehose.
+  const [liveFeedOn, setLiveFeedOn] = useState(false);
+
   // ---- query + pivot filtering ----
-  const [query, setQuery] = useState('');
+  // Persist across page navigation via SocContext, just like the report draft.
+  const [query, setQuery] = useState(() => state.investigationQuery || '');
+  useEffect(() => {
+    dispatch({ type: 'SAVE_INVESTIGATION_QUERY', query });
+  }, [query, dispatch]);
   const [jumpTargetId, setJumpTargetId] = useState(null);
   const [activePhase, setActivePhase] = useState(null);
   const [familyFilter, setFamilyFilter] = useState('all');
@@ -279,7 +288,11 @@ export default function InvestigationPage() {
               : <>showing telemetry stream · click an alert in the queue to focus the investigation</>}
           </div>
         </div>
-        <div className="dim small">{visible.length} of {baseStream.length} events</div>
+        <div className="dim small">
+          {paused
+            ? <>{visible.length} of {baseStream.length} events</>
+            : <>live · pause to count</>}
+        </div>
       </div>
 
       {/* --- Query + pause controls --- */}
@@ -410,18 +423,28 @@ export default function InvestigationPage() {
           <div className="card">
             <div className="panel-head">
               <div className="panel-title">Activity Feed</div>
-              <div className="dim small">live</div>
+              <button
+                className={`pill ${liveFeedOn ? 'is-on' : ''}`}
+                onClick={() => setLiveFeedOn((v) => !v)}
+                title={liveFeedOn ? 'stop live feed' : 'start live feed'}
+              >
+                {liveFeedOn ? '● live' : '○ paused'}
+              </button>
             </div>
-            <div className="activity-feed">
-              {liveActivity.length === 0 && <div className="empty">waiting for telemetry…</div>}
-              {liveActivity.map((e) => (
-                <div key={`live-${e.id}`} className={`activity-line ${e.isAttack ? 'attack' : 'benign'}`}>
-                  <span className="mono">[{e.ts}]</span>{' '}
-                  <span className="evt-type">{e.type}</span>
-                  {e.host && <span className="dim small"> · {e.host}</span>}
-                </div>
-              ))}
-            </div>
+            {liveFeedOn ? (
+              <div className="activity-feed">
+                {liveActivity.length === 0 && <div className="empty">waiting for telemetry…</div>}
+                {liveActivity.map((e) => (
+                  <div key={`live-${e.id}`} className={`activity-line ${e.isAttack ? 'attack' : 'benign'}`}>
+                    <span className="mono">[{e.ts}]</span>{' '}
+                    <span className="evt-type">{e.type}</span>
+                    {e.host && <span className="dim small"> · {e.host}</span>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="dim small">Live feed is paused. Toggle on to peek at the firehose.</div>
+            )}
           </div>
 
           <div className="card">
@@ -441,6 +464,16 @@ export default function InvestigationPage() {
                     </button>
                   ))}
                 </div>
+                <button
+                  className={`filter-pill live-feed-pill ${!paused ? 'is-on' : ''}`}
+                  onClick={togglePause}
+                  title={paused ? 'resume the live telemetry stream' : 'freeze the stream as a snapshot'}
+                >
+                  <span>Live Feed</span>
+                  <span className={`filter-count ${!paused ? 'filter-live' : ''}`}>
+                    {paused ? 'off' : 'on'}
+                  </span>
+                </button>
               </div>
 
               {selected && (
@@ -485,7 +518,9 @@ export default function InvestigationPage() {
                   {hosts.map((host) => (
                     <button key={host} className={`filter-row ${hostFilter === host ? 'is-on' : ''}`} onClick={() => applyHostFilter(host)}>
                       <span className="mono">{host}</span>
-                      <span className="filter-count">{hostCounts[host]}</span>
+                      {paused
+                        ? <span className="filter-count">{hostCounts[host]}</span>
+                        : <span className="filter-count filter-live">live</span>}
                     </button>
                   ))}
                 </div>
@@ -501,7 +536,9 @@ export default function InvestigationPage() {
                   {types.map((type) => (
                     <button key={type} className={`filter-row ${typeFilter === type ? 'is-on' : ''}`} onClick={() => applyTypeFilter(type)}>
                       <span className="mono">{type}</span>
-                      <span className="filter-count">{typeCounts[type]}</span>
+                      {paused
+                        ? <span className="filter-count">{typeCounts[type]}</span>
+                        : <span className="filter-count filter-live">live</span>}
                     </button>
                   ))}
                 </div>
