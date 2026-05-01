@@ -359,6 +359,7 @@ function reducer(s, a) {
           label: q.label,
           given: r.answers?.[q.id] ?? '',
           expected: q.answer,
+          hint: q.hint || '',
           correct,
           points: correct ? q.points : 0,
           max: q.points,

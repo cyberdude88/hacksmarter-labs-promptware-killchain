@@ -1009,6 +1009,8 @@ input, select, textarea { font-family: inherit; }
 .grading li.bad .grade-mark { color: var(--crit);   font-weight: 700; }
 .grade-q-label { font-weight: 600; font-size: 13px; }
 .grade-pts { font-family: var(--mono); text-align: right; font-weight: 700; }
+.grade-hint { color: var(--accent); }
+.grading li.bad .dim b { color: var(--accent); }
 .missed-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
 .missed-list li {
   padding: 10px 12px;

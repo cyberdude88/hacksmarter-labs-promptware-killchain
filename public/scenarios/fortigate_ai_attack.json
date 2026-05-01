@@ -68,19 +68,19 @@
   "report": {
     "pass_threshold_pct": 80,
     "questions": [
-      { "id": "attacker_ip",         "type": "text",   "label": "Attacker source IP",                            "placeholder": "e.g. 1.2.3.4",         "answer": "185.220.101.42",            "points": 15 },
-      { "id": "compromised_host",    "type": "text",   "label": "Compromised host",                              "placeholder": "e.g. host-name",       "answer": "fgt-edge-01",               "points": 10 },
-      { "id": "compromised_user",    "type": "text",   "label": "Compromised user account",                      "placeholder": "e.g. jdoe",            "answer": "admin",                     "points": 10 },
-      { "id": "exfil_path",          "type": "text",   "label": "API path used during the compromise",           "placeholder": "/api/...",             "answer": "/api/v2/cmdb/system/admin", "points": 15 },
-      { "id": "persistence_account", "type": "text",   "label": "Account created by attacker (persistence)",     "placeholder": "e.g. svc_xxx",         "answer": "svc_backup",                "points": 10 },
+      { "id": "attacker_ip",         "type": "text",   "label": "Attacker source IP",                            "placeholder": "e.g. 1.2.3.4",         "answer": "185.220.101.42",            "points": 15, "hint": "Alerts page — every malicious alert (brute force, TOR exit login, config export) lists the same src_ip." },
+      { "id": "compromised_host",    "type": "text",   "label": "Compromised host",                              "placeholder": "e.g. host-name",       "answer": "fgt-edge-01",               "points": 10, "hint": "Investigation page — filter for AUTH_SUCCESS; the host field is the edge device that accepted the login." },
+      { "id": "compromised_user",    "type": "text",   "label": "Compromised user account",                      "placeholder": "e.g. jdoe",            "answer": "admin",                     "points": 10, "hint": "Investigation page — the user field on the AUTH_SUCCESS event (the account whose brute-force finally landed)." },
+      { "id": "exfil_path",          "type": "text",   "label": "API path used during the compromise",           "placeholder": "/api/...",             "answer": "/api/v2/cmdb/system/admin", "points": 15, "hint": "Investigation page — search API_ENUM; the first /api/v2/cmdb/... path is the one the attacker pivoted to right after login." },
+      { "id": "persistence_account", "type": "text",   "label": "Account created by attacker (persistence)",     "placeholder": "e.g. svc_xxx",         "answer": "svc_backup",                "points": 10, "hint": "Investigation page — find the ADMIN_USER_CREATE event; the new account name is quoted in the message." },
       { "id": "attack_type",         "type": "select", "label": "Attack classification",
         "options": ["edge_device_compromise","phishing","ransomware","insider_threat","data_exfiltration_only"],
-        "answer": "edge_device_compromise", "points": 15 },
+        "answer": "edge_device_compromise", "points": 15, "hint": "Scenario summary (top of Alerts page) describes a FortiGate appliance compromise — pick the matching classification." },
       { "id": "severity",            "type": "select", "label": "Final severity",
-        "options": ["low","medium","high","critical"], "answer": "critical", "points": 10 },
+        "options": ["low","medium","high","critical"], "answer": "critical", "points": 10, "hint": "Alerts page — the highest severity reached among confirmed-malicious alerts (config export + persistence) is what the incident inherits." },
       { "id": "verdict",             "type": "select", "label": "Final verdict",
         "options": ["confirmed_incident","likely_incident","benign","inconclusive"],
-        "answer": "confirmed_incident", "points": 10 }
+        "answer": "confirmed_incident", "points": 10, "hint": "If multiple kill-chain stages (initial access → exfiltration → persistence) all triaged true_positive on the Alerts page, the verdict is not 'likely' or 'inconclusive'." }
     ],
     "narrative": {
       "label": "Incident narrative (bonus — sanity check only)",

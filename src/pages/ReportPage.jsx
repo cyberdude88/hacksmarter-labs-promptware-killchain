@@ -209,27 +209,6 @@ function Graded({ onEdit }) {
       dispatch({ type: 'ACK_CERTIFICATE' });
     }
   }, [showCertificate, state.certificatePending, dispatch]);
-  const missedQuestions = r.grading.filter((g) => !g.correct);
-  const missedReasons = [];
-  if (missedQuestions.length > 0) {
-    missedReasons.push(...missedQuestions.map((g) => ({
-      label: g.label,
-      why: g.given ? `Expected ${g.expected}, but the report answer was ${g.given}.` : `This field was left blank. Expected ${g.expected}.`,
-    })));
-  }
-  if (r.narrativeBonus === 0) {
-    missedReasons.push({
-      label: 'Narrative bonus',
-      why: 'The narrative did not include the key attack terms used for the bonus check.',
-    });
-  }
-  if (r.additionalBonus === 0) {
-    missedReasons.push({
-      label: 'Additional IOC bonus',
-      why: 'No additional IOC entry matched a known indicator from the scenario.',
-    });
-  }
-
   return (
     <div className="page page-report">
       <div className="page-head">
@@ -261,7 +240,7 @@ function Graded({ onEdit }) {
                 <div className="grade-q-label">{g.label}</div>
                 <div className="dim small">
                   your answer: <span className="mono">{g.given || '—'}</span>
-                  {!g.correct && <> · expected: <span className="mono">{g.expected}</span></>}
+                  {!g.correct && g.hint && <> · <b>Hint:</b> <span className="grade-hint">{g.hint}</span></>}
                 </div>
               </span>
               <span className="grade-pts">+{g.points}/{g.max}</span>
@@ -290,22 +269,6 @@ function Graded({ onEdit }) {
             <span className="grade-pts">+{r.additionalBonus}</span>
           </li>
         </ul>
-      </section>
-
-      <section className="card">
-        <div className="panel-title">What Was Missed</div>
-        {missedReasons.length === 0 ? (
-          <div className="dim small">No misses to review. You captured the required findings cleanly.</div>
-        ) : (
-          <ul className="missed-list">
-            {missedReasons.map((item) => (
-              <li key={item.label}>
-                <div className="missed-label">{item.label}</div>
-                <div className="dim small">{item.why}</div>
-              </li>
-            ))}
-          </ul>
-        )}
       </section>
 
       {r.passed && showCertificate && (
