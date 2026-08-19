@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Suppress legitimate vulnerability scanner",
+    "conditions": [
+      {
+        "field": "file_name",
+        "op": "equals",
+        "value": "scanner.exe"
+      },
+      {
+        "field": "sha256",
+        "op": "equals",
+        "value": "5befbe73163df36afd7ac1b97680f0a9447640aad16daeac831cca38646929b4"
+      }
+    ]
+  }
+]

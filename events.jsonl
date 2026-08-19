@@ -1,0 +1,5 @@
+{"timestamp": "2026-06-28T09:00:00Z", "file_name": "scanner.exe", "sha256": "5befbe73163df36afd7ac1b97680f0a9447640aad16daeac831cca38646929b4", "host": "WKS-01", "note": "pre-update — name AND hash match the rule"}
+{"timestamp": "2026-06-28T09:05:00Z", "file_name": "scanner.exe", "sha256": "5befbe73163df36afd7ac1b97680f0a9447640aad16daeac831cca38646929b4", "host": "WKS-02", "note": "pre-update — same"}
+{"timestamp": "2026-06-28T14:00:00Z", "file_name": "scanner.exe", "sha256": "c76572f16f872617b6063bf6a5d735d3ba2a98441bb99e4c0f979c671516ba8d", "host": "WKS-01", "note": "post-update — vendor patched the binary, hash drifted"}
+{"timestamp": "2026-06-28T14:15:00Z", "file_name": "scanner.exe", "sha256": "c76572f16f872617b6063bf6a5d735d3ba2a98441bb99e4c0f979c671516ba8d", "host": "WKS-02", "note": "post-update — same"}
+{"timestamp": "2026-06-28T15:00:00Z", "file_name": "scanner.exe", "sha256": "9bd2f8ed0a6696627ac689ed90c04a679ed7e1b48665a641965e82eed573d58d", "host": "WKS-03", "note": "look-alike name, totally different binary — rule must NOT suppress this"}

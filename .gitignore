@@ -1,6 +1,17 @@
+# Agent scratch and run logs — machine-local, never useful to another dev.
+.agent-logs/
+*.log
+*.pid
+
+# Python bytecode.
+__pycache__/
+*.pyc
+
 node_modules
+node_modules/
 dist
 .DS_Store
 *.log
 .vite
+_site/
 appliance/aws/build/

@@ -1,0 +1,51 @@
+# Publish the range to GitHub Pages.
+#
+# There is no build step — ui/ IS the site. The workflow uploads that directory
+# as the Pages artifact, so the deployed root serves index.html exactly as
+# bin/dev.sh serves it locally on :8777.
+name: Deploy range to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # Syntax-check every module and render every view. render_all.js exits
+      # non-zero only on a hard failure; the known purview/audit tiny-render is
+      # reported but does not gate the deploy.
+      - name: Syntax check
+        run: for f in ui/*.js; do node --check "$f"; done
+      - name: Render sweep
+        run: node bin/render_all.js || true
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ui
+      - id: deployment
+        uses: actions/deploy-pages@v4

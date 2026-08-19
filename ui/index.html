@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hack Smarter Labs</title>
+<link rel="icon" type="image/png" href="assets/hacksmarter-mark.png" />
+<link rel="stylesheet" href="styles.css?v=20260819a" />
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <button class="iconbtn" id="btn-waffle" title="App switcher" aria-label="App switcher">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+    </button>
+    <span class="wordmark">
+      <img class="brand-logo" src="assets/hacksmarter-mark.png"
+           alt="Hack Smarter Labs" />
+      <span class="wordmark-text">
+        <span id="portal-name">Hack Smarter Labs</span>
+        <span class="wordmark-faint" id="portal-context">· XDR Security</span>
+      </span>
+    </span>
+  </div>
+  <div class="topbar-search">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 105.3 14L20 20.7 21.7 19l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
+    <input id="global-search" type="text" placeholder="Search across incidents, alerts, devices, users, files..." autocomplete="off" spellcheck="false" />
+    <div id="global-search-dropdown" class="search-dropdown" role="listbox" hidden></div>
+  </div>
+  <div class="topbar-right">
+    <button class="iconbtn" id="btn-copilot" title="AI Security Agent" aria-label="AI Security Agent">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2l2.4 5 5.6.8-4 3.9 1 5.5L12 14.8 6.9 17.2l1-5.5-4-3.9L9.6 7z"/></svg>
+    </button>
+    <button class="iconbtn" title="What's new">🔔</button>
+    <button class="iconbtn" title="Settings">⚙</button>
+    <button class="iconbtn" title="Help">?</button>
+    <div class="tenant">Hack Smarter Labs · Tenant</div>
+    <div class="avatar" title="Me">ME</div>
+  </div>
+</header>
+
+<div class="portal-tabs" id="portal-tabs">
+  <button class="portal-tab" data-portal="defender" onclick="switchPortalContext('defender')">XDR Security</button>
+  <button class="portal-tab" data-portal="azure" onclick="switchPortalContext('azure')">Cloud Console</button>
+  <button class="portal-tab" data-portal="admin" onclick="switchPortalContext('admin')">Workspace Admin</button>
+</div>
+<div class="workload-strip" id="workload-strip"></div>
+
+<div class="shell" id="shell">
+  <nav class="pane pane-azure" id="pane-azure" hidden>
+    <div class="pane-header">
+      <span class="pane-title">Cloud</span>
+      <button class="pane-toggle" id="toggle-azure" title="Collapse" aria-label="Collapse Cloud pane">«</button>
+    </div>
+    <ul class="pane-list" id="sidenav-azure"></ul>
+  </nav>
+  <nav class="pane pane-blade" id="pane-blade">
+    <div class="pane-header">
+      <span class="pane-title" id="blade-title">Workload</span>
+      <button class="pane-toggle" id="toggle-blade" title="Collapse" aria-label="Collapse blade pane">«</button>
+    </div>
+    <ul class="pane-list" id="sidenav"></ul>
+  </nav>
+  <main class="content" id="content"></main>
+</div>
+
+<!-- APP SWITCHER (waffle) -->
+<aside id="panel-switcher" class="sidepanel left hidden">
+  <div class="sidepanel-header switcher-header">
+    <span class="switcher-close-spacer"></span>
+    <h2>Hack Smarter Labs training portals</h2>
+    <button class="iconbtn" data-close="panel-switcher">✕</button>
+  </div>
+  <div class="sidepanel-body switcher-grid" id="switcher-grid"></div>
+</aside>
+
+<!-- AI SECURITY AGENT -->
+<aside id="panel-copilot" class="sidepanel copilot hidden">
+  <div class="sidepanel-header">
+    <h2>AI Security Agent</h2>
+    <button class="iconbtn" data-close="panel-copilot">✕</button>
+  </div>
+  <div class="sidepanel-body">
+    <div class="copilot-prompts" id="copilot-prompts"></div>
+    <div class="copilot-answer" id="copilot-answer"></div>
+  </div>
+</aside>
+
+<!-- SENTINEL ANALYTICS RULE WIZARD -->
+<section id="panel-analytics-wizard" class="wizard-window hidden" role="dialog" aria-modal="true" aria-labelledby="analytics-wizard-title">
+  <div class="wizard-header">
+    <div>
+      <div class="wizard-breadcrumb">Home › SIEM &amp; SOAR › Analytics</div>
+      <h2 id="analytics-wizard-title">Analytics rule wizard - Create a new rule</h2>
+    </div>
+    <button class="iconbtn wizard-close" data-close="panel-analytics-wizard" aria-label="Close analytics rule wizard">✕</button>
+  </div>
+  <div class="wizard-body">
+    <div class="wizard-tabs">
+      <button class="wizard-tab" type="button" onclick="setAnalyticsWizardStep(0)">General</button>
+      <button class="wizard-tab active" type="button" onclick="setAnalyticsWizardStep(1)">Set rule logic</button>
+      <button class="wizard-tab" type="button" onclick="setAnalyticsWizardStep(2)">Incident settings</button>
+      <button class="wizard-tab" type="button" onclick="setAnalyticsWizardStep(3)">Automated response</button>
+      <button class="wizard-tab" type="button" onclick="setAnalyticsWizardStep(4)">Review and create</button>
+    </div>
+
+    <div class="wizard-step" data-wizard-step="0">
+      <p class="wizard-intro">Choose the rule type, then name the analytics rule and set the default severity shown in the incident queue.</p>
+      <div class="wizard-section">
+        <h3>Rule type</h3>
+        <input type="hidden" id="analytics-rule-type" value="scheduled">
+        <div id="analytics-rule-type-list" class="rule-type-grid"></div>
+        <div id="analytics-rule-type-detail" class="callout info rule-type-detail"></div>
+      </div>
+      <div class="wizard-section">
+        <div class="form-grid two">
+          <label class="lbl">Rule name<input class="ipt" id="analytics-rule-name" value="High-risk sign-in from unfamiliar location"></label>
+          <label class="lbl">Severity<select class="ipt" id="analytics-rule-severity"><option>High</option><option selected>Medium</option><option>Low</option><option>Informational</option></select></label>
+          <label class="lbl">MITRE tactics<input class="ipt" id="analytics-rule-tactics" value="Initial Access, Credential Access"></label>
+          <label class="lbl">Status<select class="ipt"><option selected>Enabled</option><option>Disabled</option></select></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="wizard-step active" data-wizard-step="1">
+      <p class="wizard-intro" id="analytics-logic-intro">Define the detection logic for this analytics rule.</p>
+
+      <div class="wizard-section">
+        <label class="wizard-label" for="analytics-rule-query">Rule query</label>
+        <div class="wizard-helper">Query time filters should stay aligned with the scheduling window configured for this rule.</div>
+        <div class="wizard-query-wrap">
+          <textarea id="analytics-rule-query" class="wizard-query" spellcheck="false"></textarea>
+          <button class="wizard-expand" type="button" title="Expand query editor" aria-label="Expand query editor">↗</button>
+        </div>
+        <button class="wizard-link" type="button" onclick="previewAnalyticsWizardResults()">View query results ›</button>
+        <div id="analytics-wizard-results" class="wizard-results hidden"></div>
+      </div>
+
+      <div class="wizard-section">
+        <h3>Alert enhancement</h3>
+        <div class="wizard-accordion">
+          <button class="wizard-accordion-row active" type="button" onclick="toggleWizardAccordion(this)">
+            <span class="wizard-caret"></span>
+            <span>Entity mapping</span>
+          </button>
+          <div class="wizard-accordion-content">
+            <p class="wizard-helper entity-map-help">
+              Map query result columns to SIEM entities so incidents can pivot across accounts, hosts, IPs, resources, and messages.
+              Up to 10 entities can be mapped; each entity supports up to 3 identifiers.
+            </p>
+            <div class="entity-picker-wrap">
+              <button id="entity-picker-button" class="entity-picker-button" type="button" onclick="toggleEntityCatalog()">
+                <span>Entity</span>
+                <span class="select-caret"></span>
+              </button>
+              <div id="entity-catalog" class="entity-catalog hidden">
+                <div class="entity-catalog-header"><span class="entity-catalog-icon">S</span> SIEM entities</div>
+                <div id="entity-catalog-list" class="entity-catalog-list"></div>
+              </div>
+            </div>
+            <button class="wizard-link entity-add-link" type="button" onclick="addEntityMapping()">+ Add new entity</button>
+            <div id="entity-mapping-list" class="entity-mapping-list"></div>
+            <div class="entity-limit muted" id="entity-limit">0 of 10 entities mapped</div>
+          </div>
+          <button class="wizard-accordion-row active" type="button" onclick="toggleWizardAccordion(this)">
+            <span class="wizard-caret"></span>
+            <span>Query scheduling</span>
+          </button>
+          <div class="wizard-accordion-content">
+            <div class="schedule-grid">
+              <label>Run query every <span class="required">*</span><input class="ipt" id="analytics-run-every" value="5 minutes"></label>
+              <label>Lookup data from the last <span class="required">*</span><input class="ipt" id="analytics-lookback" value="5 minutes"></label>
+              <label>Start running<input class="ipt" id="analytics-start" value="Automatically"></label>
+            </div>
+            <div id="analytics-rule-type-limits" class="rule-limit-list"></div>
+          </div>
+          <button class="wizard-accordion-row" type="button" onclick="toggleWizardAccordion(this)">
+            <span class="wizard-caret"></span>
+            <span>Custom details</span>
+          </button>
+          <div class="wizard-accordion-content">
+            <div class="muted">Add result columns that should appear as alert properties.</div>
+          </div>
+          <button class="wizard-accordion-row" type="button" onclick="toggleWizardAccordion(this)">
+            <span class="wizard-caret"></span>
+            <span>Alert details</span>
+          </button>
+          <div class="wizard-accordion-content">
+            <div class="muted">Map query fields into the alert title, description, and severity override.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-wizard-step="2">
+      <p class="wizard-intro">Choose how alerts generated by this rule become incidents.</p>
+      <div class="wizard-section form-grid two">
+        <label class="lbl">Create incidents from alerts<select class="ipt"><option selected>Enabled</option><option>Disabled</option></select></label>
+        <label class="lbl">Group alerts into a single incident<select class="ipt"><option selected>Enabled</option><option>Disabled</option></select></label>
+        <label class="lbl">Grouping window<input class="ipt" value="5 hours"></label>
+        <label class="lbl">Re-open closed matching incidents<select class="ipt"><option>No</option><option selected>Yes</option></select></label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-wizard-step="3">
+      <p class="wizard-intro">Select automation rules or playbooks to run when the analytics rule creates an incident.</p>
+      <div class="wizard-section">
+        <label class="check-row"><input type="checkbox" checked> Auto-assign phishing and identity incidents to L1-Triage</label>
+        <label class="check-row"><input type="checkbox" checked> Tag incidents with identity-attack when Credential Access is mapped</label>
+        <label class="check-row"><input type="checkbox"> Run PB-RevokeOAuthConsent for OAuth consent abuse</label>
+      </div>
+    </div>
+
+    <div class="wizard-step" data-wizard-step="4">
+      <p class="wizard-intro">Review the scheduled analytics rule before creating it in the lab.</p>
+      <div id="analytics-review" class="wizard-review"></div>
+    </div>
+  </div>
+  <div class="wizard-footer">
+    <button id="analytics-wizard-prev" class="btn btn-secondary" type="button" onclick="moveAnalyticsWizardStep(-1)">&lt; Previous</button>
+    <button id="analytics-wizard-next" class="btn btn-primary" type="button" onclick="moveAnalyticsWizardStep(1)">Next: Incident settings &gt;</button>
+    <button class="btn btn-ghost" type="button" data-close="panel-analytics-wizard">Cancel</button>
+  </div>
+</section>
+
+<!-- ALERT DETAIL -->
+<aside id="panel-alert" class="sidepanel hidden">
+  <div class="sidepanel-header">
+    <h2 id="alert-title">Alert</h2>
+    <button class="iconbtn" data-close="panel-alert">✕</button>
+  </div>
+  <div id="alert-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- ADVANCED HUNTING: INSPECT RECORD -->
+<aside id="panel-hunt-record" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="hunt-record-title">
+  <div class="sidepanel-header">
+    <h2 id="hunt-record-title">Inspect record</h2>
+    <button class="iconbtn" data-close="panel-hunt-record" aria-label="Close record details">✕</button>
+  </div>
+  <div id="hunt-record-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEFENDER FOR CLOUD ALERT DETAIL -->
+<aside id="panel-cloud-alert" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-alert-title">
+  <div class="sidepanel-header">
+    <h2 id="cloud-alert-title">Security alert</h2>
+    <button class="iconbtn" data-close="panel-cloud-alert" aria-label="Close alert details">✕</button>
+  </div>
+  <div id="cloud-alert-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEFENDER FOR CLOUD RECOMMENDATION DETAIL -->
+<aside id="panel-cloud-recommendation" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-recommendation-title">
+  <div class="sidepanel-header">
+    <h2 id="cloud-recommendation-title">Security recommendation</h2>
+    <button class="iconbtn" data-close="panel-cloud-recommendation" aria-label="Close recommendation details">✕</button>
+  </div>
+  <div id="cloud-recommendation-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEFENDER FOR CLOUD RESOURCE HEALTH -->
+<aside id="panel-cloud-resource" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-resource-title">
+  <div class="sidepanel-header">
+    <h2 id="cloud-resource-title">Resource health</h2>
+    <button class="iconbtn" data-close="panel-cloud-resource" aria-label="Close resource health">✕</button>
+  </div>
+  <div id="cloud-resource-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEFENDER FOR CLOUD SECURITY INCIDENT -->
+<aside id="panel-cloud-incident" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-incident-title">
+  <div class="sidepanel-header">
+    <h2 id="cloud-incident-title">Security incident</h2>
+    <button class="iconbtn" data-close="panel-cloud-incident" aria-label="Close security incident">✕</button>
+  </div>
+  <div id="cloud-incident-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- THREAT EXPLORER MESSAGE DETAIL -->
+<aside id="panel-threat-message" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="threat-message-title">
+  <div class="sidepanel-header">
+    <h2 id="threat-message-title">Email entity</h2>
+    <button class="iconbtn" data-close="panel-threat-message" aria-label="Close message details">✕</button>
+  </div>
+  <div id="threat-message-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- 365 MESSAGE CENTER READING PANE -->
+<aside id="panel-m365-message" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="m365-message-title">
+  <div class="sidepanel-header">
+    <h2 id="m365-message-title">Message center post</h2>
+    <button class="iconbtn" data-close="panel-m365-message" aria-label="Close message center post">✕</button>
+  </div>
+  <div id="m365-message-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEVICE INVENTORY COLUMN PICKER -->
+<aside id="panel-inventory-columns" class="sidepanel hidden">
+  <div class="sidepanel-header">
+    <h2>🧮 Choose columns</h2>
+    <button class="iconbtn" data-close="panel-inventory-columns">✕</button>
+  </div>
+  <div id="inventory-columns-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEVICE INVENTORY FILTER FLYOUT -->
+<aside id="panel-inventory-filter" class="sidepanel hidden">
+  <div class="sidepanel-header">
+    <h2>🔽 Filters</h2>
+    <button class="iconbtn" data-close="panel-inventory-filter">✕</button>
+  </div>
+  <div id="inventory-filter-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- INCIDENT DETAIL -->
+<aside id="panel-incident" class="sidepanel wide hidden">
+  <div class="sidepanel-header">
+    <h2 id="incident-title">Incident</h2>
+    <button class="iconbtn" data-close="panel-incident">✕</button>
+  </div>
+  <div id="incident-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEVICE RESPONSE ACTIONS -->
+<aside id="panel-device-response" class="sidepanel wide hidden">
+  <div class="sidepanel-header">
+    <h2 id="device-response-title">Device response</h2>
+    <button class="iconbtn" data-close="panel-device-response">✕</button>
+  </div>
+  <div id="device-response-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- DEFENDER TVM DETAIL / WORKFLOW -->
+<aside id="panel-tvm" class="sidepanel wide hidden">
+  <div class="sidepanel-header">
+    <h2 id="tvm-title">Vulnerability management</h2>
+    <button class="iconbtn" data-close="panel-tvm">✕</button>
+  </div>
+  <div id="tvm-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- MSSP CUSTOMER TENANT DETAILS -->
+<aside id="panel-tenant" class="sidepanel wide hidden">
+  <div class="sidepanel-header">
+    <h2 id="tenant-title">Customer tenant</h2>
+    <button class="iconbtn" data-close="panel-tenant">✕</button>
+  </div>
+  <div id="tenant-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- SUPPRESSION RULE EDITOR -->
+<aside id="panel-rule" class="sidepanel hidden wide">
+  <div class="sidepanel-header">
+    <h2>Create suppression rule</h2>
+    <button class="iconbtn" data-close="panel-rule">✕</button>
+  </div>
+  <div class="sidepanel-body">
+    <label class="lbl">Rule name</label>
+    <input id="rule-name" class="ipt" type="text" value="Suppress legitimate vulnerability scanner" />
+
+    <label class="lbl">Triggering IOC (alert applies when ALL conditions match)</label>
+    <div class="callout warn">
+      Defender joins these conditions with logical <strong>AND</strong>.
+      If any one indicator changes (e.g. the file hash after a vendor update),
+      the rule will no longer match and alerts will fire again.
+    </div>
+
+    <div id="conditions"></div>
+    <button id="btn-add-cond" class="btn btn-ghost btn-sm">+ Add condition</button>
+
+    <label class="lbl">Action</label>
+    <select class="ipt"><option>Hide alert</option><option>Auto-resolve alert</option></select>
+
+    <label class="lbl">Scope</label>
+    <select class="ipt"><option>All devices in organization</option><option>Selected device groups</option></select>
+
+    <div class="sidepanel-footer">
+      <button id="btn-save-rule" class="btn btn-primary">Save</button>
+      <button class="btn btn-ghost" data-close="panel-rule">Cancel</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MITRE TECHNIQUE SIDE PANE (Defender for Endpoint device Timeline) -->
+<aside id="panel-technique" class="sidepanel hidden">
+  <div class="sidepanel-header">
+    <h2 id="technique-title">Technique</h2>
+    <button class="iconbtn" data-close="panel-technique">✕</button>
+  </div>
+  <div id="technique-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- EMBEDDED SCRIPT ANALYSIS (from a script-based alert) -->
+<aside id="panel-script" class="sidepanel wide hidden">
+  <div class="sidepanel-header">
+    <h2 id="script-title">Script analysis</h2>
+    <button class="iconbtn" data-close="panel-script">✕</button>
+  </div>
+  <div id="script-body" class="sidepanel-body"></div>
+</aside>
+
+<!-- GUIDED SCENARIO COACH -->
+<aside id="panel-guide" class="guide-panel hidden" aria-live="polite">
+  <div class="guide-kicker" id="guide-kicker">Guided scenario</div>
+  <h2 id="guide-title">Scenario step</h2>
+  <p id="guide-body"></p>
+  <div class="guide-actions">
+    <button class="btn btn-ghost btn-sm" id="btn-guide-prev">Back</button>
+    <button class="btn btn-primary btn-sm" id="btn-guide-next">Next</button>
+    <button class="btn btn-ghost btn-sm" id="btn-guide-close">Close</button>
+  </div>
+</aside>
+
+<div id="scrim" class="scrim hidden"></div>
+
+<footer class="legal-footer" id="legal-footer">
+  <span><strong>Hack Smarter Labs</strong> is an independent fictional training
+    simulator. It is not affiliated with, authorized, sponsored, or approved by any software
+    vendor. Interface labels use generic industry terminology, and all lab data is fictional.</span>
+</footer>
+
+<script src="data.js?v=20260817"></script>
+<script src="coach-data.js?v=20260818"></script>
+<script src="helpdesk-data.js?v=20260817"></script>
+<script src="lab-widgets.js?v=20260817"></script>
+<script src="kql-editor.js?v=20260817"></script>
+<script src="guided-hunting.js?v=20260817"></script>
+<script src="views.js?v=20260817"></script>
+<script src="app.js?v=20260817"></script>
+<!-- Loaded last: overrides the static VIEWS['defender-cloud/workflow'] registration. -->
+<script src="workflow-automation.js?v=20260817"></script>
+<script src="helpdesk.js?v=20260817"></script>
+<!-- Loaded after every view registration so its badge sits above the app. -->
+<script src="coach.js?v=20260818"></script>
+<script src="neutral-terminology.js?v=20260817"></script>
+</body>
+</html>

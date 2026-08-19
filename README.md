@@ -1,170 +1,66 @@
-# The Promptware Kill Chain
+# Hack Smarter Labs — Cyber Range
 
-A lightweight, frontend-only SOC training environment, being converted from a
-generic SOC simulator into a range built around **promptware** — the seven-stage
-kill chain (Initial Access → Privilege Escalation → Reconnaissance →
-Persistence → Command & Control → Lateral Movement → Actions on Objective)
-described in Brodt, Feldman, Schneier & Nassi, *"The Promptware Kill Chain"*
-(arXiv:2601.09625, 2026).
-
-Built with **React + Vite**. Deployable to **GitHub Pages** with no backend.
-
-## Nav / incident-response lifecycle mapping
-
-| Nav item      | IR lifecycle phase          | Status |
-| ------------- | ---------------------------- | ------ |
-| Alerts        | Detection (trigger)          | live, on placeholder data |
-| Kill Chain    | Detect & Analyze — dropdown over the 7 promptware stages | shell only, no tasks yet |
-| Containment   | Containment & Eradication     | placeholder |
-| Recovery      | Recovery                      | placeholder |
-| Incident Report | Post-Incident Activity      | live, on placeholder data |
-
-## What it currently simulates (placeholder — being replaced)
-
-The alert/telemetry data still driving Alerts and Incident Report is the
-original **AI-Accelerated Edge Compromise** scenario: an exposed FortiGate
-appliance hit by an AI-augmented brute-force tool that probes admin login
-from a known TOR exit, authenticates as `admin`, exports the device config,
-and mixes in benign workstation noise as a distractor. This has nothing to
-do with promptware — it's placeholder content until a real prompt-injection
-/ AI-agent-compromise narrative is authored for the new stages above.
-
-## Layout
-
-```
-┌────────────────────────────────────────────────────────────┐
-│  Header  (scenario, replay control)                        │
-├──────────┬─────────────────────────────┬───────────────────┤
-│          │                             │  Scenario panel   │
-│  Alert   │       Log / Telemetry       ├───────────────────┤
-│  Queue   │           Viewer            │  Rule Builder     │
-│          │                             │                   │
-├──────────┴─────────────────────────────┴───────────────────┤
-│  Incident Report                       │   Score           │
-└────────────────────────────────────────┴───────────────────┘
-```
-
-## Quickstart
+A single-page, offline SOC cyber range. No sign-in, no curriculum, no portal —
+you land directly in the security workspace and work incidents.
 
 ```bash
-cd hacksmarterSOC
-npm install
-npm run dev
+bin/dev.sh start      # serves ui/ on http://127.0.0.1:8777/
+bin/dev.sh stop
+bin/dev.sh status
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`).
+Or click **Hack Smarter Labs** on the dash.
 
-## Build
+## What it is
+
+`ui/` is the whole product: ~1.4M of static JS/CSS/HTML with no build step and
+no backend. Every alert, incident, device timeline, sign-in log, hunting query
+result, email header, and vulnerability record is fixture data in `ui/data.js`.
+
+| Path | What it holds |
+|---|---|
+| `ui/index.html` | Shell: topbar, workload tabs, panes |
+| `ui/app.js` | Router, nav, chrome, storage |
+| `ui/views.js` | Every view's render function |
+| `ui/data.js` | The entire fictional environment |
+| `ui/neutral-terminology.js` | **Vendor-neutral naming layer — see below** |
+| `ui/helpdesk*.js` | IT Service Desk workload |
+| `ui/kql-editor.js`, `ui/guided-hunting.js` | Hunting query surface |
+| `ui/workflow-automation.js` | SOAR / playbook surface |
+| `ui/coach.js`, `ui/coach-data.js` | Guided walkthrough layer (inert without `?coach=`) |
+
+## Vendor-neutral naming is a product rule, not a preference
+
+`ui/neutral-terminology.js` rewrites vendor product names to generic
+security-operations language at render time — "Defender for Endpoint" becomes
+"Endpoint Detection & Response", the tenant is "Hack Smarter Labs", the domain
+is `hacksmarterlabs.example`. Internal identifiers (routes, storage keys,
+fixture field names) stay stable on purpose; only learner-facing strings change.
+
+**Do not reintroduce vendor product names in visible copy.** If you add a view
+that surfaces one, add the mapping to `neutral-terminology.js` instead.
+
+## Provenance
+
+Forked from the Mission Next Technical Academy SOC Analyst course
+(`~/Mission_Next_Technical_Academy_SOC_Analyst_course`). That project is a
+portal + simulator pair; this one keeps only the simulator — the range — and
+drops the login, catalogue, curriculum, module pages, and Supabase backend.
+
+Ports are deliberately distinct so all three can run at once:
+`8765` SC-200 lab · `8767`/`8768` academy sim/portal · `8777` this range.
+
+## Checks
 
 ```bash
-npm run build      # outputs dist/
-npm run preview    # serves dist/ locally
+node bin/render_all.js    # render every view; sweep NAV routes for dead links
+bin/qa-sweep.sh           # syntax + render, logs to docs/QA_LOG.md
 ```
 
-## OVA Appliance
+`purview/audit: tiny/empty render` is a known pre-existing failure inherited
+from upstream; it is not a rebrand regression.
 
-The supported appliance path is `appliance/debian/`.
+## Disclaimer
 
-```bash
-appliance/debian/build-ova.sh
-```
-
-That flow builds `dist/`, installs it into a minimal Debian VM with native `nginx`, hardens the guest, and exports `appliance/debian/output/hacksmarter-soc.ova`.
-
-## Deploy to GitHub Pages
-
-1. Create a GitHub repo (e.g. `hacksmarter-soc`) and push this folder.
-2. Build with the correct base path (matches the repo name):
-
-   ```bash
-   VITE_BASE=/hacksmarter-soc/ npm run build
-   ```
-
-3. Deploy `dist/`. Easiest:
-
-   ```bash
-   npm run deploy   # uses gh-pages package, pushes dist/ to gh-pages branch
-   ```
-
-4. In **Settings → Pages**, set source to `gh-pages` branch.
-
-## Adding a new scenario
-
-1. Drop a new JSON file in `public/scenarios/`, e.g. `okta_token_theft.json`. Schema:
-
-   ```json
-   {
-     "id": "okta_token_theft",
-     "name": "...",
-     "summary": "...",
-     "narrative": ["..."],
-     "objectives": ["..."],
-     "iocs": ["..."],
-     "duration": 90,
-     "replayLogIds": ["LOG-100", "..."],
-     "expectedDetections": ["LOG-101"]
-   }
-   ```
-
-2. Add the new alerts to `public/data/alerts.json` (set `scenario` to the new ID, give each a `tOffset` in seconds).
-3. Add the supporting logs to `public/data/logs.json`.
-4. (Optional) add IOCs to `public/data/iocs.json`.
-5. Update the fetch in `src/App.jsx` if you want to swap which scenario loads, or extend it to a scenario selector.
-
-## File layout
-
-```
-hacksmarterSOC/
-├─ public/
-│  ├─ data/
-│  │  ├─ alerts.json
-│  │  ├─ logs.json
-│  │  └─ iocs.json
-│  └─ scenarios/
-│     └─ promptware_kill_chain.json
-├─ src/
-│  ├─ App.jsx              # composes the SOC layout
-│  ├─ main.jsx
-│  ├─ styles.css
-│  ├─ components/
-│  │  ├─ Header.jsx
-│  │  ├─ AlertQueue.jsx
-│  │  ├─ LogViewer.jsx
-│  │  ├─ ScenarioPanel.jsx
-│  │  ├─ RuleBuilder.jsx
-│  │  ├─ ReportPanel.jsx
-│  │  └─ ScorePanel.jsx
-│  ├─ hooks/
-│  │  ├─ useAlertStream.js   # setInterval-based alert reveal
-│  │  └─ useReplay.js        # ticks through scenario logs
-│  └─ lib/
-│     ├─ ruleEngine.js       # eq / contains / regex
-│     └─ scoring.js          # triage + detection + timing + report
-├─ index.html
-├─ vite.config.js
-└─ package.json
-```
-
-## Scoring
-
-| Component               | Max | Notes                                                  |
-| ----------------------- | --- | ------------------------------------------------------ |
-| Triage accuracy         | 30  | +6 per correct verdict, −5 per wrong                  |
-| Detection coverage      | 30  | Rules firing on `expectedDetections` log IDs           |
-| Rule false positives    | −15 | Penalty for rules that match non-expected logs         |
-| Early-detection bonus   | 10  | Awarded once any expected detection fires              |
-| Incident report quality | 30  | Verdict + severity + IOC selection + narrative length  |
-
-## Suggested first rules (try these)
-
-- `event` **equals** `auth.login.fail` — catches the brute force.
-- `event` **equals** `config.export` — catches the exfiltration.
-- `src_ip` **equals** `185.220.101.42` — catches the IOC IP.
-
-## Design notes
-
-- **No backend.** All data is fetched as static JSON from `/public/`.
-- **Streaming** is simulated via `setInterval` against alerts' `tOffset` timestamps.
-- **Replay** ticks one log per second through `scenario.replayLogIds`.
-- **Rule engine** supports `eq`, `contains`, and `regex` against any log field.
-- **State** is plain `useState` / `useMemo` — no Redux, no context gymnastics.
+Independent fictional training simulator. Not affiliated with, authorized,
+sponsored, or approved by any software vendor. All data is fictional.
