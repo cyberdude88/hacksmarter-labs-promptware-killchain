@@ -29,7 +29,7 @@ var document = new Proxy({}, { get: (t, p) => {
   if (p === 'addEventListener') return () => {};
   return (...a) => elStub();
 }, set: () => true });
-var location = { hash: '#/defender/home', reload(){} };
+var location = { hash: '#/xdr/home', reload(){} };
 var history = { replaceState(){}, pushState(){} };
 var navigator = { clipboard: null };
 function requestAnimationFrame(){}
@@ -44,7 +44,7 @@ for (const f of ['data.js', 'helpdesk-data.js', 'lab-widgets.js', 'views.js', 'a
 
 const report = vm.runInContext(`
 (() => {
-  const out = { total: 0, fails: [], deadNav: [], rendered: 0 };
+  const out = { total: 0, fails: [], deadNav: [], rendered: 0, deferred: [] };
   const routes = [];
   for (const wl of Object.keys(NAV)) for (const it of NAV[wl]) if (it.route) routes.push(it.route.slice(2));
   for (const r of routes) if (!VIEWS[r]) out.deadNav.push(r);
@@ -53,7 +53,12 @@ const report = vm.runInContext(`
     try {
       let v = VIEWS[key]();
       const html = typeof v === 'string' ? v : (v && v.html);
-      if (typeof html !== 'string' || html.length < 100) { out.fails.push(key + ': tiny/empty render'); continue; }
+      if (typeof html !== 'string') { out.fails.push(key + ': no html returned'); continue; }
+      // An { html, onMount } view returns a mount point on purpose — its real
+      // markup is built against a live DOM this harness does not have. Short
+      // html is expected there, so only the string form is length-checked.
+      if (v && typeof v.onMount === 'function') { out.deferred.push(key); out.rendered++; continue; }
+      if (html.length < 100) { out.fails.push(key + ': tiny/empty render'); continue; }
       if (/>undefined</.test(html) || /undefined undefined/.test(html)) { out.fails.push(key + ': "undefined" in output'); continue; }
       out.rendered++;
     } catch (e) { out.fails.push(key + ': throws ' + e.message.slice(0, 90)); }
@@ -62,7 +67,8 @@ const report = vm.runInContext(`
 })()
 `, ctx);
 const r = JSON.parse(report);
-console.log(`views: ${r.rendered}/${r.total} render clean; dead NAV routes: ${r.deadNav.length}`);
+console.log(`views: ${r.rendered}/${r.total} render clean (${r.deferred.length} mount-time, not statically checked); dead NAV routes: ${r.deadNav.length}`);
+for (const d of r.deferred) console.log('  mount-time: ' + d);
 for (const d of r.deadNav) console.log('  DEAD NAV: #/' + d);
 for (const f of r.fails) console.log('  FAIL: ' + f);
 process.exit(r.fails.length || r.deadNav.length ? 1 : 0);

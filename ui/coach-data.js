@@ -25,7 +25,7 @@ const MODULE_COACHES = [
     role: 'Tier 1 SOC analyst',
     summary: 'Open the alert, find the evidence behind it in the sign-in log, then take your verdict back to the module.',
     completionToken: 'm01',
-    home: '#/defender/alerts',
+    home: '#/xdr/alerts',
     resetState: () => {
       sessionStorage.removeItem('defender-lab.signin.user');
       sessionStorage.removeItem('defender-lab.signin.result');
@@ -37,10 +37,10 @@ const MODULE_COACHES = [
     // verdict depends on is readable in the sign-in log; the account owner's
     // denial is handed to the student in the module's own evidence panel, the
     // way a service-desk callback would reach a Tier 1 analyst.
-    allow: ['#/defender/alerts', '#/entra/sign-in-logs'],
+    allow: ['#/xdr/alerts', '#/identity/sign-in-logs'],
     steps: [
       {
-        route: '#/defender/alerts',
+        route: '#/xdr/alerts',
         target: 'tr[data-alert-id="A1701"]',
         require: true,
         title: 'Start at the alert',
@@ -54,7 +54,7 @@ const MODULE_COACHES = [
         },
       },
       {
-        route: '#/defender/alerts',
+        route: '#/xdr/alerts',
         // The pivot lives in the alert pane, not the left rail: the rail on this
         // page belongs to Defender, and the sign-in log is an identity surface.
         // Following evidence from an alert into the log that recorded it is the
@@ -66,10 +66,10 @@ const MODULE_COACHES = [
         body: 'The pane claims eight failures then a success, one source address, and an unmanaged browser. That is a lead, not proof the session was unauthorized. Note the Medium severity, then follow the highlighted pivot to the <strong>sign-in log</strong> that recorded the activity. In a SIEM the first question is always "which log would record this?"',
         waitLabel: 'I am in the sign-in log',
         nudge: 'Use the highlighted "Investigate sign-ins for this account" button in the alert pane.',
-        check: () => location.hash === '#/entra/sign-in-logs',
+        check: () => location.hash === '#/identity/sign-in-logs',
       },
       {
-        route: '#/entra/sign-in-logs',
+        route: '#/identity/sign-in-logs',
         target: '#signin-user-filter',
         require: true,
         title: 'Narrow the log to one account',
@@ -83,7 +83,7 @@ const MODULE_COACHES = [
         check: () => sessionStorage.getItem('defender-lab.signin.user') === 'j.santos@hacksmarterlabs.example',
       },
       {
-        route: '#/entra/sign-in-logs',
+        route: '#/identity/sign-in-logs',
         target: '.signin-row[data-signin-id="SL-019"]',
         require: true,
         waitLabel: 'Next: find the success',
@@ -99,7 +99,7 @@ const MODULE_COACHES = [
         body: 'The eight failures from 09:02–09:08 all came from 185.220.101.24. At 09:09:41 the same IP succeeded. That change—from blocked attempts to obtained access—is the critical fact. Open the highlighted success to inspect whether its context fits the account owner.',
       },
       {
-        route: '#/entra/sign-in-logs',
+        route: '#/identity/sign-in-logs',
         target: null,
         title: 'You have the facts',
         instruction: 'You have the evidence. Take it back to Module 1 and record your verdict.',

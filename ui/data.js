@@ -644,7 +644,7 @@ const ATTACK_STORIES = {
         verdict:'At risk', remediation:'Exfil of quarterly forecasts possible.' },
       { id:'cfo-mailbox', type:'Mailbox', label:'CFO mailbox delegate', ring:2,
         verdict:'At risk', remediation:'CFO inbox readable via Mail.ReadWrite app scope.' },
-      { id:'m365-admin', type:'Role', label:'M365 admin role', ring:2,
+      { id:'workspace', type:'Role', label:'M365 admin role', ring:2,
         verdict:'At risk', remediation:'Possible role escalation via app consent.' },
       { id:'teams-channel', type:'Channel', label:'Finance Teams channel', ring:2,
         verdict:'Adjacent', remediation:'Cross-app token may reach Teams chat history.' },
@@ -3274,43 +3274,122 @@ const COMPLIANCE_FRAMEWORKS = [
   { name:'CIS Azure Foundations Benchmark 2.0',percent:69, passing:118, failing:53 },
 ];
 
+// Data loss prevention model.
+//
+// Policy state and per-rule configured action are separate fields on purpose:
+// the action a rule ENFORCES at runtime is a function of both, and that
+// function is the single most-missed idea in DLP deployment. A rule configured
+// to Block only actually blocks when its policy is enforcing — in simulation
+// the same rule audits, and in simulation-with-tips it degrades to
+// block-with-override. dlpAppliedAction() below is the whole truth table, and
+// the policies tab renders configured-vs-applied side by side so the learner
+// sees the gap rather than being told about it.
+//
+// Action restrictiveness, least to most: allow < audit < block-override < block.
+const DLP_ACTIONS = {
+  'allow':          { label:'Allow',              rank:0, note:'Activity proceeds. Audit data only, no notification.' },
+  'audit':          { label:'Audit only',         rank:1, note:'Activity proceeds. Audited, and may notify or alert.' },
+  'block-override': { label:'Block with override',rank:2, note:'Blocked by default; the user may override with a justification.' },
+  'block':          { label:'Block',              rank:3, note:'Blocked unconditionally.' },
+};
+
+const DLP_POLICY_STATES = {
+  'off':             { label:'Off',                      note:'Inactive. Use while drafting or reviewing a policy.' },
+  'simulation':      { label:'Simulation',               note:'Runs as if enforcing, enforces nothing. Matches land in the simulation view, not in production results.' },
+  'simulation-tips': { label:'Simulation + policy tips', note:'No enforcement, but users see tips and notifications — trains users ahead of enforcement.' },
+  'on':              { label:'On',                       note:'Full enforcement. Configured actions apply.' },
+};
+
+// The runtime truth table. A configured action plus a policy state yields the
+// action actually applied.
+function dlpAppliedAction(configured, state) {
+  if (state === 'off') return null;
+  if (state === 'on') return configured;
+  if (configured === 'allow') return 'allow';
+  if (state === 'simulation-tips') {
+    // Tips give the user something to act on, so a block degrades to a block
+    // the user can override rather than to a silent audit.
+    return (configured === 'block' || configured === 'block-override') ? 'block-override' : 'audit';
+  }
+  return 'audit'; // plain simulation audits everything it would have acted on
+}
+
 const DLP_POLICIES = [
-  { id:'DLP-001', name:'U.S. Financial Data',
-    scope:'Exchange, SharePoint, OneDrive, Teams', enabled:true,
+  { id:'DLP-001', name:'U.S. Financial Data', priority:1, state:'on',
+    scope:'Mail, Document Sites, Personal Drives, Chat', enabled:true,
     rules:[
-      { name:'Block sharing externally',
-        conditions:['Content contains: Credit card number (count ≥ 1, confidence ≥ 85%)','OR Content contains: U.S. bank account number'],
+      { name:'Block sharing externally', configuredAction:'block',
+        conditions:['Content contains: Credit card number (count \u2265 1, confidence \u2265 85%)','OR Content contains: U.S. bank account number'],
         actions:['Block access for external users','Notify user with policy tip','Generate incident report (high severity)'] },
     ] },
-  { id:'DLP-002', name:'PII protection (U.S.)',
-    scope:'Exchange, SharePoint, OneDrive, Teams, Endpoint', enabled:true,
+  { id:'DLP-002', name:'PII protection (U.S.)', priority:2, state:'on',
+    scope:'Mail, Document Sites, Personal Drives, Chat, Endpoint', enabled:true,
     rules:[
-      { name:'Warn on egress',
-        conditions:['Content contains: U.S. Social Security Number (count ≥ 1, confidence ≥ 85%)'],
+      { name:'Warn on egress', configuredAction:'block-override',
+        conditions:['Content contains: U.S. Social Security Number (count \u2265 1, confidence \u2265 85%)'],
         actions:['User override allowed with business justification','Notify compliance officer'] },
     ] },
-  { id:'DLP-003', name:'Source code protection',
+  { id:'DLP-003', name:'Source code protection', priority:3, state:'simulation',
     scope:'Endpoint DLP', enabled:false,
     rules:[
-      { name:'Block upload to non-corporate cloud',
+      { name:'Block upload to non-corporate cloud', configuredAction:'block',
         conditions:['File extension is one of: .cs, .ts, .py, .go','AND Sensitive label = Confidential\\Engineering'],
         actions:['Block upload to non-allowed cloud services','Audit copy to USB'] },
     ] },
+  { id:'DLP-004', name:'Health records (HIPAA)', priority:4, state:'simulation-tips',
+    scope:'Mail, Document Sites, Personal Drives', enabled:false,
+    rules:[
+      { name:'Restrict PHI egress', configuredAction:'block',
+        conditions:['Content contains: U.S. Health Insurance Number (count \u2265 1)','OR Content contains: Medical terms dictionary (count \u2265 5)'],
+        actions:['Block external sharing','Notify user with policy tip','Notify privacy office'] },
+    ] },
 ];
 
+// Alerts, not "incidents" — an alert is one policy match; the XDR side groups
+// correlated alerts into incidents. Keeping the distinction is the point.
 const DLP_INCIDENTS = [
   { id:'DLP-1007', severity:'high', status:'Needs review', policy:'U.S. Financial Data',
-    user:'jdoe@hacksmarterlabs.example', location:'OneDrive', item:'customer-list.xlsx',
+    user:'jdoe@hacksmarterlabs.example', location:'Personal Drives', item:'customer-list.xlsx',
     activity:'External share blocked', sensitiveInfo:['Credit card number','U.S. bank account number'],
-    time:'2026-06-28T15:00:11Z',
+    time:'2026-06-28T15:00:11Z', owner:'', verdict:'', insiderRisk:'Medium',
+    matchCount:14, appliedAction:'block',
+    what:'A workbook holding 14 payment-card values and 3 bank account numbers was shared to an address outside the organization. The highest-priority enforcing policy blocked the share.',
+    who:'jdoe is a Finance analyst with no prior policy matches in the last 90 days.',
     timeline:['Sensitive info detected in workbook','External sharing attempt blocked','User shown policy tip','Incident report generated'],
+    events:[
+      { time:'2026-06-28T14:58:02Z', activity:'File accessed',   item:'customer-list.xlsx', detail:'Opened from Personal Drives', verdict:'' },
+      { time:'2026-06-28T15:00:11Z', activity:'Share attempted', item:'customer-list.xlsx', detail:'Link created for supplier-portal.example (external)', verdict:'' },
+      { time:'2026-06-28T15:00:11Z', activity:'Action enforced', item:'customer-list.xlsx', detail:'Block applied; policy tip shown to user', verdict:'' },
+    ],
     actions:['Keep block','Notify manager','Allow override with business justification','Escalate to eDiscovery'] },
   { id:'DLP-1012', severity:'medium', status:'User override requested', policy:'PII protection (U.S.)',
-    user:'maria.ross@hacksmarterlabs.example', location:'SharePoint', item:'employee-roster.csv',
+    user:'maria.ross@hacksmarterlabs.example', location:'Document Sites', item:'employee-roster.csv',
     activity:'Download warning acknowledged', sensitiveInfo:['U.S. Social Security Number'],
-    time:'2026-06-28T12:38:00Z',
+    time:'2026-06-28T12:38:00Z', owner:'', verdict:'', insiderRisk:'Low',
+    matchCount:212, appliedAction:'block-override',
+    what:'A roster containing 212 national identity numbers was downloaded after the user supplied a business justification to override the block.',
+    who:'maria.ross is an HR generalist. Roster exports are an expected part of the role, which is what makes the override plausible.',
     timeline:['PII detected','Policy tip displayed','User entered business justification','Reviewer approval pending'],
+    events:[
+      { time:'2026-06-28T12:36:41Z', activity:'File accessed',   item:'employee-roster.csv', detail:'Opened from the HR document site', verdict:'' },
+      { time:'2026-06-28T12:38:00Z', activity:'Download blocked',item:'employee-roster.csv', detail:'Block with override presented', verdict:'' },
+      { time:'2026-06-28T12:38:52Z', activity:'Override used',   item:'employee-roster.csv', detail:'Justification: "Quarterly benefits reconciliation, approved by O. Brooks"', verdict:'' },
+    ],
     actions:['Approve override','Reject override','Request more context'] },
+  { id:'DLP-1019', severity:'high', status:'Needs review', policy:'Source code protection',
+    user:'apatel@hacksmarterlabs.example', location:'Endpoint', item:'ingest_pipeline.py',
+    activity:'Upload to personal cloud storage', sensitiveInfo:['Source code','Label: Confidential\\Engineering'],
+    time:'2026-06-29T02:14:30Z', owner:'', verdict:'', insiderRisk:'High',
+    matchCount:1, appliedAction:'audit',
+    what:'A labeled source file was uploaded to a consumer file-sharing site from a managed endpoint at 02:14 local time. The matching policy is in simulation, so nothing was blocked \u2014 the upload succeeded and only an audit record exists.',
+    who:'apatel is an Inventory Planner. Source code egress is well outside the role, and the hour is unusual for this user.',
+    timeline:['Labeled file read from endpoint','Upload to consumer storage observed','Policy in simulation \u2014 audit only, no block','Alert raised for review'],
+    events:[
+      { time:'2026-06-29T02:12:07Z', activity:'File read',       item:'ingest_pipeline.py', detail:'Read from C:\\repos\\ingest\\', verdict:'' },
+      { time:'2026-06-29T02:14:30Z', activity:'Upload observed', item:'ingest_pipeline.py', detail:'POST to consumer-drive.example (not an allowed destination)', verdict:'' },
+      { time:'2026-06-29T02:15:11Z', activity:'Audit recorded',  item:'ingest_pipeline.py', detail:'Simulation mode \u2014 configured Block applied as Audit', verdict:'' },
+    ],
+    actions:['Escalate to insider risk','Move policy to enforce','Contact the user\u2019s manager','Preserve endpoint evidence'] },
 ];
 
 const INSIDER_RISK_POLICIES = [
@@ -3401,32 +3480,32 @@ const LIFECYCLE_POLICIES = [
 ];
 
 const PURVIEW_SOLUTIONS = [
-  { area:'Core', name:'Classic governance portal', route:'#/purview/classic-governance',
+  { area:'Core', name:'Classic governance portal', route:'#/governance/classic-governance',
     detail:'Launch the support-mode classic governance experience for catalog, data health insights, and workflow labs.' },
-  { area:'Data Security', name:'Data Loss Prevention', route:'#/purview/dlp',
+  { area:'Data Security', name:'Data Loss Prevention', route:'#/governance/dlp',
     detail:'Protect sensitive content across Exchange, SharePoint, OneDrive, Teams, and endpoints.' },
-  { area:'Data Security', name:'Information Protection', route:'#/purview/information-protection',
+  { area:'Data Security', name:'Information Protection', route:'#/governance/information-protection',
     detail:'Create sensitivity labels, label policies, and automatic classification behavior.' },
-  { area:'Risk & Compliance', name:'Insider Risk Management', route:'#/purview/insider-risk',
+  { area:'Risk & Compliance', name:'Insider Risk Management', route:'#/governance/insider-risk',
     detail:'Detect risky user activity and manage investigation cases.' },
-  { area:'Risk & Compliance', name:'Communication Compliance', route:'#/purview/communication-compliance',
+  { area:'Risk & Compliance', name:'Communication Compliance', route:'#/governance/communication-compliance',
     detail:'Review policy matches in Teams, Exchange, and other communication channels.' },
-  { area:'Risk & Compliance', name:'eDiscovery', route:'#/purview/ediscovery',
+  { area:'Risk & Compliance', name:'eDiscovery', route:'#/governance/ediscovery',
     detail:'Create cases, manage custodians, preserve content, and run searches.' },
-  { area:'Data Governance', name:'Records Management', route:'#/purview/records',
+  { area:'Data Governance', name:'Records Management', route:'#/governance/records',
     detail:'Publish retention and record labels and review disposition workflows.' },
-  { area:'Data Governance', name:'Data Lifecycle Management', route:'#/purview/lifecycle',
+  { area:'Data Governance', name:'Data Lifecycle Management', route:'#/governance/lifecycle',
     detail:'Manage aging content, inactive locations, and retention-driven cleanup.' },
-  { area:'Core', name:'Audit', route:'#/purview/audit',
+  { area:'Core', name:'Audit', route:'#/governance/audit',
     detail:'Search 365 audit events by operation, user, workload, and IP address.' },
 ];
 
 const CLASSIC_PURVIEW_FEATURES = [
-  { name:'Data Catalog (classic)', route:'#/purview/classic-governance',
+  { name:'Data Catalog (classic)', route:'#/governance/classic-governance',
     detail:'Search and browse registered data assets, recent assets, owned assets, and glossary-linked metadata.' },
-  { name:'Data Health Insights (classic)', route:'#/purview/classic-governance',
+  { name:'Data Health Insights (classic)', route:'#/governance/classic-governance',
     detail:'Review catalog analytics such as sources, assets, glossary terms, ownership, and curation health.' },
-  { name:'Purview Workflow (classic)', route:'#/purview/classic-governance',
+  { name:'Purview Workflow (classic)', route:'#/governance/classic-governance',
     detail:'Model approval workflows for glossary changes, access requests, and governance review tasks.' },
 ];
 
@@ -3465,17 +3544,17 @@ const GUIDED_SCENARIOS = [
     archetype:'Suppression rule drift',
     summary:'Follow the scanner.exe alerts from suppression success to post-update hash drift.',
     steps:[
-      { route:'#/defender/home', target:'.guided-scenario-card',
+      { route:'#/xdr/home', target:'.guided-scenario-card',
         title:'Start from the shift dashboard',
         body:'Pick the noisy scanner scenario from the home view, then move into the alert queue where the suppression behavior is visible.' },
-      { route:'#/defender/alerts', target:'.grid tbody tr:nth-child(3)',
+      { route:'#/xdr/alerts', target:'.grid tbody tr:nth-child(3)',
         title:'Open the post-update alert',
         body:'The first two scanner.exe detections are suppressed. The post-update events still have the same file name, but the hash changed, so the AND rule no longer matches.',
         actionLabel:'Open alert A003', action:'openAlert:A003' },
-      { route:'#/defender/alerts', target:'#panel-alert .callout.warn',
+      { route:'#/xdr/alerts', target:'#panel-alert .callout.warn',
         title:'Inspect the rule evaluation',
         body:'The alert detail shows which condition failed. In real tuning work, this is where you decide whether a hash is too volatile for the rule.' },
-      { route:'#/defender/suppression', target:'.callout',
+      { route:'#/xdr/suppression', target:'.callout',
         title:'Review the suppression design',
         body:'Use stable indicators when possible, such as signer or controlled install path. Avoid broad file-name-only suppression for attacker look-alikes.' },
     ],
@@ -3486,14 +3565,14 @@ const GUIDED_SCENARIOS = [
     archetype:'DCSync identity attack',
     summary:'Open a correlated incident, review entities, and follow the timeline.',
     steps:[
-      { route:'#/defender/incidents', target:'.grid tbody tr:first-child',
+      { route:'#/xdr/incidents', target:'.grid tbody tr:first-child',
         title:'Find the identity incident',
         body:'The incident queue groups related Defender for Identity alerts into a single investigation record.',
         actionLabel:'Open incident INC-1019', action:'openIncident:INC-1019' },
-      { route:'#/defender/incidents', target:'#panel-incident .entity-chip',
+      { route:'#/xdr/incidents', target:'#panel-incident .entity-chip',
         title:'Pivot through evidence',
         body:'Entities identify the service account, domain controller, and source IP that matter for containment and validation.' },
-      { route:'#/sentinel/incidents', target:'.grid tbody tr:first-child',
+      { route:'#/siem/incidents', target:'.grid tbody tr:first-child',
         title:'Confirm Sentinel correlation',
         body:'The same incident pattern appears from the SIEM side, reinforcing queue triage across Defender XDR and Sentinel.' },
     ],
@@ -3504,13 +3583,13 @@ const GUIDED_SCENARIOS = [
     archetype:'KQL threat hunting',
     summary:'Run the saved query that finds suspicious process execution from C:\\Users\\Public.',
     steps:[
-      { route:'#/defender/hunting', target:'#kql',
+      { route:'#/xdr/hunting', target:'#kql',
         title:'Load the hunting query',
         body:'The query searches process execution from a common attacker staging path and excludes routine initiating processes.' },
-      { route:'#/defender/hunting', target:'.kql-toolbar .btn-primary',
+      { route:'#/xdr/hunting', target:'.kql-toolbar .btn-primary',
         title:'Run against fixtures',
         body:'Run the mock query to review endpoint rows, then promote the pattern to detection engineering in Sentinel analytics.' },
-      { route:'#/sentinel/analytics', target:'.grid tbody tr:first-child',
+      { route:'#/siem/analytics', target:'.grid tbody tr:first-child',
         title:'Connect hunting to rules',
         body:'Scheduled analytics rules turn repeatable hunting logic into alerting with severity, frequency, and MITRE mapping.' },
     ],
@@ -3521,10 +3600,10 @@ const GUIDED_SCENARIOS = [
     archetype:'M365 audit investigation',
     summary:'Use Purview audit events to validate who performed a sensitive operation.',
     steps:[
-      { route:'#/purview/audit', target:'.card.card-body',
+      { route:'#/governance/audit', target:'.card.card-body',
         title:'Set audit criteria',
         body:'Audit search narrows activity by operation, user, workload, and time window during an investigation.' },
-      { route:'#/purview/audit', target:'.grid tbody tr:nth-child(2)',
+      { route:'#/governance/audit', target:'.grid tbody tr:nth-child(2)',
         title:'Review privileged activity',
       body:'The result set includes role assignment, file access, consent grant, and identity replication events for cross-checking incident evidence.' },
     ],
@@ -3535,11 +3614,11 @@ const GUIDED_SCENARIOS = [
     archetype:'Embedded to standalone',
     summary:'Jump from the Defender home guided scenario into the matching standalone Copilot session.',
     steps:[
-      { route:'#/defender/home', target:'.guided-scenario-card',
+      { route:'#/xdr/home', target:'.guided-scenario-card',
         title:'Open the local Copilot session',
         body:'Use the guided scenario overlay to jump into the same transcript that the embedded topbar Copilot panel references.',
         actionLabel:'Open session cs-009', action:'openCopilotSession:cs-009' },
-      { route:'#/copilot/session', target:'.copilot-session-detail',
+      { route:'#/ai-agent/session', target:'.copilot-session-detail',
         title:'Review the standalone transcript',
         body:'The session detail view keeps the transcript, pin board, and rerun controls in one place so you can study the same investigation outside the embedded panel.' },
     ],
@@ -3582,14 +3661,17 @@ const FIELDS = [
   { key:'signer',    label:'Signer' },
 ];
 
+// Workload ids are the route namespace (#/<id>/<page>), so they are
+// learner-facing and carry no vendor product names — the same rule the
+// terminology layer applies to visible copy.
 const PORTALS = [
-  { id:'defender',      name:'XDR Security',       tag:'XDR · alerts, incidents, hunting',           color:'#0078d4', initial:'XDR' },
-  { id:'sentinel',      name:'SIEM & SOAR',        tag:'SIEM · analytics rules, hunting, automation',color:'#0064bf', initial:'SIEM' },
-  { id:'defender-cloud',name:'Cloud Console',      tag:'CSPM/CWPP · recommendations, compliance',    color:'#5c2d91', initial:'CC' },
-  { id:'purview',       name:'Data Governance',    tag:'Data security · DLP, insider risk, audit',   color:'#038387', initial:'DG' },
-  { id:'copilot',       name:'AI Security Agent',           tag:'Standalone · sessions, promptbooks, plugins, knowledge', color:'#7a7574', initial:'AI' },
-  { id:'entra',         name:'Identity & Access',  tag:'Identity · Conditional Access, Identity Protection', color:'#0b5cab', initial:'IAM' },
-  { id:'m365-admin',    name:'Workspace Admin',    tag:'Tenant admin · users, licenses, health, reports', color:'#7719aa', initial:'WA' },
+  { id:'xdr',        name:'XDR Security',      tag:'XDR · alerts, incidents, hunting',                       color:'#0078d4', initial:'XDR' },
+  { id:'siem',       name:'SIEM & SOAR',       tag:'SIEM · analytics rules, hunting, automation',            color:'#0064bf', initial:'SIEM' },
+  { id:'cloud',      name:'Cloud Console',     tag:'CSPM/CWPP · recommendations, compliance',                color:'#5c2d91', initial:'CC' },
+  { id:'governance', name:'Data Governance',   tag:'Data security · DLP, insider risk, audit',               color:'#038387', initial:'DG' },
+  { id:'ai-agent',   name:'AI Security Agent', tag:'Standalone · sessions, promptbooks, plugins, knowledge', color:'#7a7574', initial:'AI' },
+  { id:'identity',   name:'Identity & Access', tag:'Identity · Conditional Access, Identity Protection',     color:'#0b5cab', initial:'IAM' },
+  { id:'workspace',  name:'Workspace Admin',   tag:'Tenant admin · users, licenses, health, reports',        color:'#7719aa', initial:'WA' },
 ];
 
 // Neutral simulator app launcher. Shown in the outer pane across all workloads;
@@ -3614,183 +3696,183 @@ const CLOUD_NAV = [
 ];
 
 const NAV = {
-  defender: [
-    { route:'#/defender/home',                  label:'Home',                    icon:'🏠' },
+  xdr: [
+    { route:'#/xdr/home',                  label:'Home',                    icon:'🏠' },
     { section:'Exposure management' },
-    { route:'#/defender/exposure',              label:'Overview',                icon:'🎯' },
-    { route:'#/defender/secure-score',          label:'Secure score',            icon:'🛡' },
-    { route:'#/defender/vulnerabilities',       label:'Vulnerability management', icon:'🩹' },
+    { route:'#/xdr/exposure',              label:'Overview',                icon:'🎯' },
+    { route:'#/xdr/secure-score',          label:'Secure score',            icon:'🛡' },
+    { route:'#/xdr/vulnerabilities',       label:'Vulnerability management', icon:'🩹' },
     { section:'Investigation & response' },
     { subsection:'Incidents & alerts' },
-    { route:'#/defender/incidents',             label:'Incidents',               icon:'⛓' },
-    { route:'#/defender/alerts',                label:'Alerts',                  icon:'⚠' },
-    { route:'#/defender/cases',                 label:'Cases',                   icon:'📁' },
-    { route:'#/defender/alert-tuning',          label:'Alert tuning',            icon:'🎚' },
+    { route:'#/xdr/incidents',             label:'Incidents',               icon:'⛓' },
+    { route:'#/xdr/alerts',                label:'Alerts',                  icon:'⚠' },
+    { route:'#/xdr/cases',                 label:'Cases',                   icon:'📁' },
+    { route:'#/xdr/alert-tuning',          label:'Alert tuning',            icon:'🎚' },
     { subsection:'Hunting' },
-    { route:'#/defender/hunting',               label:'Advanced hunting',        icon:'🔎' },
-    { route:'#/defender/custom-detections',     label:'Custom detection rules',  icon:'🧠' },
-    { route:'#/defender/hunting-graph',         label:'Hunting graph (Preview)', icon:'🕸' },
+    { route:'#/xdr/hunting',               label:'Advanced hunting',        icon:'🔎' },
+    { route:'#/xdr/custom-detections',     label:'Custom detection rules',  icon:'🧠' },
+    { route:'#/xdr/hunting-graph',         label:'Hunting graph (Preview)', icon:'🕸' },
     { subsection:'Actions & submissions' },
-    { route:'#/defender/action-center',         label:'Action center',           icon:'🧰' },
-    { route:'#/defender/air',                   label:'AIR center',              icon:'🤖' },
+    { route:'#/xdr/action-center',         label:'Action center',           icon:'🧰' },
+    { route:'#/xdr/air',                   label:'AIR center',              icon:'🤖' },
     { section:'Threat intelligence' },
-    { route:'#/defender/threat-analytics',      label:'Threat analytics',        icon:'📊' },
-    { route:'#/defender/intel-explorer',        label:'Intel explorer',          icon:'🛰' },
-    { route:'#/sentinel/threat-intel',          label:'Intel management',        icon:'🗂' },
+    { route:'#/xdr/threat-analytics',      label:'Threat analytics',        icon:'📊' },
+    { route:'#/xdr/intel-explorer',        label:'Intel explorer',          icon:'🛰' },
+    { route:'#/siem/threat-intel',          label:'Intel management',        icon:'🗂' },
     { section:'Assets' },
-    { route:'#/defender/devices',               label:'Devices',                 icon:'💻' },
-    { route:'#/defender/identities',            label:'Identities',              icon:'🆔' },
-    { route:'#/defender/identity-protection',   label:'Identity protection',     icon:'🔐' },
+    { route:'#/xdr/devices',               label:'Devices',                 icon:'💻' },
+    { route:'#/xdr/identities',            label:'Identities',              icon:'🆔' },
+    { route:'#/xdr/identity-protection',   label:'Identity protection',     icon:'🔐' },
     { section:'Endpoints' },
-    { route:'#/defender/endpoints',             label:'Endpoint security ops',   icon:'💻' },
-    { route:'#/defender/asr-policy',            label:'ASR policies',            icon:'🚧' },
+    { route:'#/xdr/endpoints',             label:'Endpoint security ops',   icon:'💻' },
+    { route:'#/xdr/asr-policy',            label:'ASR policies',            icon:'🚧' },
     { section:'Email & collaboration' },
-    { route:'#/defender/email-collab',          label:'Email & collaboration',   icon:'✉' },
-    { route:'#/defender/threat-explorer',       label:'Threat explorer',         icon:'📧' },
+    { route:'#/xdr/email-collab',          label:'Email & collaboration',   icon:'✉' },
+    { route:'#/xdr/threat-explorer',       label:'Threat explorer',         icon:'📧' },
     { section:'Cloud apps' },
-    { route:'#/defender/cloud-apps',            label:'Cloud apps',              icon:'☁' },
+    { route:'#/xdr/cloud-apps',            label:'Cloud apps',              icon:'☁' },
     { section:'SIEM & SOAR' },
-    { route:'#/sentinel/home',                  label:'Overview',                icon:'🏠' },
-    { route:'#/sentinel/search',                label:'Search',                  icon:'🔎' },
-    { route:'#/sentinel/graph',                 label:'Sentinel Graph',          icon:'🕸' },
+    { route:'#/siem/home',                  label:'Overview',                icon:'🏠' },
+    { route:'#/siem/search',                label:'Search',                  icon:'🔎' },
+    { route:'#/siem/graph',                 label:'Sentinel Graph',          icon:'🕸' },
     { subsection:'Threat management' },
-    { route:'#/sentinel/workbooks',             label:'Workbooks',               icon:'📓' },
-    { route:'#/sentinel/hunting',               label:'Hunting',                 icon:'🔎' },
-    { route:'#/sentinel/notebooks',             label:'Notebooks',               icon:'📔' },
-    { route:'#/sentinel/mitre',                 label:'MITRE ATT&CK',            icon:'🧭' },
+    { route:'#/siem/workbooks',             label:'Workbooks',               icon:'📓' },
+    { route:'#/siem/hunting',               label:'Hunting',                 icon:'🔎' },
+    { route:'#/siem/notebooks',             label:'Notebooks',               icon:'📔' },
+    { route:'#/siem/mitre',                 label:'MITRE ATT&CK',            icon:'🧭' },
     { subsection:'Content management' },
-    { route:'#/sentinel/content-hub',           label:'Content hub',             icon:'🧱' },
-    { route:'#/sentinel/repositories',          label:'Repositories',            icon:'📚' },
-    { route:'#/sentinel/community',             label:'Community',               icon:'💬' },
+    { route:'#/siem/content-hub',           label:'Content hub',             icon:'🧱' },
+    { route:'#/siem/repositories',          label:'Repositories',            icon:'📚' },
+    { route:'#/siem/community',             label:'Community',               icon:'💬' },
     { subsection:'Configuration' },
-    { route:'#/sentinel/data-connectors',       label:'Data connectors',         icon:'🔌' },
-    { route:'#/sentinel/analytics',             label:'Analytics',               icon:'🧠' },
-    { route:'#/sentinel/watchlist',             label:'Watchlists',              icon:'👁' },
-    { route:'#/sentinel/automation',            label:'Automation',              icon:'⚙' },
+    { route:'#/siem/data-connectors',       label:'Data connectors',         icon:'🔌' },
+    { route:'#/siem/analytics',             label:'Analytics',               icon:'🧠' },
+    { route:'#/siem/watchlist',             label:'Watchlists',              icon:'👁' },
+    { route:'#/siem/automation',            label:'Automation',              icon:'⚙' },
     { section:'Other' },
-    { route:'#/defender/reports',               label:'Reports',                 icon:'📑' },
-    { route:'#/defender/learning-hub',          label:'Learning hub',            icon:'🎓' },
-    { route:'#/defender/trials',                label:'Trials',                  icon:'🧪' },
+    { route:'#/xdr/reports',               label:'Reports',                 icon:'📑' },
+    { route:'#/xdr/learning-hub',          label:'Learning hub',            icon:'🎓' },
+    { route:'#/xdr/trials',                label:'Trials',                  icon:'🧪' },
     { section:'System' },
-    { route:'#/defender/settings',              label:'Settings',                icon:'⚙' },
-    { route:'#/sentinel/settings',              label:'SIEM & SOAR',             icon:'🛰' },
-    { route:'#/defender/device-discovery',      label:'Device discovery',        icon:'📡' },
-    { route:'#/defender/suppression',           label:'Suppression rules',       icon:'🔕' },
-    { route:'#/defender/notifications',         label:'Email notifications',     icon:'📨' },
-    { route:'#/defender/mto',                   label:'Multi-tenant management', icon:'👥' },
+    { route:'#/xdr/settings',              label:'Settings',                icon:'⚙' },
+    { route:'#/siem/settings',              label:'SIEM & SOAR',             icon:'🛰' },
+    { route:'#/xdr/device-discovery',      label:'Device discovery',        icon:'📡' },
+    { route:'#/xdr/suppression',           label:'Suppression rules',       icon:'🔕' },
+    { route:'#/xdr/notifications',         label:'Email notifications',     icon:'📨' },
+    { route:'#/xdr/mto',                   label:'Multi-tenant management', icon:'👥' },
     // === local-tasks nav:defender ===
   ],
-  sentinel: [
+  siem: [
     { section:'General' },
-    { route:'#/sentinel/home',                  label:'Overview (Preview)',      icon:'🏠' },
-    { route:'#/sentinel/logs',                  label:'Logs',                    icon:'📜' },
-    { route:'#/sentinel/news',                  label:'News & guides',           icon:'📰' },
-    { route:'#/sentinel/search',                label:'Search',                  icon:'🔎' },
+    { route:'#/siem/home',                  label:'Overview (Preview)',      icon:'🏠' },
+    { route:'#/siem/logs',                  label:'Logs',                    icon:'📜' },
+    { route:'#/siem/news',                  label:'News & guides',           icon:'📰' },
+    { route:'#/siem/search',                label:'Search',                  icon:'🔎' },
     { section:'Threat management' },
-    { route:'#/sentinel/incidents',             label:'Incidents',               icon:'⛓' },
-    { route:'#/sentinel/graph',                 label:'Sentinel Graph',          icon:'🕸' },
-    { route:'#/sentinel/workbooks',             label:'Workbooks',               icon:'📓' },
-    { route:'#/sentinel/hunting',               label:'Hunting',                 icon:'🔎' },
-    { route:'#/sentinel/hunting/dns',           label:'ASIM DNS (Preview)',      icon:'🌐' },
-    { route:'#/sentinel/hunting/authentication', label:'ASIM Authentication (Preview)', icon:'🔐' },
-    { route:'#/sentinel/hunting/network-session', label:'ASIM Network Session (Preview)', icon:'🛰' },
-    { route:'#/sentinel/anomalies',             label:'Anomalies',               icon:'〽' },
-    { route:'#/sentinel/soc-optimization',      label:'SOC optimization',        icon:'📈' },
-    { route:'#/sentinel/summary-rules',         label:'Summary rules',           icon:'∑' },
-    { route:'#/sentinel/data-lake-jobs',        label:'Data lake KQL jobs',      icon:'🌊' },
-    { route:'#/sentinel/notebooks',             label:'Notebooks',               icon:'📓' },
-    { route:'#/sentinel/entity-behavior',       label:'Entity behavior',         icon:'👤' },
-    { route:'#/sentinel/threat-intel',          label:'Threat intelligence',     icon:'🛰' },
-    { route:'#/sentinel/mitre',                 label:'MITRE ATT&CK (Preview)',  icon:'🧭' },
+    { route:'#/siem/incidents',             label:'Incidents',               icon:'⛓' },
+    { route:'#/siem/graph',                 label:'Sentinel Graph',          icon:'🕸' },
+    { route:'#/siem/workbooks',             label:'Workbooks',               icon:'📓' },
+    { route:'#/siem/hunting',               label:'Hunting',                 icon:'🔎' },
+    { route:'#/siem/hunting/dns',           label:'ASIM DNS (Preview)',      icon:'🌐' },
+    { route:'#/siem/hunting/authentication', label:'ASIM Authentication (Preview)', icon:'🔐' },
+    { route:'#/siem/hunting/network-session', label:'ASIM Network Session (Preview)', icon:'🛰' },
+    { route:'#/siem/anomalies',             label:'Anomalies',               icon:'〽' },
+    { route:'#/siem/soc-optimization',      label:'SOC optimization',        icon:'📈' },
+    { route:'#/siem/summary-rules',         label:'Summary rules',           icon:'∑' },
+    { route:'#/siem/data-lake-jobs',        label:'Data lake KQL jobs',      icon:'🌊' },
+    { route:'#/siem/notebooks',             label:'Notebooks',               icon:'📓' },
+    { route:'#/siem/entity-behavior',       label:'Entity behavior',         icon:'👤' },
+    { route:'#/siem/threat-intel',          label:'Threat intelligence',     icon:'🛰' },
+    { route:'#/siem/mitre',                 label:'MITRE ATT&CK (Preview)',  icon:'🧭' },
     { section:'Content management' },
-    { route:'#/sentinel/content-hub',           label:'Content hub',             icon:'🧱' },
-    { route:'#/sentinel/repositories',          label:'Repositories (Preview)',  icon:'📚' },
-    { route:'#/sentinel/community',             label:'Community',               icon:'💬' },
+    { route:'#/siem/content-hub',           label:'Content hub',             icon:'🧱' },
+    { route:'#/siem/repositories',          label:'Repositories (Preview)',  icon:'📚' },
+    { route:'#/siem/community',             label:'Community',               icon:'💬' },
     { section:'Configuration' },
-    { route:'#/sentinel/workspace-manager',     label:'Workspace manager (Preview)', icon:'🧰' },
-    { route:'#/sentinel/data-connectors',       label:'Data connectors',         icon:'🔌' },
-    { route:'#/sentinel/analytics',             label:'Analytics',               icon:'🧠' },
-    { route:'#/sentinel/watchlist',             label:'Watchlist',               icon:'👁' },
-    { route:'#/sentinel/automation',            label:'Automation',              icon:'⚙' },
-    { route:'#/sentinel/settings',              label:'Settings',                icon:'⚙' },
+    { route:'#/siem/workspace-manager',     label:'Workspace manager (Preview)', icon:'🧰' },
+    { route:'#/siem/data-connectors',       label:'Data connectors',         icon:'🔌' },
+    { route:'#/siem/analytics',             label:'Analytics',               icon:'🧠' },
+    { route:'#/siem/watchlist',             label:'Watchlist',               icon:'👁' },
+    { route:'#/siem/automation',            label:'Automation',              icon:'⚙' },
+    { route:'#/siem/settings',              label:'Settings',                icon:'⚙' },
     // === local-tasks nav:sentinel ===
   ],
-  'defender-cloud': [
+  'cloud': [
     { section:'General' },
-    { route:'#/defender-cloud/overview',         label:'Overview',                   icon:'🏠' },
-    { route:'#/defender-cloud/setup',            label:'Setup',                      icon:'🧩' },
-    { route:'#/defender-cloud/recommendations',  label:'Recommendations',            icon:'✅' },
-    { route:'#/defender-cloud/attack-paths',     label:'Attack path analysis',       icon:'🧭' },
-    { route:'#/defender-cloud/alerts',           label:'Security alerts',            icon:'⚠' },
-    { route:'#/defender-cloud/inventory',        label:'Inventory',                  icon:'📦' },
-    { route:'#/defender-cloud/explorer',         label:'Cloud Security Explorer',    icon:'🔎' },
-    { route:'#/defender-cloud/workbooks',        label:'Workbooks',                  icon:'📓' },
-    { route:'#/defender-cloud/community',        label:'Community',                  icon:'💬' },
-    { route:'#/defender-cloud/diagnose',         label:'Diagnose and solve problems',icon:'🩺' },
+    { route:'#/cloud/overview',         label:'Overview',                   icon:'🏠' },
+    { route:'#/cloud/setup',            label:'Setup',                      icon:'🧩' },
+    { route:'#/cloud/recommendations',  label:'Recommendations',            icon:'✅' },
+    { route:'#/cloud/attack-paths',     label:'Attack path analysis',       icon:'🧭' },
+    { route:'#/cloud/alerts',           label:'Security alerts',            icon:'⚠' },
+    { route:'#/cloud/inventory',        label:'Inventory',                  icon:'📦' },
+    { route:'#/cloud/explorer',         label:'Cloud Security Explorer',    icon:'🔎' },
+    { route:'#/cloud/workbooks',        label:'Workbooks',                  icon:'📓' },
+    { route:'#/cloud/community',        label:'Community',                  icon:'💬' },
+    { route:'#/cloud/diagnose',         label:'Diagnose and solve problems',icon:'🩺' },
     { section:'Cloud Security' },
-    { route:'#/defender-cloud/cloud-security',   label:'Cloud Security',             icon:'☁' },
-    { route:'#/defender-cloud/regulatory',       label:'Regulatory compliance',      icon:'📜' },
+    { route:'#/cloud/cloud-security',   label:'Cloud Security',             icon:'☁' },
+    { route:'#/cloud/regulatory',       label:'Regulatory compliance',      icon:'📜' },
     { section:'Management' },
-    { route:'#/defender-cloud/environment',      label:'Environment settings',       icon:'⚙' },
-    { route:'#/defender-cloud/workflow',         label:'Workflow automation',        icon:'🔁' },
+    { route:'#/cloud/environment',      label:'Environment settings',       icon:'⚙' },
+    { route:'#/cloud/workflow',         label:'Workflow automation',        icon:'🔁' },
     // === local-tasks nav:defender-cloud ===
   ],
-  purview: [
+  governance: [
     { section:'Purview' },
-    { route:'#/purview/home',                   label:'Home',                  icon:'🏠' },
-    { route:'#/purview/solutions',              label:'Solutions',             icon:'🧩' },
-    { route:'#/purview/classic-governance',     label:'Classic governance',    icon:'🏛' },
+    { route:'#/governance/home',                   label:'Home',                  icon:'🏠' },
+    { route:'#/governance/solutions',              label:'Solutions',             icon:'🧩' },
+    { route:'#/governance/classic-governance',     label:'Classic governance',    icon:'🏛' },
     { section:'Data security' },
-    { route:'#/purview/dlp',                    label:'Data loss prevention',  icon:'🚫' },
-    { route:'#/purview/information-protection', label:'Information protection',icon:'🔖' },
+    { route:'#/governance/dlp',                    label:'Data loss prevention',  icon:'🚫' },
+    { route:'#/governance/information-protection', label:'Information protection',icon:'🔖' },
     { section:'Risk & compliance' },
-    { route:'#/purview/insider-risk',           label:'Insider risk',          icon:'🕵' },
-    { route:'#/purview/communication-compliance', label:'Communication compliance', icon:'💬' },
-    { route:'#/purview/ediscovery',             label:'eDiscovery',            icon:'🔍' },
-    { route:'#/purview/audit',                  label:'Audit',                 icon:'📜' },
-    { route:'#/purview/graph-activity',         label:'Graph activity logs',   icon:'🧾' },
+    { route:'#/governance/insider-risk',           label:'Insider risk',          icon:'🕵' },
+    { route:'#/governance/communication-compliance', label:'Communication compliance', icon:'💬' },
+    { route:'#/governance/ediscovery',             label:'eDiscovery',            icon:'🔍' },
+    { route:'#/governance/audit',                  label:'Audit',                 icon:'📜' },
+    { route:'#/governance/graph-activity',         label:'Graph activity logs',   icon:'🧾' },
     { section:'Data governance' },
-    { route:'#/purview/records',                label:'Records management',    icon:'🗃' },
-    { route:'#/purview/lifecycle',              label:'Data lifecycle',        icon:'⏱' },
+    { route:'#/governance/records',                label:'Records management',    icon:'🗃' },
+    { route:'#/governance/lifecycle',              label:'Data lifecycle',        icon:'⏱' },
     { section:'Portal' },
-    { route:'#/purview/settings',               label:'Settings',              icon:'⚙' },
+    { route:'#/governance/settings',               label:'Settings',              icon:'⚙' },
     // === local-tasks nav:purview ===
   ],
-  copilot: [
-    { route:'#/copilot/home',                   label:'Home',                  icon:'🏠' },
-    { route:'#/copilot/sessions',               label:'Sessions',              icon:'🗂' },
-    { route:'#/copilot/promptbooks',            label:'Promptbooks',           icon:'📚' },
-    { route:'#/copilot/plugins',                label:'Plugins',               icon:'🧩' },
-    { route:'#/copilot/knowledge',              label:'Knowledge',             icon:'🧠' },
-    { route:'#/copilot/settings',               label:'Settings',              icon:'⚙' },
+  'ai-agent': [
+    { route:'#/ai-agent/home',                   label:'Home',                  icon:'🏠' },
+    { route:'#/ai-agent/sessions',               label:'Sessions',              icon:'🗂' },
+    { route:'#/ai-agent/promptbooks',            label:'Promptbooks',           icon:'📚' },
+    { route:'#/ai-agent/plugins',                label:'Plugins',               icon:'🧩' },
+    { route:'#/ai-agent/knowledge',              label:'Knowledge',             icon:'🧠' },
+    { route:'#/ai-agent/settings',               label:'Settings',              icon:'⚙' },
     // === local-tasks nav:copilot ===
   ],
-  entra: [
+  identity: [
     { section:'Identity' },
-    { route:'#/entra/overview',                 label:'Overview',              icon:'🏠' },
+    { route:'#/identity/overview',                 label:'Overview',              icon:'🏠' },
     { section:'Protection' },
-    { route:'#/entra/identity-protection',      label:'Identity Protection',  icon:'🛡' },
-    { route:'#/entra/conditional-access',       label:'Conditional Access',   icon:'🔐' },
+    { route:'#/identity/identity-protection',      label:'Identity Protection',  icon:'🛡' },
+    { route:'#/identity/conditional-access',       label:'Conditional Access',   icon:'🔐' },
     // Sign-in logs belong to monitoring, not to the identity object list — the
     // real console puts them at Identity > Monitoring & health > Sign-in logs.
     // A student who learns the wrong path here has to unlearn it later.
     { section:'Monitoring & health' },
-    { route:'#/entra/sign-in-logs',             label:'Sign-in logs',          icon:'🔑' },
+    { route:'#/identity/sign-in-logs',             label:'Sign-in logs',          icon:'🔑' },
     // === local-tasks nav:entra ===
   ],
-  'm365-admin': [
-    { route:'#/m365-admin/home',                label:'Home',                  icon:'🏠' },
+  'workspace': [
+    { route:'#/workspace/home',                label:'Home',                  icon:'🏠' },
     { section:'Your organization' },
-    { route:'#/m365-admin/users',               label:'Users',                 icon:'👥' },
-    { route:'#/m365-admin/licenses',            label:'Billing › Licenses',    icon:'🪪' },
+    { route:'#/workspace/users',               label:'Users',                 icon:'👥' },
+    { route:'#/workspace/licenses',            label:'Billing › Licenses',    icon:'🪪' },
     { section:'Reports' },
-    { route:'#/m365-admin/usage',               label:'Usage',                 icon:'📊' },
+    { route:'#/workspace/usage',               label:'Usage',                 icon:'📊' },
     { section:'Health' },
-    { route:'#/m365-admin/service-health',      label:'Service health',        icon:'💚' },
-    { route:'#/m365-admin/message-center',      label:'Message center',        icon:'📣' },
+    { route:'#/workspace/service-health',      label:'Service health',        icon:'💚' },
+    { route:'#/workspace/message-center',      label:'Message center',        icon:'📣' },
     { section:'Configuration' },
-    { route:'#/m365-admin/setup',               label:'Setup',                 icon:'🧩' },
-    { route:'#/m365-admin/admin-centers',       label:'Admin centers',         icon:'🧭' },
+    { route:'#/workspace/setup',               label:'Setup',                 icon:'🧩' },
+    { route:'#/workspace/admin-centers',       label:'Admin centers',         icon:'🧭' },
   ],
 };
 
@@ -6565,7 +6647,7 @@ function getCopilotSettings() {
 // === end local-tasks fixtures ===
 
 // ===================== Entra admin center — tenant directory =====================
-// Populates #/entra/overview so the Entra surface carries the same synthetic
+// Populates #/identity/overview so the Entra surface carries the same synthetic
 // tenant the Defender/Sentinel views investigate. Every principal here either
 // appears in IDENTITIES (Defender for Identity onboarded) or in the alert /
 // incident fixtures, so cross-portal pivots line up.
@@ -6815,7 +6897,7 @@ const SIGNIN_LOG_TYPES = [
     empty:'Platform-managed identities assigned to cloud resources. Credentials are rotated by the platform and never handled by a person.' },
 ];
 
-// Raw sign-in log for #/entra/sign-in-logs — the evidence table Module 01 sends
+// Raw sign-in log for #/identity/sign-in-logs — the evidence table Module 01 sends
 // a first-time student to read. Deliberately unsorted-looking and mixed with
 // benign traffic: the failure burst is findable, but only by filtering. Nothing
 // in the rows states a verdict; the analyst supplies that.
@@ -6978,9 +7060,9 @@ const M365_MESSAGE_CENTER = [
 ];
 
 const M365_SETUP_TASKS = [
-  { title:'Protect admin accounts with phishing-resistant MFA', category:'Sign-in security', status:'In progress', route:'#/entra/conditional-access' },
-  { title:'Review data loss prevention coverage', category:'Data protection', status:'Available', route:'#/purview/dlp' },
-  { title:'Review service health notification preferences', category:'Operations', status:'Available', route:'#/m365-admin/service-health' },
-  { title:'Validate 365 license assignments', category:'Licensing', status:'Available', route:'#/m365-admin/licenses' },
+  { title:'Protect admin accounts with phishing-resistant MFA', category:'Sign-in security', status:'In progress', route:'#/identity/conditional-access' },
+  { title:'Review data loss prevention coverage', category:'Data protection', status:'Available', route:'#/governance/dlp' },
+  { title:'Review service health notification preferences', category:'Operations', status:'Available', route:'#/workspace/service-health' },
+  { title:'Validate 365 license assignments', category:'Licensing', status:'Available', route:'#/workspace/licenses' },
 ];
 // === end 365 admin center ===

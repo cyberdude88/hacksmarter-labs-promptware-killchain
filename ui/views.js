@@ -1041,7 +1041,7 @@ function renderMockAsimLab(config) {
         <div class="page-subtitle">${esc(config.subtitle)}</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-secondary" href="#/sentinel/hunting">Advanced hunting</a>
+        <a class="btn btn-secondary" href="#/siem/hunting">Advanced hunting</a>
         ${config.nextHref ? `<a class="btn btn-secondary" href="${esc(config.nextHref)}">${esc(config.nextLabel || 'Next parser')}</a>` : ''}
         <button class="btn btn-primary" onclick="${esc(config.runFn)}()">Run query</button>
       </div>
@@ -1276,7 +1276,7 @@ function renderDiscoveredDevicesCard() {
       <div class="card">
         <div class="card-toolbar">
           <strong>Discovered devices</strong>
-          <a class="chip-link" href="#/defender/devices">View all →</a>
+          <a class="chip-link" href="#/xdr/devices">View all →</a>
         </div>
         <div class="card-body">
           <h2 style="margin:0 0 12px">Total discovered devices: ${DISCOVERED_DEVICES.length}</h2>
@@ -1296,14 +1296,14 @@ function renderDiscoveredDevicesCard() {
               <div class="bar"><i style="width:${Math.max(2, Math.round(n / max * 100))}%"></i></div>
             </div>`).join('')}
           </div>
-          <button class="btn btn-secondary" style="margin-top:12px" onclick="setInventoryTab('iot');navigate('#/defender/devices')">View all IoT devices</button>
+          <button class="btn btn-secondary" style="margin-top:12px" onclick="setInventoryTab('iot');navigate('#/xdr/devices')">View all IoT devices</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-toolbar">
           <strong>Devices discovered in the last 7 days</strong>
-          <a class="chip-link" href="#/defender/device-discovery">Discovery settings →</a>
+          <a class="chip-link" href="#/xdr/device-discovery">Discovery settings →</a>
         </div>
         <div class="card-body">
           <h2 style="margin:0 0 12px">Recently discovered devices in your organization: ${recent.length}</h2>
@@ -1329,7 +1329,7 @@ function renderDiscoveredDevicesCard() {
   `;
 }
 
-VIEWS['defender/home'] = () => {
+VIEWS['xdr/home'] = () => {
   const incHigh = INCIDENTS.filter(i => i.severity === 'high').length;
   const incMed  = INCIDENTS.filter(i => i.severity === 'medium').length;
   const incOpen = INCIDENTS.filter(i => i.status !== 'Resolved').length;
@@ -1394,7 +1394,7 @@ VIEWS['defender/home'] = () => {
       <div class="card">
         <div class="card-toolbar">
           <strong>Active incidents</strong>
-          <a class="chip-link" href="#/defender/incidents">View all →</a>
+          <a class="chip-link" href="#/xdr/incidents">View all →</a>
         </div>
         <table class="grid">
           <thead><tr><th>Severity</th><th>Title</th><th>Alerts</th><th>Status</th></tr></thead>
@@ -1414,7 +1414,7 @@ VIEWS['defender/home'] = () => {
       <div class="card">
         <div class="card-toolbar">
           <strong>Latest alerts</strong>
-          <a class="chip-link" href="#/defender/alerts">View all →</a>
+          <a class="chip-link" href="#/xdr/alerts">View all →</a>
         </div>
         <table class="grid">
           <thead><tr><th>Severity</th><th>Title</th><th>Asset</th></tr></thead>
@@ -1436,7 +1436,7 @@ VIEWS['defender/home'] = () => {
         <div class="alert-section-title">Secure score</div>
         <div class="donut" style="--pct:65"><div class="donut-inner"><b>65%</b><span>247 / 380 pts</span></div></div>
         <div class="muted">3 high-impact actions available.</div>
-        <a class="chip-link" href="#/defender/secure-score">Improve score →</a>
+        <a class="chip-link" href="#/xdr/secure-score">Improve score →</a>
       </div>
       <div class="card card-body">
         <div class="alert-section-title">Active threat campaigns</div>
@@ -1446,22 +1446,22 @@ VIEWS['defender/home'] = () => {
             <div class="muted" style="font-size:12px;">${esc(t.type)} · ${t.impactedAssets} impacted asset(s)</div>
           </div>
         `).join('')}
-        <a class="chip-link" href="#/defender/threat-analytics">All threat analytics →</a>
+        <a class="chip-link" href="#/xdr/threat-analytics">All threat analytics →</a>
       </div>
       <div class="card card-body">
         <div class="alert-section-title">Suggested next steps</div>
         <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7;">
-          <li><a href="#/defender/incidents">Triage 5 active incidents</a></li>
-          <li><a href="#/defender/hunting">Hunt for staging in C:\\Users\\Public</a></li>
-          <li><a href="#/defender/suppression">Review noisy detections</a></li>
-          <li><a href="#/sentinel/analytics">Tune Sentinel analytics rules</a></li>
+          <li><a href="#/xdr/incidents">Triage 5 active incidents</a></li>
+          <li><a href="#/xdr/hunting">Hunt for staging in C:\\Users\\Public</a></li>
+          <li><a href="#/xdr/suppression">Review noisy detections</a></li>
+          <li><a href="#/siem/analytics">Tune Sentinel analytics rules</a></li>
         </ul>
       </div>
     </div>
   `;
 };
 
-VIEWS['defender/incidents'] = () => `
+VIEWS['xdr/incidents'] = () => `
   <div class="page-header">
     <div><div class="breadcrumb">Investigation & response › Incidents &amp; alerts › <strong>Incidents</strong></div><h1>Incidents</h1></div>
   </div>
@@ -1536,7 +1536,7 @@ function renderIncidentAssets(inc, incAlerts) {
               ? `<button class="btn btn-ghost btn-sm" onclick="openDevice('${esc(n)}')">Open device</button>`
               : (type === 'User' || type === 'Account' || type === 'Identity')
                 ? `<button class="btn btn-ghost btn-sm" onclick="openIdentity('${esc(n)}')">Open identity</button>`
-                : `<button class="btn btn-ghost btn-sm" onclick="navigate('#/defender/hunting')">Hunt</button>`;
+                : `<button class="btn btn-ghost btn-sm" onclick="navigate('#/xdr/hunting')">Hunt</button>`;
             return `
               <tr>
                 <td>${clickableEntity(type, n)}</td>
@@ -1550,7 +1550,7 @@ function renderIncidentAssets(inc, incAlerts) {
   `).join('') || '<div class="muted">No entities recorded on this incident.</div>';
 }
 
-VIEWS['defender/incident'] = () => {
+VIEWS['xdr/incident'] = () => {
   const selectedId = sessionStorage.getItem('defender-lab.incident.id') || INCIDENTS[0].id;
   const inc = INCIDENTS.find(i => i.id === selectedId) || INCIDENTS[0];
   const incAlerts = alerts.filter(a => inc.alertIds.includes(a.id));
@@ -1626,9 +1626,9 @@ VIEWS['defender/incident'] = () => {
     <div class="page-header incident-page-header">
       <div>
         <div class="breadcrumb">
-          <a href="#/defender/incidents">Investigation &amp; response</a> ›
-          <a href="#/defender/incidents">Incidents &amp; alerts</a> ›
-          <a href="#/defender/incidents">Incidents</a> ›
+          <a href="#/xdr/incidents">Investigation &amp; response</a> ›
+          <a href="#/xdr/incidents">Incidents &amp; alerts</a> ›
+          <a href="#/xdr/incidents">Incidents</a> ›
           <strong>${esc(inc.id)}</strong>
         </div>
         <h1>${esc(inc.title)}</h1>
@@ -1644,7 +1644,7 @@ VIEWS['defender/incident'] = () => {
       <button class="btn btn-secondary btn-sm" onclick="toast('Incident classified (lab stub).')">Classify</button>
       <button class="btn btn-secondary btn-sm" onclick="toast('Comment added (lab stub).')">Add comment</button>
       <button class="btn btn-secondary btn-sm" onclick="toast('Tags opened (lab stub).')">Manage tags</button>
-      <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/hunting')">Go hunt</button>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
     </div>
 
     <div class="incident-page-tabs tabs">
@@ -1679,7 +1679,7 @@ VIEWS['defender/incident'] = () => {
   `;
 };
 
-VIEWS['defender/alerts'] = () => {
+VIEWS['xdr/alerts'] = () => {
   let suppressed = 0;
   const rows = alerts.map(a => {
     const rule = matchedRule(a);
@@ -1728,7 +1728,7 @@ VIEWS['defender/alerts'] = () => {
   `;
 };
 
-VIEWS['defender/cases'] = () => `
+VIEWS['xdr/cases'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Investigation &amp; response › <strong>Cases</strong></div>
@@ -1775,7 +1775,7 @@ VIEWS['defender/cases'] = () => `
   </div>
 `;
 
-VIEWS['defender/hunting'] = () => {
+VIEWS['xdr/hunting'] = () => {
   const prefilled = sessionStorage.getItem('defender-lab.hunting.prefill');
   const autorun = sessionStorage.getItem('defender-lab.hunting.autorun') === '1';
   sessionStorage.removeItem('defender-lab.hunting.prefill');
@@ -1792,8 +1792,8 @@ VIEWS['defender/hunting'] = () => {
         <div class="page-subtitle">Query Defender XDR tables, inspect schema groups, and turn repeatable hunts into detections.</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-secondary" href="#/defender/hunting-graph">Hunting graph</a>
-        <a class="btn btn-primary" href="#/defender/custom-detections">Create custom detection</a>
+        <a class="btn btn-secondary" href="#/xdr/hunting-graph">Hunting graph</a>
+        <a class="btn btn-primary" href="#/xdr/custom-detections">Create custom detection</a>
       </div>
     </div>
     <div class="kpi-strip hunting-status-cards">
@@ -1928,13 +1928,13 @@ VIEWS['defender/hunting'] = () => {
   };
 };
 
-VIEWS['sentinel/hunting/authentication'] = () => renderMockAsimLab({
+VIEWS['siem/hunting/authentication'] = () => renderMockAsimLab({
   crumb:'Sentinel › Hunting',
   title:'ASIM Authentication',
   heading:'ASIM Authentication hunting',
   subtitle:'Normalize Windows logons and Entra sign-ins into one parser-style view so you can filter by source IP, target user, and result without switching tables.',
   schemaVersion:'ASIM 0.1.7',
-  nextHref:'#/sentinel/hunting/network-session',
+  nextHref:'#/siem/hunting/network-session',
   nextLabel:'Network session',
   runFn:'runAsimAuthenticationQuery',
   loadFn:'loadAsimAuthenticationQuery',
@@ -1958,13 +1958,13 @@ VIEWS['sentinel/hunting/authentication'] = () => renderMockAsimLab({
   studyNote:'The same query shape can investigate a DC logon or an Entra sign-in, which is why ASIM helps SOC teams avoid writing separate hunts for every source.',
 });
 
-VIEWS['sentinel/hunting/network-session'] = () => renderMockAsimLab({
+VIEWS['siem/hunting/network-session'] = () => renderMockAsimLab({
   crumb:'Sentinel › Hunting',
   title:'ASIM Network Session',
   heading:'ASIM Network Session hunting',
   subtitle:'Review firewall and proxy sessions in a normalized shape so blocked outbound traffic, risky destinations, and source-host blast radius stay easy to compare.',
   schemaVersion:'ASIM 0.1.7',
-  nextHref:'#/sentinel/hunting/dns',
+  nextHref:'#/siem/hunting/dns',
   nextLabel:'DNS hunting',
   runFn:'runAsimNetworkSessionQuery',
   loadFn:'loadAsimNetworkSessionQuery',
@@ -1988,7 +1988,7 @@ VIEWS['sentinel/hunting/network-session'] = () => renderMockAsimLab({
   studyNote:'When a question asks whether a domain or IP was contacted, a normalized network-session view avoids hunting separately in every firewall or proxy table.',
 });
 
-VIEWS['defender/custom-detections'] = () => `
+VIEWS['xdr/custom-detections'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Hunting › <strong>Custom detections</strong></div>
@@ -1996,8 +1996,8 @@ VIEWS['defender/custom-detections'] = () => `
       <div class="page-subtitle">Turn repeatable advanced hunting queries into scheduled or near-real-time alerting and response actions.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/defender/hunting">Advanced hunting</a>
-      <a class="btn btn-primary" href="#/defender/hunting">Run sample query</a>
+      <a class="btn btn-secondary" href="#/xdr/hunting">Advanced hunting</a>
+      <a class="btn btn-primary" href="#/xdr/hunting">Run sample query</a>
     </div>
   </div>
 
@@ -2072,7 +2072,7 @@ function huntingGraphLayout(nodes) {
   }, {});
 }
 
-VIEWS['defender/hunting-graph'] = () => {
+VIEWS['xdr/hunting-graph'] = () => {
   const state = currentHuntingGraphState();
   const scenario = huntingGraphScenario();
   const result = buildHuntingGraphResult();
@@ -2177,7 +2177,7 @@ VIEWS['defender/hunting-graph'] = () => {
       </div>
       <div class="alert-section-title">Validate findings</div>
       <p class="muted">Use Advanced hunting to confirm event evidence before taking response actions or creating a custom detection.</p>
-      <a class="chip-link" href="#/defender/hunting">Open Advanced hunting →</a>
+      <a class="chip-link" href="#/xdr/hunting">Open Advanced hunting →</a>
     </aside>`;
 
   return `
@@ -2188,7 +2188,7 @@ VIEWS['defender/hunting-graph'] = () => {
         <div class="page-subtitle">Render fictional exposure paths, inspect entity relationships, and identify high-leverage nodes.</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-secondary" href="#/defender/hunting">Advanced hunting</a>
+        <a class="btn btn-secondary" href="#/xdr/hunting">Advanced hunting</a>
         <button class="btn btn-primary" type="button" onclick="openHuntingGraphScenarios()">Search with predefined scenarios</button>
       </div>
     </div>
@@ -2248,7 +2248,7 @@ VIEWS['defender/hunting-graph'] = () => {
     </div>`;
 };
 
-VIEWS['defender/threat-analytics'] = () => `
+VIEWS['xdr/threat-analytics'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Threat intelligence › <strong>Threat analytics</strong></div>
@@ -2274,7 +2274,7 @@ VIEWS['defender/threat-analytics'] = () => `
             <td>${esc(t.type)}</td>
             <td>${esc(t.status)}</td>
             <td>${t.impactedAssets}</td>
-            <td>${(t.relatedIncidents || []).map(id => `<a class="chip-link" href="#/defender/incidents" onclick="event.preventDefault(); openIncident('${esc(id)}')">${esc(id)}</a>`).join('') || '<span class="muted">None</span>'}</td>
+            <td>${(t.relatedIncidents || []).map(id => `<a class="chip-link" href="#/xdr/incidents" onclick="event.preventDefault(); openIncident('${esc(id)}')">${esc(id)}</a>`).join('') || '<span class="muted">None</span>'}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -2309,7 +2309,7 @@ VIEWS['defender/threat-analytics'] = () => `
   </div>
 `;
 
-VIEWS['defender/secure-score'] = () => `
+VIEWS['xdr/secure-score'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Exposure management › <strong>Secure score</strong></div><h1>Secure Score</h1></div></div>
   <div class="two-col">
     <div class="card card-body" style="text-align:center;">
@@ -2340,7 +2340,7 @@ VIEWS['defender/secure-score'] = () => `
   </div>
 `;
 
-VIEWS['defender/cloud-apps'] = () => {
+VIEWS['xdr/cloud-apps'] = () => {
   const inv = CLOUD_APP_INVESTIGATIONS[0];
   return `
     <div class="page-header">
@@ -2386,7 +2386,7 @@ VIEWS['defender/cloud-apps'] = () => {
       </section>
     </div>
     <section class="card" style="margin-top:16px;">
-      <div class="card-toolbar"><strong>Investigation timeline</strong><a class="chip-link" href="#/sentinel/graph">Open Sentinel Graph →</a></div>
+      <div class="card-toolbar"><strong>Investigation timeline</strong><a class="chip-link" href="#/siem/graph">Open Sentinel Graph →</a></div>
       <ol class="timeline card-body">
         ${inv.activity.map(a => `
           <li><div class="t-time">${fmtTime(a.time)}</div><div class="t-title">${esc(a.title)}</div><div class="muted">${esc(a.detail)}</div></li>
@@ -2396,7 +2396,7 @@ VIEWS['defender/cloud-apps'] = () => {
   `;
 };
 
-VIEWS['defender/settings'] = () => `
+VIEWS['xdr/settings'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">System › <strong>Settings</strong></div>
@@ -2405,7 +2405,7 @@ VIEWS['defender/settings'] = () => `
     </div>
     <div class="page-actions">
       <button class="btn btn-secondary" onclick="toast('Settings export prepared in the lab.')">Export</button>
-      <a class="btn btn-secondary" href="#/defender/mto">Multi-tenant management</a>
+      <a class="btn btn-secondary" href="#/xdr/mto">Multi-tenant management</a>
       <button class="btn btn-primary" onclick="toast('Settings saved in lab memory only.')">Save changes</button>
     </div>
   </div>
@@ -2443,7 +2443,7 @@ VIEWS['defender/settings'] = () => `
       </table>
     </section>
     <section class="card">
-      <div class="card-toolbar"><strong>Permissions and roles</strong><a class="chip-link" href="#/defender/action-center">Review pending actions →</a></div>
+      <div class="card-toolbar"><strong>Permissions and roles</strong><a class="chip-link" href="#/xdr/action-center">Review pending actions →</a></div>
       <table class="grid">
         <thead><tr><th>Role</th><th>Members</th><th>Rights</th></tr></thead>
         <tbody>${MDE_SETTINGS.roles.map(r => `
@@ -2466,7 +2466,7 @@ VIEWS['defender/settings'] = () => `
   </section>
 `;
 
-VIEWS['defender/mto'] = () => {
+VIEWS['xdr/mto'] = () => {
   const tenant = currentMsspTenant();
   const tenantIncidents = MTO_INCIDENTS.filter(i => i.tenant === tenant.name);
   const openIncidents = MTO_INCIDENTS.filter(i => i.status !== 'Resolved');
@@ -2478,7 +2478,7 @@ VIEWS['defender/mto'] = () => {
         <div class="page-subtitle">Consolidated incident queue for a managed-security-provider style lab tenant. Use it to reason about delegated access versus customer-tenant administration.</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-secondary" href="#/defender/settings">Back to settings</a>
+        <a class="btn btn-secondary" href="#/xdr/settings">Back to settings</a>
         <button class="btn btn-primary" onclick="toast('MTO queue updated in local lab state only.')">Refresh queue</button>
       </div>
     </div>
@@ -2547,7 +2547,7 @@ VIEWS['defender/mto'] = () => {
   `;
 };
 
-VIEWS['defender/asr-policy'] = () => `
+VIEWS['xdr/asr-policy'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Configuration › Endpoints › <strong>Attack surface reduction</strong></div>
@@ -2585,7 +2585,7 @@ VIEWS['defender/asr-policy'] = () => `
   </div>
 `;
 
-VIEWS['defender/notifications'] = () => `
+VIEWS['xdr/notifications'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">System › <strong>Email notifications</strong></div>
@@ -2622,7 +2622,7 @@ VIEWS['defender/notifications'] = () => `
   </div>
 `;
 
-VIEWS['defender/alert-tuning'] = () => `
+VIEWS['xdr/alert-tuning'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Investigation &amp; response › <strong>Alert tuning</strong></div>
@@ -2639,7 +2639,7 @@ VIEWS['defender/alert-tuning'] = () => `
   </div>
   <div class="two-col" style="margin-top:16px;">
     <section class="card">
-      <div class="card-toolbar"><strong>Incident rollup examples</strong><a class="chip-link" href="#/defender/incidents">Open incidents →</a></div>
+      <div class="card-toolbar"><strong>Incident rollup examples</strong><a class="chip-link" href="#/xdr/incidents">Open incidents →</a></div>
       <table class="grid">
         <thead><tr><th>Incident</th><th>Correlated alerts</th><th>Why grouped</th></tr></thead>
         <tbody>${INCIDENTS.filter(i => i.alertIds.length > 1).slice(0,5).map(i => `
@@ -2652,7 +2652,7 @@ VIEWS['defender/alert-tuning'] = () => `
       </table>
     </section>
     <section class="card">
-      <div class="card-toolbar"><strong>Tuning rules</strong><a class="chip-link" href="#/defender/suppression">Compare suppression →</a></div>
+      <div class="card-toolbar"><strong>Tuning rules</strong><a class="chip-link" href="#/xdr/suppression">Compare suppression →</a></div>
       <table class="grid">
         <thead><tr><th>Status</th><th>Name</th><th>Type</th><th>Outcome</th></tr></thead>
         <tbody>${ALERT_TUNING_RULES.map(r => `
@@ -2663,7 +2663,7 @@ VIEWS['defender/alert-tuning'] = () => `
   </div>
 `;
 
-VIEWS['defender/air'] = () => `
+VIEWS['xdr/air'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Investigation &amp; response › <strong>AIR center</strong></div>
@@ -2796,7 +2796,7 @@ function avTag(status) {
   return `<span class="tag ${cls}">${esc(status)}</span>`;
 }
 
-VIEWS['defender/devices'] = () => {
+VIEWS['xdr/devices'] = () => {
   const tab    = currentInventoryTab();
   const facets = currentInventoryFacets();
   const range  = currentInventoryRange();
@@ -2819,7 +2819,7 @@ VIEWS['defender/devices'] = () => {
       <div class="page-subtitle">Onboarded devices and the unmanaged assets your sensors discovered on monitored networks. Select a device to investigate, or triage what can still be onboarded.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/defender/device-discovery">📡 Discovery settings</a>
+      <a class="btn btn-secondary" href="#/xdr/device-discovery">📡 Discovery settings</a>
       <button class="btn btn-primary" onclick="toast('Fictional lab action: an onboarding package would be generated for the selected devices.')">Onboard devices</button>
     </div>
   </div>
@@ -2924,7 +2924,7 @@ const DISCOVERY_SOURCE_EXPLAINER = {
   'Authenticated scan':'Found by an authenticated SNMP read-only scan from a designated scanning device. This is how network gear gets assessed when it cannot run a sensor.',
 };
 
-VIEWS['defender/discovered-device'] = () => {
+VIEWS['xdr/discovered-device'] = () => {
   const d = currentDiscoveredDevice();
   const tab = currentDiscoveredTab();
   const g = ONBOARDING_GUIDANCE[d.onboardingStatus];
@@ -2998,7 +2998,7 @@ VIEWS['defender/discovered-device'] = () => {
             Discovered devices are assessed even without a sensor, so remediation can start before onboarding.
           </div>
           <p class="muted">Recommendations for unmanaged assets are worked from Exposure management alongside the rest of the tenant. ${canOnboard ? 'Onboarding this device would additionally give it software inventory and per-device vulnerability detail.' : 'For unsupported platforms this is the main lever you have.'}</p>
-          <a class="btn btn-secondary" href="#/defender/exposure">Open recommendations</a>`}
+          <a class="btn btn-secondary" href="#/xdr/exposure">Open recommendations</a>`}
       </section>`,
 
     onboarding: () => `
@@ -3018,14 +3018,14 @@ VIEWS['defender/discovered-device'] = () => {
           <button class="btn btn-primary" onclick="toast('Fictional lab action: an onboarding package would be downloaded for ${esc(d.name)}.')">Download onboarding package</button>` : ''}
         <div class="alert-section-title">Other actions</div>
         <button class="btn btn-secondary" onclick="toast('Fictional lab action: ${esc(d.name)} would be excluded from active probing.')">Exclude from standard discovery</button>
-        <a class="btn btn-secondary" href="#/defender/device-discovery">Discovery settings</a>
+        <a class="btn btn-secondary" href="#/xdr/device-discovery">Discovery settings</a>
       </section>`,
   }[tab]();
 
   return `
   <div class="page-header">
     <div>
-      <div class="breadcrumb"><a class="chip-link" href="#/defender/devices">Assets › Devices</a> › <strong>${esc(d.name)}</strong></div>
+      <div class="breadcrumb"><a class="chip-link" href="#/xdr/devices">Assets › Devices</a> › <strong>${esc(d.name)}</strong></div>
       <h1>${esc(d.name)}</h1>
       <div class="dev-tags">
         <span class="tag">Unmanaged</span>
@@ -3039,7 +3039,7 @@ VIEWS['defender/discovered-device'] = () => {
     <div class="page-actions">
       <button class="btn ${canOnboard ? 'btn-primary' : 'btn-secondary'}" ${canOnboard ? '' : 'disabled title="No sensor exists for this platform."'}
               onclick="toast('Fictional lab action: an onboarding package would be downloaded for ${esc(d.name)}.')">Onboard device</button>
-      <a class="btn btn-secondary" href="#/defender/devices">Back to inventory</a>
+      <a class="btn btn-secondary" href="#/xdr/devices">Back to inventory</a>
     </div>
   </div>
 
@@ -3052,7 +3052,7 @@ VIEWS['defender/discovered-device'] = () => {
 };
 
 // ---------- Defender for Endpoint › System > Settings > Device discovery ----------
-VIEWS['defender/device-discovery'] = () => {
+VIEWS['xdr/device-discovery'] = () => {
   const s = DEVICE_DISCOVERY_SETTINGS;
   return `
   <div class="page-header">
@@ -3062,7 +3062,7 @@ VIEWS['defender/device-discovery'] = () => {
       <div class="page-subtitle">Control how onboarded devices find unmanaged assets: scan mode, which networks are watched, what is excluded from active probing, and authenticated scans for network gear.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/defender/devices">Open device inventory</a>
+      <a class="btn btn-secondary" href="#/xdr/devices">Open device inventory</a>
     </div>
   </div>
 
@@ -3136,8 +3136,8 @@ VIEWS['defender/device-discovery'] = () => {
       <div class="alert-section-title">Vulnerability assessment</div>
       <p class="muted">Discovered endpoints are assessed automatically and produce recommendations under Exposure management. IoT assets are assessed once an Enterprise IoT license is in place.</p>
       <div class="tile-grid">
-        <a class="tile" href="#/defender/exposure"><strong>Recommendations</strong><span>Remediate what discovery found — for example, SSH weaknesses on unmanaged servers.</span></a>
-        <a class="tile" href="#/defender/hunting"><strong>Advanced hunting</strong><span>Query discovered devices and their activity alongside onboarded telemetry.</span></a>
+        <a class="tile" href="#/xdr/exposure"><strong>Recommendations</strong><span>Remediate what discovery found — for example, SSH weaknesses on unmanaged servers.</span></a>
+        <a class="tile" href="#/xdr/hunting"><strong>Advanced hunting</strong><span>Query discovered devices and their activity alongside onboarded telemetry.</span></a>
       </div>
     </section>
   </div>
@@ -3185,7 +3185,7 @@ const DEVICE_TABS = [
   { key:'sentinel',        label:'Sentinel events' },
 ];
 
-VIEWS['defender/device'] = () => {
+VIEWS['xdr/device'] = () => {
   const selectedId = sessionStorage.getItem('defender-lab.device.id') || DEVICES[0].id;
   const d = DEVICES.find(x => x.id === selectedId) || DEVICES[0];
   const tab = sessionStorage.getItem('defender-lab.device.tab') || 'overview';
@@ -3382,7 +3382,7 @@ VIEWS['defender/device'] = () => {
     const recs = currentTvmRecommendations().filter(item => (tvm.recommendations || []).includes(item.id));
     return `
       <div class="dev-cmdbar">
-        <button class="btn btn-primary btn-sm" onclick="navigate('#/defender/vulnerabilities')">Open full TVM dashboard</button>
+        <button class="btn btn-primary btn-sm" onclick="navigate('#/xdr/vulnerabilities')">Open full TVM dashboard</button>
         <button class="btn btn-secondary btn-sm" onclick="openTvmSoftware('${esc(tvm.software[0]?.name || 'CodeGenius')}')">Inspect top software</button>
         <button class="btn btn-secondary btn-sm" onclick="openTvmRemediationFlow('${esc(recs[0]?.id || 'tr-01')}')">Request remediation</button>
       </div>
@@ -3478,7 +3478,7 @@ VIEWS['defender/device'] = () => {
       <div class="card card-body">
         <div class="alert-section-title">Sentinel events</div>
         <p class="muted">Related Sentinel events and incidents associated with ${esc(d.name)}.</p>
-        <button class="btn btn-primary btn-sm" onclick="navigate('#/sentinel/incidents')">Open related Sentinel incident</button>
+        <button class="btn btn-primary btn-sm" onclick="navigate('#/siem/incidents')">Open related Sentinel incident</button>
       </div>`;
   }
 
@@ -3498,7 +3498,7 @@ VIEWS['defender/device'] = () => {
 
   return `
     <div class="dev-crumbs">
-      <a onclick="navigate('#/defender/devices')">Device inventory</a>
+      <a onclick="navigate('#/xdr/devices')">Device inventory</a>
       <span>›</span>
       <a>${esc(d.name)}</a>
     </div>
@@ -3563,7 +3563,7 @@ VIEWS['defender/device'] = () => {
 };
 
 // ---------- Defender for Identity ↔ XDR › Identities (list) ----------
-VIEWS['defender/identities'] = () => `
+VIEWS['xdr/identities'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Assets › <strong>Identities</strong></div>
@@ -3599,7 +3599,7 @@ VIEWS['defender/identities'] = () => `
   </div>
 `;
 
-VIEWS['defender/identity-protection'] = () => `
+VIEWS['xdr/identity-protection'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Assets › Identities › <strong>Identity protection</strong></div>
@@ -3761,7 +3761,7 @@ function identityAssetRows(identity) {
   ];
 }
 
-VIEWS['defender/identity'] = () => {
+VIEWS['xdr/identity'] = () => {
   const selectedId = sessionStorage.getItem('defender-lab.identity.id') || IDENTITIES[0].id;
   const i = IDENTITIES.find(x => x.id === selectedId) || IDENTITIES[0];
   const tab = sessionStorage.getItem('defender-lab.identity.tab') || 'overview';
@@ -3953,7 +3953,7 @@ VIEWS['defender/identity'] = () => {
       <div class="card card-body">
         <div class="alert-section-title">Related Sentinel events</div>
         <p class="muted">SigninLogs / IdentityLogonEvents / IdentityDirectoryEvents associated with ${esc(i.displayName)}.</p>
-        <button class="btn btn-primary btn-sm" onclick="navigate('#/sentinel/incidents')">Open related Sentinel incident</button>
+        <button class="btn btn-primary btn-sm" onclick="navigate('#/siem/incidents')">Open related Sentinel incident</button>
       </div>`;
   }
 
@@ -3965,7 +3965,7 @@ VIEWS['defender/identity'] = () => {
 
   return `
     <div class="dev-crumbs">
-      <a onclick="navigate('#/defender/identities')">Identity inventory</a>
+      <a onclick="navigate('#/xdr/identities')">Identity inventory</a>
       <span>›</span>
       <a>${esc(i.displayName)}</a>
     </div>
@@ -4023,7 +4023,7 @@ VIEWS['defender/identity'] = () => {
   `;
 };
 
-VIEWS['defender/suppression'] = () => {
+VIEWS['xdr/suppression'] = () => {
   return `
     <div class="page-header">
       <div><div class="breadcrumb">System › <strong>Suppression rules</strong></div><h1>Suppression rules</h1></div>
@@ -4060,7 +4060,7 @@ VIEWS['defender/suppression'] = () => {
 // ====================================================================
 // SENTINEL
 // ====================================================================
-VIEWS['sentinel/home'] = () => `
+VIEWS['siem/home'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Sentinel › <strong>Overview</strong></div><h1>Overview</h1></div></div>
   <div class="kpi-strip">
     <div class="kpi"><span class="kpi-label">Events received (24h)</span><span class="kpi-value">4.2M</span><span class="kpi-delta">▲ 6%</span></div>
@@ -4070,7 +4070,7 @@ VIEWS['sentinel/home'] = () => `
   </div>
   <div class="two-col">
     <div class="card">
-      <div class="card-toolbar"><strong>Recent incidents</strong><a class="chip-link" href="#/sentinel/incidents">View all →</a></div>
+      <div class="card-toolbar"><strong>Recent incidents</strong><a class="chip-link" href="#/siem/incidents">View all →</a></div>
       <table class="grid"><thead><tr><th>Severity</th><th>Title</th><th>Tactics</th></tr></thead>
       <tbody>${INCIDENTS.slice(0,4).map(i => `
         <tr onclick="openIncident('${i.id}')">
@@ -4093,7 +4093,7 @@ VIEWS['sentinel/home'] = () => `
   <div class="card" style="margin-top:16px;">
     <div class="card-toolbar">
       <strong>Home lab path: IOC to MITRE coverage</strong>
-      <a class="chip-link" href="#/sentinel/threat-intel">Open threat intelligence →</a>
+      <a class="chip-link" href="#/siem/threat-intel">Open threat intelligence →</a>
     </div>
     <div class="flowline">
       ${SENTINEL_LAB_FLOW.map(step => `
@@ -4106,7 +4106,7 @@ VIEWS['sentinel/home'] = () => `
   </div>
 `;
 
-VIEWS['sentinel/incidents'] = () => `
+VIEWS['siem/incidents'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Sentinel › Threat management › <strong>Incidents</strong></div>
@@ -4114,8 +4114,8 @@ VIEWS['sentinel/incidents'] = () => `
       <div class="page-subtitle">Sentinel queue with Defender XDR unified-response context, ownership, evidence, and cross-product pivots.</div>
     </div>
     <div class="page-actions">
-      <button class="btn btn-secondary" onclick="navigate('#/defender/incidents')">Open Defender XDR queue</button>
-      <button class="btn btn-primary" onclick="navigate('#/sentinel/graph')">Open Sentinel Graph</button>
+      <button class="btn btn-secondary" onclick="navigate('#/xdr/incidents')">Open Defender XDR queue</button>
+      <button class="btn btn-primary" onclick="navigate('#/siem/graph')">Open Sentinel Graph</button>
     </div>
   </div>
   <div class="callout info">
@@ -4141,7 +4141,7 @@ VIEWS['sentinel/incidents'] = () => `
             </td>
             <td>
               <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openIncidentPage('${esc(i.id)}')">Open in Defender XDR</button>
-              ${i.id === SENTINEL_GRAPH.incidentId ? `<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); navigate('#/sentinel/graph')">Graph</button>` : ''}
+              ${i.id === SENTINEL_GRAPH.incidentId ? `<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); navigate('#/siem/graph')">Graph</button>` : ''}
             </td>
           </tr>`;
       }).join('')}</tbody>
@@ -4334,7 +4334,7 @@ function renderSentinelGraphBlastList() {
         </div>
         <div class="sg-response-note"><strong>Analyst objective</strong><span>Prioritize containment around confirmed activity while protecting the highest-impact reachable assets.</span></div>
       </div>
-      <div class="sg-detail-actions"><button class="btn btn-primary btn-sm" onclick="selectSentinelGraphNode('app-docviewer')">Return to malicious app</button><button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/hunting-graph')">Open Hunting graph</button></div>
+      <div class="sg-detail-actions"><button class="btn btn-primary btn-sm" onclick="selectSentinelGraphNode('app-docviewer')">Return to malicious app</button><button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting-graph')">Open Hunting graph</button></div>
     </aside>`;
 }
 
@@ -4350,7 +4350,7 @@ function renderSentinelGraphLearning(state) {
     </div>`;
 }
 
-VIEWS['sentinel/graph'] = () => {
+VIEWS['siem/graph'] = () => {
   const inc = INCIDENTS.find(i => i.id === SENTINEL_GRAPH.incidentId) || INCIDENTS[0];
   const state = currentSentinelGraphState();
   const story = ATTACK_STORIES[SENTINEL_GRAPH.incidentId];
@@ -4446,7 +4446,7 @@ VIEWS['sentinel/graph'] = () => {
   };
 };
 
-VIEWS['sentinel/analytics'] = () => {
+VIEWS['siem/analytics'] = () => {
   const ws = currentWorkspace();
   const idxs = ws.ruleIdx;
   const createdRules = (typeof readCreatedAnalyticsRules === 'function' ? readCreatedAnalyticsRules() : [])
@@ -4508,7 +4508,7 @@ VIEWS['sentinel/analytics'] = () => {
   `;
 };
 
-VIEWS['sentinel/anomalies'] = () => `
+VIEWS['siem/anomalies'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Threat management › <strong>Anomalies</strong></div>
@@ -4516,8 +4516,8 @@ VIEWS['sentinel/anomalies'] = () => `
       <div class="page-subtitle">Customize anomaly rules, decide when they create incidents, and use anomaly rows as hunting pivots.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/hunting">Open hunting</a>
-      <a class="btn btn-primary" href="#/sentinel/analytics">Analytics rules</a>
+      <a class="btn btn-secondary" href="#/siem/hunting">Open hunting</a>
+      <a class="btn btn-primary" href="#/siem/analytics">Analytics rules</a>
     </div>
   </div>
 
@@ -4821,7 +4821,7 @@ function renderWefPlanningCard() {
   `;
 }
 
-VIEWS['sentinel/content-hub'] = () => {
+VIEWS['siem/content-hub'] = () => {
   const state = currentSyslogAmaState();
   const solutions = SENTINEL_CONTENT_SOLUTIONS.map(s => {
     const labState = currentSentinelIngestionState(s.id);
@@ -4837,7 +4837,7 @@ VIEWS['sentinel/content-hub'] = () => {
         <div class="page-subtitle">Install Sentinel solution packages before configuring solution-backed connectors.</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-secondary" href="#/sentinel/data-connectors">Data connectors</a>
+        <a class="btn btn-secondary" href="#/siem/data-connectors">Data connectors</a>
       </div>
     </div>
 
@@ -4874,7 +4874,7 @@ VIEWS['sentinel/content-hub'] = () => {
   `;
 };
 
-VIEWS['sentinel/data-connectors'] = () => `
+VIEWS['siem/data-connectors'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Configuration › <strong>Data connectors</strong></div>
@@ -4882,7 +4882,7 @@ VIEWS['sentinel/data-connectors'] = () => `
       <div class="page-subtitle">Use connectors for events and threat indicators. Solution-backed connectors may require Content hub installation first.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/content-hub">Content hub</a>
+      <a class="btn btn-secondary" href="#/siem/content-hub">Content hub</a>
     </div>
   </div>
   <div class="callout warn" style="margin-bottom:14px;">
@@ -4923,7 +4923,7 @@ VIEWS['sentinel/data-connectors'] = () => `
   </div>
 `;
 
-VIEWS['sentinel/threat-intel'] = () => `
+VIEWS['siem/threat-intel'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Threat management › <strong>Threat intelligence</strong></div>
@@ -4931,8 +4931,8 @@ VIEWS['sentinel/threat-intel'] = () => `
       <div class="page-subtitle">Import indicators, verify ThreatIntelIndicators, then map IOCs to events with analytics rules.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/data-connectors">Data connectors</a>
-      <a class="btn btn-primary" href="#/sentinel/analytics">Analytics rules</a>
+      <a class="btn btn-secondary" href="#/siem/data-connectors">Data connectors</a>
+      <a class="btn btn-primary" href="#/siem/analytics">Analytics rules</a>
     </div>
   </div>
 
@@ -4985,7 +4985,7 @@ VIEWS['sentinel/threat-intel'] = () => `
   </div>
 `;
 
-VIEWS['sentinel/mitre'] = () => {
+VIEWS['siem/mitre'] = () => {
   // Index rule coverage by tactic name and technique id.
   const tacticCoverage = {};   // { tacticName: [rule, ...] }
   const techCoverage   = {};   // { techniqueId: [rule, ...] }
@@ -5073,7 +5073,7 @@ VIEWS['sentinel/mitre'] = () => {
     </div>
 
     <div class="card" style="margin-top:14px;">
-      <div class="card-toolbar"><strong>Coverage by rule</strong><a class="chip-link" href="#/sentinel/analytics">Edit analytics rules →</a></div>
+      <div class="card-toolbar"><strong>Coverage by rule</strong><a class="chip-link" href="#/siem/analytics">Edit analytics rules →</a></div>
       <table class="grid">
         <thead><tr><th>Tactic</th><th>Technique</th><th>Analytics rule</th><th>Status</th><th>Entity mapping</th></tr></thead>
         <tbody>
@@ -5092,7 +5092,7 @@ VIEWS['sentinel/mitre'] = () => {
   `;
 };
 
-VIEWS['sentinel/logs'] = () => {
+VIEWS['siem/logs'] = () => {
   const initialTask = KQL_PRACTICE_TASKS[0];
   const restoreJob = currentSentinelRestoreJob();
   const workspaceQuery = `workspace("${currentWorkspace().name}").SecurityEvent
@@ -5112,8 +5112,8 @@ VIEWS['sentinel/logs'] = () => {
       <div class="page-subtitle">Work through row-level KQL tasks against local fixtures. The runner supports union, join, summarize, parse, extract, parse_json, split, externaldata, and render.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/hunting">Open hunting</a>
-      <a class="btn btn-secondary" href="#/sentinel/hunting/dns">Open ASIM DNS</a>
+      <a class="btn btn-secondary" href="#/siem/hunting">Open hunting</a>
+      <a class="btn btn-secondary" href="#/siem/hunting/dns">Open ASIM DNS</a>
       <button class="btn btn-primary" onclick="runSentinelKqlPractice()">Run practice query</button>
     </div>
   </div>
@@ -5336,7 +5336,7 @@ VIEWS['sentinel/logs'] = () => {
   };
 };
 
-VIEWS['sentinel/hunting'] = () => {
+VIEWS['siem/hunting'] = () => {
   const jobComplete = localStorage.getItem('defender-lab.sentinel.networklogs.searchJob') === 'complete';
   const activeTab = currentSentinelHuntingTab();
   const bookmarks = currentSentinelBookmarks();
@@ -5468,7 +5468,7 @@ VIEWS['sentinel/hunting'] = () => {
                   <td>${bookmark.entityMapping.map(item => `<span class="tag">${esc(item)}</span>`).join(' ')}</td>
                   <td>${bookmark.tags.map(tag => `<span class="tag">${esc(tag)}</span>`).join(' ')}</td>
                   <td><span class="mitre">${esc(bookmark.mitre)}</span></td>
-                  <td>${bookmark.promotedIncidentId ? `<button class="link-button strong" onclick="navigate('#/sentinel/incidents')">${esc(bookmark.promotedIncidentId)}</button>` : `${bookmark.linkedIncidents?.map(id => `<span class="tag">${esc(id)}</span>`).join(' ') || '<span class="muted">None</span>'}`}</td>
+                  <td>${bookmark.promotedIncidentId ? `<button class="link-button strong" onclick="navigate('#/siem/incidents')">${esc(bookmark.promotedIncidentId)}</button>` : `${bookmark.linkedIncidents?.map(id => `<span class="tag">${esc(id)}</span>`).join(' ') || '<span class="muted">None</span>'}`}</td>
                   <td>
                     <button class="btn btn-secondary btn-sm" onclick="promoteSentinelBookmark('${esc(bookmark.id)}')">Promote to incident</button>
                     <button class="btn btn-ghost btn-sm" onclick="addBookmarkToExistingIncident('${esc(bookmark.id)}', '${esc(bookmark.linkedIncidents?.[0] || bookmark.incident || 'INC-1042')}')">Add to existing incident</button>
@@ -5570,8 +5570,8 @@ VIEWS['sentinel/hunting'] = () => {
       <div class="page-subtitle">Work through retained search results, bookmarks, and a live query feed from the same hunting surface.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/logs">Open Logs</a>
-      <a class="btn btn-secondary" href="#/sentinel/search">Restore data</a>
+      <a class="btn btn-secondary" href="#/siem/logs">Open Logs</a>
+      <a class="btn btn-secondary" href="#/siem/search">Restore data</a>
       <button class="btn btn-primary" onclick="runSentinelSearchJob()">Run search job</button>
     </div>
   </div>
@@ -5584,7 +5584,7 @@ VIEWS['sentinel/hunting'] = () => {
   `;
 };
 
-VIEWS['sentinel/soc-optimization'] = () => `
+VIEWS['siem/soc-optimization'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Sentinel › Manage › <strong>SOC optimization</strong></div>
@@ -5592,8 +5592,8 @@ VIEWS['sentinel/soc-optimization'] = () => `
       <div class="page-subtitle">Review coverage gaps, rule quality, and data-value recommendations before changing ingestion or detections.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/analytics">Analytics rules</a>
-      <a class="btn btn-secondary" href="#/sentinel/hunting">Retention</a>
+      <a class="btn btn-secondary" href="#/siem/analytics">Analytics rules</a>
+      <a class="btn btn-secondary" href="#/siem/hunting">Retention</a>
     </div>
   </div>
   <div class="kpi-strip">
@@ -5628,7 +5628,7 @@ VIEWS['sentinel/soc-optimization'] = () => `
   </div>
 `;
 
-VIEWS['sentinel/summary-rules'] = () => `
+VIEWS['siem/summary-rules'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Sentinel › Hunting › <strong>Summary rules</strong></div>
@@ -5673,7 +5673,7 @@ VIEWS['sentinel/summary-rules'] = () => `
   </div>
 `;
 
-VIEWS['sentinel/data-lake-jobs'] = () => {
+VIEWS['siem/data-lake-jobs'] = () => {
   const complete = localStorage.getItem('defender-lab.sentinel.dataLakeJob') === 'complete';
   return `
   <div class="page-header">
@@ -5683,7 +5683,7 @@ VIEWS['sentinel/data-lake-jobs'] = () => {
       <div class="page-subtitle">Run long-range KQL over retained Data lake tables, then materialize results for analyst review.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/hunting">Basic search job</a>
+      <a class="btn btn-secondary" href="#/siem/hunting">Basic search job</a>
       <button class="btn btn-primary" onclick="runSentinelDataLakeJob()">Run Data lake job</button>
     </div>
   </div>
@@ -5727,7 +5727,7 @@ VIEWS['sentinel/data-lake-jobs'] = () => {
 `;
 };
 
-VIEWS['sentinel/notebooks'] = () => `
+VIEWS['siem/notebooks'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Sentinel › Hunting › <strong>Notebooks</strong></div>
@@ -5735,7 +5735,7 @@ VIEWS['sentinel/notebooks'] = () => `
       <div class="page-subtitle">Use notebook-style investigation templates for enrichment, entity pivots, and Data lake job review.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/sentinel/data-lake-jobs">Data lake jobs</a>
+      <a class="btn btn-secondary" href="#/siem/data-lake-jobs">Data lake jobs</a>
       <button class="btn btn-primary" onclick="toast('Notebook opened with static lab cells only.')">Open notebook</button>
     </div>
   </div>
@@ -5775,7 +5775,7 @@ print("Load incident entities, enrich indicators, and attach the result table to
   </div>
 `;
 
-VIEWS['sentinel/workbooks'] = () => `
+VIEWS['siem/workbooks'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Threat management › <strong>Workbooks</strong></div><h1>Workbooks</h1></div></div>
   <div class="three-col">
     ${SENTINEL_WORKBOOKS.map(w => `
@@ -5799,7 +5799,7 @@ VIEWS['sentinel/workbooks'] = () => `
   </div>
 `;
 
-VIEWS['sentinel/automation'] = () => {
+VIEWS['siem/automation'] = () => {
   const lab = SENTINEL_AUTOMATION_LAB;
   const selectedTrigger = sessionStorage.getItem('defender-lab.sentinel.rule.trigger') || lab.ruleDraft.trigger;
   const isAlertTrigger = selectedTrigger === 'When alert is created';
@@ -6150,15 +6150,15 @@ const CLOUD_ATTACK_PATHS = [
 ];
 
 const SECONDARY_SURFACES = {
-  'defender/reports': { crumb:'Defender › Other', title:'Reports', note:'Secondary reporting surface for lab review. The exam-relevant detail is in Threat analytics, Secure score, and incident queues.', links:[['Open Threat analytics','#/defender/threat-analytics'], ['Open Secure score','#/defender/secure-score']] },
-  'defender/learning-hub': { crumb:'Defender › Other', title:'Learning hub', note:'Supporting study surface with pointers into the local hands-on flows.', links:[['Start Guided scenarios','#/defender/home'], ['Open Advanced hunting','#/defender/hunting']] },
-  'defender/trials': { crumb:'Defender › Other', title:'Trials', note:'Chrome-only lab surface. Licensing and trials are outside this local simulator; practice workload behavior instead.', links:[['Open Settings','#/defender/settings'], ['Open Endpoints','#/defender/endpoints']] },
-  'sentinel/news': { crumb:'Sentinel › General', title:'News and guides', note:'Supporting content surface. Current syllabus practice is covered by connectors, analytics, incidents, hunting, and graph views.', links:[['Open Data connectors','#/sentinel/data-connectors'], ['Open Sentinel Graph','#/sentinel/graph']] },
-  'sentinel/repositories': { crumb:'Sentinel › Content management', title:'Repositories', note:'Supporting content lifecycle surface. Use Workspace manager to distribute rules and DCR-backed content across workspaces.', links:[['Open Workspace manager','#/sentinel/workspace-manager'], ['Open Content hub','#/sentinel/content-hub']] },
-  'sentinel/community': { crumb:'Sentinel › Content management', title:'Community', note:'Supporting community surface. The lab keeps all content local and original.', links:[['Open Hunting','#/sentinel/hunting'], ['Open Analytics','#/sentinel/analytics']] },
-  'defender-cloud/community': { crumb:'Defender for Cloud › General', title:'Community', note:'Supporting study surface for cloud security guidance. Use alerts, inventory, and attack paths for hands-on practice.', links:[['Open Security alerts','#/defender-cloud/alerts'], ['Open Attack paths','#/defender-cloud/attack-paths']] },
-  'defender-cloud/workbooks': { crumb:'Defender for Cloud › General', title:'Workbooks', note:'Secondary dashboard surface for posture and workload protection summaries.', links:[['Open Recommendations','#/defender-cloud/recommendations'], ['Open Inventory','#/defender-cloud/inventory']] },
-  'defender-cloud/diagnose': { crumb:'Defender for Cloud › General', title:'Diagnose and solve problems', note:'Secondary support surface. The lab models investigation decisions in alerts, inventory, and attack paths.', links:[['Open Security alerts','#/defender-cloud/alerts'], ['Open Environment settings','#/defender-cloud/environment']] },
+  'xdr/reports': { crumb:'Defender › Other', title:'Reports', note:'Secondary reporting surface for lab review. The exam-relevant detail is in Threat analytics, Secure score, and incident queues.', links:[['Open Threat analytics','#/xdr/threat-analytics'], ['Open Secure score','#/xdr/secure-score']] },
+  'xdr/learning-hub': { crumb:'Defender › Other', title:'Learning hub', note:'Supporting study surface with pointers into the local hands-on flows.', links:[['Start Guided scenarios','#/xdr/home'], ['Open Advanced hunting','#/xdr/hunting']] },
+  'xdr/trials': { crumb:'Defender › Other', title:'Trials', note:'Chrome-only lab surface. Licensing and trials are outside this local simulator; practice workload behavior instead.', links:[['Open Settings','#/xdr/settings'], ['Open Endpoints','#/xdr/endpoints']] },
+  'siem/news': { crumb:'Sentinel › General', title:'News and guides', note:'Supporting content surface. Current syllabus practice is covered by connectors, analytics, incidents, hunting, and graph views.', links:[['Open Data connectors','#/siem/data-connectors'], ['Open Sentinel Graph','#/siem/graph']] },
+  'siem/repositories': { crumb:'Sentinel › Content management', title:'Repositories', note:'Supporting content lifecycle surface. Use Workspace manager to distribute rules and DCR-backed content across workspaces.', links:[['Open Workspace manager','#/siem/workspace-manager'], ['Open Content hub','#/siem/content-hub']] },
+  'siem/community': { crumb:'Sentinel › Content management', title:'Community', note:'Supporting community surface. The lab keeps all content local and original.', links:[['Open Hunting','#/siem/hunting'], ['Open Analytics','#/siem/analytics']] },
+  'cloud/community': { crumb:'Defender for Cloud › General', title:'Community', note:'Supporting study surface for cloud security guidance. Use alerts, inventory, and attack paths for hands-on practice.', links:[['Open Security alerts','#/cloud/alerts'], ['Open Attack paths','#/cloud/attack-paths']] },
+  'cloud/workbooks': { crumb:'Defender for Cloud › General', title:'Workbooks', note:'Secondary dashboard surface for posture and workload protection summaries.', links:[['Open Recommendations','#/cloud/recommendations'], ['Open Inventory','#/cloud/inventory']] },
+  'cloud/diagnose': { crumb:'Defender for Cloud › General', title:'Diagnose and solve problems', note:'Secondary support surface. The lab models investigation decisions in alerts, inventory, and attack paths.', links:[['Open Security alerts','#/cloud/alerts'], ['Open Environment settings','#/cloud/environment']] },
 };
 
 function renderSecondarySurface(config) {
@@ -6179,15 +6179,15 @@ function renderSecondarySurface(config) {
     </div>`;
 }
 
-VIEWS['defender/reports'] = () => renderSecondarySurface(SECONDARY_SURFACES['defender/reports']);
-VIEWS['defender/learning-hub'] = () => renderSecondarySurface(SECONDARY_SURFACES['defender/learning-hub']);
-VIEWS['defender/trials'] = () => renderSecondarySurface(SECONDARY_SURFACES['defender/trials']);
-VIEWS['sentinel/news'] = () => renderSecondarySurface(SECONDARY_SURFACES['sentinel/news']);
-VIEWS['sentinel/repositories'] = () => renderSecondarySurface(SECONDARY_SURFACES['sentinel/repositories']);
-VIEWS['sentinel/community'] = () => renderSecondarySurface(SECONDARY_SURFACES['sentinel/community']);
-VIEWS['defender-cloud/community'] = () => renderSecondarySurface(SECONDARY_SURFACES['defender-cloud/community']);
-VIEWS['defender-cloud/workbooks'] = () => renderSecondarySurface(SECONDARY_SURFACES['defender-cloud/workbooks']);
-VIEWS['defender-cloud/diagnose'] = () => renderSecondarySurface(SECONDARY_SURFACES['defender-cloud/diagnose']);
+VIEWS['xdr/reports'] = () => renderSecondarySurface(SECONDARY_SURFACES['xdr/reports']);
+VIEWS['xdr/learning-hub'] = () => renderSecondarySurface(SECONDARY_SURFACES['xdr/learning-hub']);
+VIEWS['xdr/trials'] = () => renderSecondarySurface(SECONDARY_SURFACES['xdr/trials']);
+VIEWS['siem/news'] = () => renderSecondarySurface(SECONDARY_SURFACES['siem/news']);
+VIEWS['siem/repositories'] = () => renderSecondarySurface(SECONDARY_SURFACES['siem/repositories']);
+VIEWS['siem/community'] = () => renderSecondarySurface(SECONDARY_SURFACES['siem/community']);
+VIEWS['cloud/community'] = () => renderSecondarySurface(SECONDARY_SURFACES['cloud/community']);
+VIEWS['cloud/workbooks'] = () => renderSecondarySurface(SECONDARY_SURFACES['cloud/workbooks']);
+VIEWS['cloud/diagnose'] = () => renderSecondarySurface(SECONDARY_SURFACES['cloud/diagnose']);
 
 function defenderCloudMulticloudState() {
   return typeof currentDefenderCloudMulticloudState === 'function'
@@ -6476,7 +6476,7 @@ function renderDefenderCloudAttackPathDetail(path, ui) {
     <div class="page-header dfc-detail-header"><div>
       <div class="pill-row"><span class="sev ${path.severity}">${cap(path.severity)} risk</span><span class="tag ${defenderCloudAttackPathStatusTag(status)}">${esc(status)}</span><span class="tag">${esc(path.cloud)}</span></div>
       <h1>${esc(path.name)}</h1><div class="page-subtitle">${esc(path.scenario)}</div>
-    </div><div class="page-actions"><a class="btn btn-secondary" href="#/defender-cloud/explorer">Open Cloud Security Explorer</a></div></div>
+    </div><div class="page-actions"><a class="btn btn-secondary" href="#/cloud/explorer">Open Cloud Security Explorer</a></div></div>
     ${status === 'Resolved' ? '<div class="callout success">All path-breaking recommendations are resolved. The path can remain visible for up to 24 hours while the graph refreshes.</div>' : ''}
     <div class="dfc-path-detail-grid">
       <section class="card card-body dfc-path-map-card">
@@ -6509,10 +6509,10 @@ function renderDefenderCloudAttackPathDetail(path, ui) {
     </section>`;
 }
 
-VIEWS['defender/action-center'] = () => `
+VIEWS['xdr/action-center'] = () => `
   <div class="page-header">
     <div><div class="breadcrumb">Investigation &amp; response › <strong>Action center</strong></div><h1>Action center</h1><div class="page-subtitle">Review completed and pending response actions from AIR, MDE, and MDO.</div></div>
-    <div class="page-actions"><a class="btn btn-secondary" href="#/defender/air">Open AIR center</a></div>
+    <div class="page-actions"><a class="btn btn-secondary" href="#/xdr/air">Open AIR center</a></div>
   </div>
   <div class="kpi-strip">
     <div class="kpi"><span class="kpi-label">Pending approval</span><span class="kpi-value">${ACTION_CENTER_ITEMS.filter(i=>i.status.includes('Pending')).length}</span></div>
@@ -6537,7 +6537,7 @@ VIEWS['defender/action-center'] = () => `
     </table>
   </div>`;
 
-VIEWS['defender/email-collab'] = () => `
+VIEWS['xdr/email-collab'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Email &amp; collaboration › <strong>Investigations</strong></div>
@@ -6545,8 +6545,8 @@ VIEWS['defender/email-collab'] = () => `
       <div class="page-subtitle">Practice MDO triage paths for phishing, mailbox rules, submissions, and OAuth follow-on activity.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/defender/threat-explorer">Open Threat Explorer</a>
-      <a class="btn btn-secondary" href="#/defender/cloud-apps">Cloud apps OAuth pivot</a>
+      <a class="btn btn-secondary" href="#/xdr/threat-explorer">Open Threat Explorer</a>
+      <a class="btn btn-secondary" href="#/xdr/cloud-apps">Cloud apps OAuth pivot</a>
     </div>
   </div>
   <div class="two-col">
@@ -6576,8 +6576,8 @@ VIEWS['defender/email-collab'] = () => `
         Threat Explorer is the dedicated mail triage drill-down. Use it to pivot by verdict, campaign, and targeted user before you take remediation action.
       </div>
       <div class="sidepanel-footer" style="padding-top:12px;">
-        <a class="btn btn-primary" href="#/defender/threat-explorer">Open Threat Explorer</a>
-        <a class="btn btn-secondary" href="#/defender/email-collab/threat-explorer/campaigns">Campaign pivots</a>
+        <a class="btn btn-primary" href="#/xdr/threat-explorer">Open Threat Explorer</a>
+        <a class="btn btn-secondary" href="#/xdr/email-collab/threat-explorer/campaigns">Campaign pivots</a>
       </div>
     </section>
   </div>
@@ -6587,22 +6587,22 @@ VIEWS['defender/email-collab'] = () => `
       <span class="muted">Use the full explorer for pivots and entity detail</span>
     </div>
     <div class="tile-grid">
-      <a class="tile" href="#/defender/threat-explorer"><strong>Threat Explorer</strong><span>Filter phish and malware waves, inspect headers, and queue remediation.</span></a>
-      <a class="tile" href="#/defender/cloud-apps"><strong>Cloud Apps OAuth</strong><span>Continue the phishing-to-consent chain and review risky app activity.</span></a>
-      <a class="tile" href="#/purview/audit"><strong>Purview Audit</strong><span>Search consent, login, and Copilot interactions across the timeline.</span></a>
+      <a class="tile" href="#/xdr/threat-explorer"><strong>Threat Explorer</strong><span>Filter phish and malware waves, inspect headers, and queue remediation.</span></a>
+      <a class="tile" href="#/xdr/cloud-apps"><strong>Cloud Apps OAuth</strong><span>Continue the phishing-to-consent chain and review risky app activity.</span></a>
+      <a class="tile" href="#/governance/audit"><strong>Purview Audit</strong><span>Search consent, login, and Copilot interactions across the timeline.</span></a>
     </div>
   </div>`;
 
-VIEWS['defender/endpoints'] = () => `
+VIEWS['xdr/endpoints'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Endpoints › <strong>Endpoint security ops</strong></div><h1>Endpoint security operations</h1><div class="page-subtitle">Shortcut surface for MDE device settings, ASR policy, live response, and device inventory.</div></div></div>
   <div class="tile-grid">
-    <a class="tile" href="#/defender/devices"><strong>Device inventory</strong><span>Open device overview, timeline, live response, and package collection.</span></a>
-    <a class="tile" href="#/defender/settings"><strong>MDE settings</strong><span>Advanced features, device groups, roles, and automation levels.</span></a>
-    <a class="tile" href="#/defender/asr-policy"><strong>ASR policies</strong><span>Audit/block states, exclusions, and expected impact.</span></a>
-    <a class="tile" href="#/defender/custom-detections"><strong>Custom detections</strong><span>Promote Advanced hunting queries to endpoint actions.</span></a>
+    <a class="tile" href="#/xdr/devices"><strong>Device inventory</strong><span>Open device overview, timeline, live response, and package collection.</span></a>
+    <a class="tile" href="#/xdr/settings"><strong>MDE settings</strong><span>Advanced features, device groups, roles, and automation levels.</span></a>
+    <a class="tile" href="#/xdr/asr-policy"><strong>ASR policies</strong><span>Audit/block states, exclusions, and expected impact.</span></a>
+    <a class="tile" href="#/xdr/custom-detections"><strong>Custom detections</strong><span>Promote Advanced hunting queries to endpoint actions.</span></a>
   </div>`;
 
-VIEWS['defender/exposure'] = () => `
+VIEWS['xdr/exposure'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Exposure management › <strong>Overview</strong></div><h1>Exposure management</h1><div class="page-subtitle">Prioritize exposed assets by incident linkage, cloud attack paths, and secure score recommendations.</div></div></div>
   <div class="kpi-strip">
     <div class="kpi"><span class="kpi-label">Critical assets</span><span class="kpi-value">7</span></div>
@@ -6612,21 +6612,21 @@ VIEWS['defender/exposure'] = () => `
   </div>
   <div class="two-col">
     <section class="card card-body"><div class="alert-section-title">Exposure priorities</div><ul><li>Resolve public management ports on internet-facing VMs before tuning low-value posture findings.</li><li>Use Defender for Cloud attack paths when a resource appears in a workload-protection alert.</li><li>Pivot endpoint exposure to device inventory and cloud exposure to inventory/attack paths.</li></ul></section>
-    <section class="card"><div class="card-toolbar"><strong>Related attack paths</strong><a class="chip-link" href="#/defender-cloud/attack-paths">Open cloud paths →</a></div>${CLOUD_ATTACK_PATHS.map(p => `<div class="card-body border-top"><span class="sev ${p.severity}">${cap(p.severity)}</span> <strong>${esc(p.name)}</strong><div class="muted">${esc(p.result)}</div></div>`).join('')}</section>
+    <section class="card"><div class="card-toolbar"><strong>Related attack paths</strong><a class="chip-link" href="#/cloud/attack-paths">Open cloud paths →</a></div>${CLOUD_ATTACK_PATHS.map(p => `<div class="card-body border-top"><span class="sev ${p.severity}">${cap(p.severity)}</span> <strong>${esc(p.name)}</strong><div class="muted">${esc(p.result)}</div></div>`).join('')}</section>
   </div>`;
 
-VIEWS['defender/intel-explorer'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Threat intelligence › <strong>Intel explorer</strong></div><h1>Intel explorer</h1><div class="page-subtitle">Static IOC triage surface using the lab's Sentinel threat intelligence indicators.</div></div><div class="page-actions"><a class="btn btn-secondary" href="#/sentinel/threat-intel">Sentinel threat intel</a></div></div>
+VIEWS['xdr/intel-explorer'] = () => `
+  <div class="page-header"><div><div class="breadcrumb">Threat intelligence › <strong>Intel explorer</strong></div><h1>Intel explorer</h1><div class="page-subtitle">Static IOC triage surface using the lab's Sentinel threat intelligence indicators.</div></div><div class="page-actions"><a class="btn btn-secondary" href="#/siem/threat-intel">Sentinel threat intel</a></div></div>
   <div class="card">
     <div class="card-toolbar"><strong>Indicators in this lab</strong><span class="muted">Mapped to synthetic events only</span></div>
     <table class="grid"><thead><tr><th>Type</th><th>Indicator</th><th>Confidence</th><th>Scenario</th><th>Pivot</th></tr></thead><tbody>
-      <tr><td>IP</td><td class="kv">203.0.113.10</td><td>High</td><td>TI match synthetic transaction</td><td><a class="chip-link" href="#/sentinel/threat-intel">Open TI lab</a></td></tr>
-      <tr><td>Domain</td><td class="kv">bad-demo.example</td><td>Medium</td><td>Phishing and command channel demo</td><td><a class="chip-link" href="#/sentinel/logs">Open logs</a></td></tr>
-      <tr><td>Hash</td><td class="kv">aaaabbbbcccc...</td><td>Low</td><td>Scanner suppression gotcha</td><td><a class="chip-link" href="#/defender/suppression">Open suppression</a></td></tr>
+      <tr><td>IP</td><td class="kv">203.0.113.10</td><td>High</td><td>TI match synthetic transaction</td><td><a class="chip-link" href="#/siem/threat-intel">Open TI lab</a></td></tr>
+      <tr><td>Domain</td><td class="kv">bad-demo.example</td><td>Medium</td><td>Phishing and command channel demo</td><td><a class="chip-link" href="#/siem/logs">Open logs</a></td></tr>
+      <tr><td>Hash</td><td class="kv">aaaabbbbcccc...</td><td>Low</td><td>Scanner suppression gotcha</td><td><a class="chip-link" href="#/xdr/suppression">Open suppression</a></td></tr>
     </tbody></table>
   </div>`;
 
-VIEWS['sentinel/search'] = () => {
+VIEWS['siem/search'] = () => {
   const restoreJob = currentSentinelRestoreJob();
   const complete = restoreJob.status === 'complete';
   return `
@@ -6637,15 +6637,15 @@ VIEWS['sentinel/search'] = () => {
       <div class="page-subtitle">Run investigation searches across Basic, Analytics, Data lake, and summary-table patterns.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-primary" href="#/sentinel/hunting">Open hunting workspace</a>
+      <a class="btn btn-primary" href="#/siem/hunting">Open hunting workspace</a>
       <button class="btn btn-secondary" onclick="runSentinelRestoreJob()">Run restore job</button>
     </div>
   </div>
   <div class="tile-grid">
-    <a class="tile" href="#/sentinel/hunting"><strong>Basic-table search job</strong><span>Recover older NetworkLogs_CL rows through materialized search results.</span></a>
-    <a class="tile" href="#/sentinel/data-lake-jobs"><strong>Data lake KQL job</strong><span>Run long-range historical hunts and review results tables.</span></a>
-    <a class="tile" href="#/sentinel/summary-rules"><strong>Summary table query</strong><span>Compare noisy raw telemetry with aggregate summary output.</span></a>
-    <a class="tile" href="#/sentinel/logs"><strong>Logs</strong><span>Inspect current Sentinel fixture rows and copy KQL.</span></a>
+    <a class="tile" href="#/siem/hunting"><strong>Basic-table search job</strong><span>Recover older NetworkLogs_CL rows through materialized search results.</span></a>
+    <a class="tile" href="#/siem/data-lake-jobs"><strong>Data lake KQL job</strong><span>Run long-range historical hunts and review results tables.</span></a>
+    <a class="tile" href="#/siem/summary-rules"><strong>Summary table query</strong><span>Compare noisy raw telemetry with aggregate summary output.</span></a>
+    <a class="tile" href="#/siem/logs"><strong>Logs</strong><span>Inspect current Sentinel fixture rows and copy KQL.</span></a>
   </div>
   <div class="card" style="margin-top:16px;">
     <div class="card-toolbar">
@@ -6671,7 +6671,7 @@ VIEWS['sentinel/search'] = () => {
         <textarea class="kql" readonly>${esc(SENTINEL_RESTORE_JOB.query)}</textarea>
         <div class="sidepanel-footer" style="padding-top:12px;">
           <button class="btn btn-primary" onclick="runSentinelRestoreJob()">Restore table</button>
-          <a class="btn btn-secondary" href="#/sentinel/logs">Open logs</a>
+          <a class="btn btn-secondary" href="#/siem/logs">Open logs</a>
         </div>
       </div>
     </div>
@@ -6697,17 +6697,17 @@ VIEWS['sentinel/search'] = () => {
   </div>`;
 };
 
-VIEWS['sentinel/entity-behavior'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Threat management › <strong>Entity behavior</strong></div><h1>Entity behavior</h1><div class="page-subtitle">UEBA-style risk context for users, hosts, and IPs that feed incidents, anomalies, and hunting pivots.</div></div><div class="page-actions"><a class="btn btn-secondary" href="#/sentinel/settings">UEBA settings</a></div></div>
+VIEWS['siem/entity-behavior'] = () => `
+  <div class="page-header"><div><div class="breadcrumb">Threat management › <strong>Entity behavior</strong></div><h1>Entity behavior</h1><div class="page-subtitle">UEBA-style risk context for users, hosts, and IPs that feed incidents, anomalies, and hunting pivots.</div></div><div class="page-actions"><a class="btn btn-secondary" href="#/siem/settings">UEBA settings</a></div></div>
   <div class="two-col">
     <section class="card">
       <div class="card-toolbar"><strong>Behavioral entities</strong><span class="muted">Fictional UEBA scores</span></div>
       <table class="grid">
         <thead><tr><th>Entity</th><th>Type</th><th>Score</th><th>Top anomaly</th><th>Pivot</th><th>Action</th></tr></thead>
         <tbody>
-          <tr><td>jane.doe@hacksmarterlabs.example</td><td>Account</td><td><span class="sev high">92</span></td><td>OAuth grant after phishing click</td><td><a class="chip-link" href="#/sentinel/graph">Graph</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('jane.doe@hacksmarterlabs.example', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
-          <tr><td>FIN-FS-02</td><td>Host</td><td><span class="sev high">88</span></td><td>Rare encryption process and service stop</td><td><a class="chip-link" href="#/defender/device">Device</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('FIN-FS-02', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
-          <tr><td>10.5.12.44</td><td>IP</td><td><span class="sev medium">67</span></td><td>Repeated IOC destination contact</td><td><a class="chip-link" href="#/sentinel/hunting/dns">DNS hunt</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('10.5.12.44', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
+          <tr><td>jane.doe@hacksmarterlabs.example</td><td>Account</td><td><span class="sev high">92</span></td><td>OAuth grant after phishing click</td><td><a class="chip-link" href="#/siem/graph">Graph</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('jane.doe@hacksmarterlabs.example', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
+          <tr><td>FIN-FS-02</td><td>Host</td><td><span class="sev high">88</span></td><td>Rare encryption process and service stop</td><td><a class="chip-link" href="#/xdr/device">Device</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('FIN-FS-02', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
+          <tr><td>10.5.12.44</td><td>IP</td><td><span class="sev medium">67</span></td><td>Repeated IOC destination contact</td><td><a class="chip-link" href="#/siem/hunting/dns">DNS hunt</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('10.5.12.44', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
         </tbody>
       </table>
     </section>
@@ -6718,7 +6718,7 @@ VIEWS['sentinel/entity-behavior'] = () => `
     </section>
   </div>`;
 
-VIEWS['sentinel/watchlist'] = () => `
+VIEWS['siem/watchlist'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Configuration › <strong>Watchlist</strong></div><h1>Watchlists</h1><div class="page-subtitle">Use watchlists to enrich KQL detections with controlled lists such as VIP users, approved scanners, and Tier 0 apps.</div></div><div class="page-actions"><button class="btn btn-primary" onclick="toast('Watchlist upload simulated.')">+ Add watchlist</button></div></div>
   <div class="card"><div class="card-toolbar"><strong>Watchlists</strong><span class="muted">Local fixture rows</span></div><table class="grid"><thead><tr><th>Name</th><th>Alias</th><th>Items</th><th>Updated</th><th>Detection use</th></tr></thead><tbody>${SENTINEL_WATCHLIST_ROWS.map(w => `<tr><td><strong>${esc(w.name)}</strong></td><td class="kv">${esc(w.alias)}</td><td>${w.items}</td><td>${fmtTime(w.updated)}</td><td>${esc(w.use)}</td></tr>`).join('')}</tbody></table></div>
   <div class="card card-body" style="margin-top:16px;"><div class="alert-section-title">KQL pattern</div><pre class="kql">let VIPs = _GetWatchlist('vip_accounts') | project UserPrincipalName;
@@ -6726,25 +6726,25 @@ SigninLogs
 | where UserPrincipalName in (VIPs)
 | where RiskLevel == "High"</pre></div>`;
 
-VIEWS['sentinel/settings'] = () => `
+VIEWS['siem/settings'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Configuration › <strong>Settings</strong></div><h1>Sentinel settings</h1><div class="page-subtitle">Workspace-level controls for UEBA, retention decisions, and content lifecycle.</div></div></div>
   <div class="two-col">
     <section class="card card-body"><div class="alert-section-title">UEBA enablement</div>
       <div class="setting-row"><div><strong>Entity behavior analytics</strong><span>Builds behavioral context for accounts, hosts, and IPs.</span></div><label class="toggle"><input type="checkbox" checked><span></span></label></div>
       <div class="setting-row"><div><strong>Directory data sync</strong><span>Enriches accounts with department, manager, and role context.</span></div><label class="toggle"><input type="checkbox" checked><span></span></label></div>
       <div class="setting-row"><div><strong>Anomaly enrichment</strong><span>Feeds customizable anomaly rules and hunting pivots.</span></div><label class="toggle"><input type="checkbox" checked><span></span></label></div>
-      <a class="chip-link" href="#/sentinel/entity-behavior">Open Entity behavior →</a>
+      <a class="chip-link" href="#/siem/entity-behavior">Open Entity behavior →</a>
     </section>
-    <section class="card card-body"><div class="alert-section-title">Workspace operations</div><ul><li>Use Workspace manager to publish analytics, workbooks, and automation to member workspaces.</li><li>Use Data connectors for DCR-backed Windows, CEF, Azure Activity, and custom ingestion labs.</li><li>Use Analytics and Anomalies for detection engineering coverage.</li></ul><a class="chip-link" href="#/sentinel/workspace-manager">Open Workspace manager →</a></section>
+    <section class="card card-body"><div class="alert-section-title">Workspace operations</div><ul><li>Use Workspace manager to publish analytics, workbooks, and automation to member workspaces.</li><li>Use Data connectors for DCR-backed Windows, CEF, Azure Activity, and custom ingestion labs.</li><li>Use Analytics and Anomalies for detection engineering coverage.</li></ul><a class="chip-link" href="#/siem/workspace-manager">Open Workspace manager →</a></section>
   </div>`;
 
-VIEWS['sentinel/workspace-manager'] = () => {
+VIEWS['siem/workspace-manager'] = () => {
   const content = [
-    { type:'Analytics rules', selected:5, total:SENTINEL_RULES.length, link:'#/sentinel/analytics', detail:'Scheduled, NRT, TI, and ML behavior analytics examples' },
-    { type:'Hunting queries', selected:4, total:SAVED_QUERIES.length, link:'#/defender/hunting', detail:'Reusable Advanced hunting and Sentinel search patterns' },
-    { type:'Workbooks', selected:3, total:5, link:'#/sentinel/workbooks', detail:'SOC overview, UEBA, and ingestion health panels' },
-    { type:'Automation', selected:2, total:3, link:'#/sentinel/automation', detail:'Playbooks and automation rules tied to incident response' },
-    { type:'DCR-backed connectors', selected:4, total:SENTINEL_INGESTION_LABS.length + 1, link:'#/sentinel/data-connectors', detail:'Syslog, Windows Security Events, CEF, Azure Activity, custom logs' },
+    { type:'Analytics rules', selected:5, total:SENTINEL_RULES.length, link:'#/siem/analytics', detail:'Scheduled, NRT, TI, and ML behavior analytics examples' },
+    { type:'Hunting queries', selected:4, total:SAVED_QUERIES.length, link:'#/xdr/hunting', detail:'Reusable Advanced hunting and Sentinel search patterns' },
+    { type:'Workbooks', selected:3, total:5, link:'#/siem/workbooks', detail:'SOC overview, UEBA, and ingestion health panels' },
+    { type:'Automation', selected:2, total:3, link:'#/siem/automation', detail:'Playbooks and automation rules tied to incident response' },
+    { type:'DCR-backed connectors', selected:4, total:SENTINEL_INGESTION_LABS.length + 1, link:'#/siem/data-connectors', detail:'Syslog, Windows Security Events, CEF, Azure Activity, custom logs' },
   ];
   const workspace = currentWorkspace();
   const tenant = currentMsspTenant();
@@ -6758,7 +6758,7 @@ VIEWS['sentinel/workspace-manager'] = () => {
         <h1>Workspace manager</h1>
         <div class="page-subtitle">Central landing surface for packaging, publishing, and tracking Sentinel content across member workspaces and customer tenants.</div>
       </div>
-      <div class="page-actions"><a class="btn btn-secondary" href="#/sentinel/analytics">Analytics</a><a class="btn btn-primary" href="#/sentinel/data-connectors">DCR workflows</a></div>
+      <div class="page-actions"><a class="btn btn-secondary" href="#/siem/analytics">Analytics</a><a class="btn btn-primary" href="#/siem/data-connectors">DCR workflows</a></div>
     </div>
     <div class="kpi-strip">
       <div class="kpi"><span class="kpi-label">Member workspaces</span><span class="kpi-value">${SENTINEL_WORKSPACES.length}</span></div>
@@ -6825,7 +6825,7 @@ VIEWS['sentinel/workspace-manager'] = () => {
         <textarea class="kql" readonly>${esc(workspaceQuery)}</textarea>
         <div class="sidepanel-footer" style="padding-top:12px;">
           <button class="btn btn-secondary" onclick='loadSentinelLogsQuery(${JSON.stringify(workspaceQuery)})'>Send to Logs</button>
-          <a class="btn btn-primary" href="#/sentinel/logs">Open Logs</a>
+          <a class="btn btn-primary" href="#/siem/logs">Open Logs</a>
         </div>
       </section>
     </div>
@@ -6843,7 +6843,7 @@ VIEWS['sentinel/workspace-manager'] = () => {
 // ====================================================================
 // DEFENDER FOR CLOUD
 // ====================================================================
-VIEWS['defender-cloud/overview'] = () => `
+VIEWS['cloud/overview'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Overview</strong></div><h1>Defender for Cloud</h1></div></div>
   <div class="kpi-strip">
     <div class="kpi"><span class="kpi-label">Secure score</span><span class="kpi-value">65%</span></div>
@@ -6872,12 +6872,12 @@ VIEWS['defender-cloud/overview'] = () => `
         <div><span class="sev medium">Medium</span> ${DEFENDER_CLOUD_RECS.filter(r=>r.severity==='medium').length} recommendations</div>
         <div><span class="sev low">Low</span> ${DEFENDER_CLOUD_RECS.filter(r=>r.severity==='low').length} recommendations</div>
       </div>
-      <a class="chip-link" href="#/defender-cloud/recommendations">All recommendations →</a>
+      <a class="chip-link" href="#/cloud/recommendations">All recommendations →</a>
     </div>
   </div>
 `;
 
-VIEWS['defender-cloud/recommendations'] = () => `
+VIEWS['cloud/recommendations'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Recommendations</strong></div><h1>Recommendations</h1><div class="page-subtitle">Select a recommendation to review its risk context, affected resources, and remediation steps.</div></div></div>
   <div class="filterbar">
     <span class="chip">Severity: <strong>Any</strong> ▾</span>
@@ -6931,7 +6931,7 @@ function renderCloudRecommendationDetail(rec, tab) {
       <div class="pill-row">${(rec.riskFactors || []).map(item => `<span class="tag orange">${esc(item)}</span>`).join('') || '<span class="muted">No additional risk factors.</span>'}</div>
       <div class="alert-section-title">Attack-path context</div>
       <div class="callout ${rec.attackPath && !rec.attackPath.startsWith('No active') ? 'warn' : 'info'}">${esc(rec.attackPath || 'No attack-path context is available for this finding.')}</div>
-      <button class="btn btn-secondary btn-sm" onclick="hidePanels(); navigate('#/defender-cloud/attack-paths');">Open attack path analysis</button>
+      <button class="btn btn-secondary btn-sm" onclick="hidePanels(); navigate('#/cloud/attack-paths');">Open attack path analysis</button>
     ` : active === 'remediation' ? `
       <div class="alert-section-title">Recommended sequence</div>
       <ol class="attack-evidence-list">${(rec.remediation || []).map(step => `<li>${esc(step)}</li>`).join('')}</ol>
@@ -6949,17 +6949,17 @@ function renderCloudRecommendationDetail(rec, tab) {
         <tbody>${assets.map((asset, index) => `<tr><td><strong>${esc(asset)}</strong></td><td>${esc(rec.resourceType)}</td><td><span class="tag ${index === 0 && rec.severity === 'high' ? 'orange' : ''}">Unhealthy</span></td></tr>`).join('')}</tbody>
       </table>
       ${assets.length < rec.affected ? `<div class="muted" style="margin-top:10px;">${rec.affected - assets.length} additional affected resource${rec.affected - assets.length === 1 ? '' : 's'} summarized in this lab fixture.</div>` : ''}
-      <button class="btn btn-secondary btn-sm" style="margin-top:12px;" onclick="hidePanels(); navigate('#/defender-cloud/inventory');">Open resource inventory</button>
+      <button class="btn btn-secondary btn-sm" style="margin-top:12px;" onclick="hidePanels(); navigate('#/cloud/inventory');">Open resource inventory</button>
     ` : `
       <div class="alert-section-title">Related initiatives and standards</div>
       ${(rec.initiatives || []).map(name => `<div class="detail-row"><span>${esc(name)}</span><strong>Mapped</strong></div>`).join('') || '<div class="muted">No related initiatives.</div>'}
       <div class="callout info" style="margin-top:14px;">A recommendation can contribute evidence to more than one initiative. Remediating the resource finding can therefore improve multiple compliance views.</div>
-      <button class="btn btn-secondary btn-sm" onclick="hidePanels(); navigate('#/defender-cloud/regulatory');">Open regulatory compliance</button>
+      <button class="btn btn-secondary btn-sm" onclick="hidePanels(); navigate('#/cloud/regulatory');">Open regulatory compliance</button>
     `}
   `;
 }
 
-VIEWS['defender-cloud/regulatory'] = () => `
+VIEWS['cloud/regulatory'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Regulatory compliance</strong></div><h1>Regulatory compliance</h1></div></div>
   ${COMPLIANCE_FRAMEWORKS.map(f => `
     <div class="card card-body">
@@ -6976,7 +6976,7 @@ VIEWS['defender-cloud/regulatory'] = () => `
 const DEFENDER_CLOUD_SEVERITY_ORDER = ['high', 'medium', 'low', 'informational'];
 const DEFENDER_CLOUD_STATUSES = ['Active', 'Dismissed', 'Resolved'];
 
-VIEWS['defender-cloud/alerts'] = () => {
+VIEWS['cloud/alerts'] = () => {
   const filters = defenderCloudAlertFilters();
   const all = defenderCloudAlertRows();
   const rows = all.filter(a =>
@@ -6998,7 +6998,7 @@ VIEWS['defender-cloud/alerts'] = () => {
     </div>
     <div class="page-actions">
       <button class="btn btn-secondary" onclick="toast('Download CSV report — one-time export of the filtered alert list (lab stub).')">Download CSV report</button>
-      <a class="btn btn-secondary" href="#/defender-cloud/attack-paths">Attack paths</a>
+      <a class="btn btn-secondary" href="#/cloud/attack-paths">Attack paths</a>
     </div>
   </div>
 
@@ -7138,13 +7138,13 @@ function renderCloudAlertDetail(alert, tab) {
       <div class="alert-section-title">Prevent future attacks</div>
       <div class="muted">Remediate these recommendations to reduce the attack surface this alert exploited.</div>
       <ul class="attack-evidence-list">${(alert.recommendations || []).map(r => `<li>${esc(r)}</li>`).join('') || '<li class="muted">No recommendations mapped.</li>'}</ul>
-      <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender-cloud/recommendations'); hidePanels();">Open recommendations</button>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('#/cloud/recommendations'); hidePanels();">Open recommendations</button>
 
       <div class="alert-section-title">Trigger automated response</div>
       <div class="muted">Run a logic app in response to this alert.</div>
       <div style="margin-top:8px;">
         <button class="btn btn-secondary btn-sm" onclick="toast('Logic app triggered for ${esc(alert.id)} (lab stub — no real automation runs).')">Trigger logic app</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender-cloud/workflow'); hidePanels();">Open workflow automation</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/cloud/workflow'); hidePanels();">Open workflow automation</button>
       </div>
 
       <div class="alert-section-title">Suppress similar alerts</div>
@@ -7161,7 +7161,7 @@ function renderCloudAlertDetail(alert, tab) {
       <div class="pill-row">
         <button class="btn btn-secondary btn-sm" onclick="toast('Marked useful — feedback tunes detection quality.')">Useful</button>
         <button class="btn btn-secondary btn-sm" onclick="toast('Marked not useful — pick a reason and add a comment in the portal.')">Not useful</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/settings'); hidePanels();">Configure email notification settings</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/settings'); hidePanels();">Configure email notification settings</button>
       </div>
     `}`;
 }
@@ -7189,8 +7189,8 @@ function renderCloudIncidentAttackPath(incident) {
       <div class="muted" style="margin:6px 0;">Entry point <strong>${esc(path.start)}</strong> → ${esc(path.result)}</div>
       <ol class="attack-evidence-list">${(path.path || []).map(s => `<li>${esc(s)}</li>`).join('')}</ol>
       <div style="margin-top:8px;">
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender-cloud/attack-paths'); hidePanels();">Open attack path analysis</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender-cloud/recommendations'); hidePanels();">Remediate path recommendations</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/cloud/attack-paths'); hidePanels();">Open attack path analysis</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/cloud/recommendations'); hidePanels();">Remediate path recommendations</button>
       </div>
       <div class="muted" style="margin-top:8px;">
         This is the posture side of the same story: the incident is what the attacker did, the attack path is the exposure that let them. Remediating the path removes the route — resolving the alerts does not.
@@ -7361,7 +7361,7 @@ function renderCloudResourceDetail(asset, tab) {
       <div class="alert-section-title">Exposure and risk</div>
       <div class="callout ${asset.risk === 'High' ? 'warn' : 'info'}"><strong>${esc(asset.exposure)}</strong><div style="margin-top:5px;">Risk is based on this fictional resource's exposure, active findings, and relationship to other cloud assets.</div></div>
 
-      ${paths.length ? `<div class="alert-section-title">Attack path involvement</div>${paths.map(path => `<div class="detail-row"><span>${esc(path.name)}</span><strong>${esc(path.status || cap(path.severity))}</strong></div>`).join('')}<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="navigate('#/defender-cloud/attack-paths');hidePanels();">Open attack path analysis</button>` : ''}
+      ${paths.length ? `<div class="alert-section-title">Attack path involvement</div>${paths.map(path => `<div class="detail-row"><span>${esc(path.name)}</span><strong>${esc(path.status || cap(path.severity))}</strong></div>`).join('')}<button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="navigate('#/cloud/attack-paths');hidePanels();">Open attack path analysis</button>` : ''}
     ` : active === 'recommendations' ? `
       <div class="alert-section-title">Active security recommendations</div>
       <p class="muted">Recommendations are shown in risk order for this resource. Catalog-backed rows open the full remediation pane.</p>
@@ -7369,7 +7369,7 @@ function renderCloudResourceDetail(asset, tab) {
         <thead><tr><th>Severity</th><th>Recommendation</th><th>Source</th></tr></thead>
         <tbody>${recommendations.length ? recommendations.map(rec => `<tr ${rec.id ? `class="dfc-recommendation-row" tabindex="0" onclick="openCloudRecommendation('${esc(rec.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCloudRecommendation('${esc(rec.id)}');}"` : ''}><td><span class="sev ${esc(rec.severity)}">${cap(rec.severity)}</span></td><td><strong>${esc(rec.title)}</strong></td><td>${esc(rec.source)}</td></tr>`).join('') : '<tr><td colspan="3" class="muted">No active recommendations for this resource.</td></tr>'}</tbody>
       </table>
-      <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="navigate('#/defender-cloud/recommendations');hidePanels();">Open all recommendations</button>
+      <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="navigate('#/cloud/recommendations');hidePanels();">Open all recommendations</button>
     ` : `
       <div class="alert-section-title">Security alerts</div>
       <p class="muted">Alerts are matched through the resource name and extracted cloud entities.</p>
@@ -7381,10 +7381,10 @@ function renderCloudResourceDetail(asset, tab) {
   `;
 }
 
-VIEWS['defender-cloud/inventory'] = () => `
+VIEWS['cloud/inventory'] = () => `
   <div class="page-header">
     <div><div class="breadcrumb">Defender for Cloud › <strong>Inventory</strong></div><h1>Inventory</h1><div class="page-subtitle">Cloud resources with workload-protection alerts, recommendations, and exposure context.</div></div>
-    <div class="page-actions"><a class="btn btn-secondary" href="#/defender-cloud/attack-paths">Attack paths</a></div>
+    <div class="page-actions"><a class="btn btn-secondary" href="#/cloud/attack-paths">Attack paths</a></div>
   </div>
   <div class="kpi-strip">
     <div class="kpi"><span class="kpi-label">Resources</span><span class="kpi-value">${defenderCloudInventoryRows().length}</span></div>
@@ -7415,7 +7415,7 @@ VIEWS['defender-cloud/inventory'] = () => `
     </table>
   </div>`;
 
-VIEWS['defender-cloud/attack-paths'] = () => {
+VIEWS['cloud/attack-paths'] = () => {
   const paths = defenderCloudAttackPaths();
   const ui = defenderCloudAttackPathUi();
   const selected = ui.selectedId ? defenderCloudAttackPathById(ui.selectedId) : null;
@@ -7423,7 +7423,7 @@ VIEWS['defender-cloud/attack-paths'] = () => {
   return `
     <div class="page-header">
       <div><div class="breadcrumb">Defender for Cloud › <strong>Attack path analysis</strong></div><h1>Attack path analysis</h1><div class="page-subtitle">Prioritize externally driven, exploitable routes to business-critical cloud assets.</div></div>
-      <div class="page-actions"><a class="btn btn-secondary" href="#/defender-cloud/inventory">Inventory</a><a class="btn btn-primary" href="#/defender-cloud/explorer">Cloud Security Explorer</a></div>
+      <div class="page-actions"><a class="btn btn-secondary" href="#/cloud/inventory">Inventory</a><a class="btn btn-primary" href="#/cloud/explorer">Cloud Security Explorer</a></div>
     </div>
     <div class="callout info dfc-learn-note"><strong>Coverage requirement:</strong> attack paths require Defender CSPM and agentless scanning. Container paths additionally need agentless container posture or Defender for Containers coverage. Viewing requires an eligible read or security role on the relevant scopes.</div>
     ${renderDefenderCloudAttackPathTabs(ui.tab)}
@@ -7441,7 +7441,7 @@ const DEFENDER_CLOUD_AZURE_PLANS = [
   { id:'ai', name:'AI', kind:'Workload protection', note:'Protects supported AI workloads; availability depends on resource type and region.' },
 ];
 
-VIEWS['defender-cloud/setup'] = () => {
+VIEWS['cloud/setup'] = () => {
   const state = currentDefenderCloudSetupState();
   const enabledPlans = Object.values(state.plans).filter(p => p.enabled).length;
   const server = state.plans.servers;
@@ -7528,7 +7528,7 @@ VIEWS['defender-cloud/setup'] = () => {
           <div><span><strong>stprodeuw</strong><small>Azure Storage account</small></span>${protectionStatus(storage.enabled && state.saved, `Storage · malware scanning ${storage.malwareScanning ? 'on' : 'off'} · sensitivity context ${storage.sensitiveData ? 'on' : 'off'}`)}</div>
           <div><span><strong>sql-orders-prod</strong><small>Azure SQL database</small></span>${protectionStatus(state.plans.databases.enabled && state.saved, 'Databases · confirm the Azure SQL subplan is selected')}</div>
         </div>
-        <div class="card-body dc-coverage-actions"><span class="muted">Use the Coverage workbook for plan/resource gaps; then confirm the asset appears in inventory and produces recommendations or alerts.</span><a class="btn btn-secondary btn-sm" href="#/defender-cloud/inventory">Open inventory</a></div>
+        <div class="card-body dc-coverage-actions"><span class="muted">Use the Coverage workbook for plan/resource gaps; then confirm the asset appears in inventory and produces recommendations or alerts.</span><a class="btn btn-secondary btn-sm" href="#/cloud/inventory">Open inventory</a></div>
       </section>
     </div>
 
@@ -7556,22 +7556,22 @@ VIEWS['defender-cloud/setup'] = () => {
       <section class="card card-body">
         <div class="alert-section-title">Hybrid and multicloud are separate</div>
         <p class="muted">On-premises servers use Azure Arc. AWS accounts and GCP projects use native connectors with federated access; their connector flow also establishes the access needed for selected CSPM and workload-protection capabilities.</p>
-        <a class="btn btn-secondary" href="#/defender-cloud/environment">Open connector lab</a>
+        <a class="btn btn-secondary" href="#/cloud/environment">Open connector lab</a>
       </section>
 
       <section class="card card-body">
         <div class="alert-section-title">SC-200 response handoff</div>
         <div class="button-stack">
-          <a class="btn btn-primary" href="#/defender-cloud/alerts">Investigate workload alerts</a>
-          <a class="btn btn-secondary" href="#/defender-cloud/attack-paths">Review attack paths</a>
-          <a class="btn btn-secondary" href="#/defender-cloud/recommendations">Remediate recommendations</a>
+          <a class="btn btn-primary" href="#/cloud/alerts">Investigate workload alerts</a>
+          <a class="btn btn-secondary" href="#/cloud/attack-paths">Review attack paths</a>
+          <a class="btn btn-secondary" href="#/cloud/recommendations">Remediate recommendations</a>
         </div>
       </section>
     </aside>
   </div>`;
 };
 
-VIEWS['defender-cloud/explorer'] = () => `
+VIEWS['cloud/explorer'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Cloud Security Explorer</strong></div><h1>Cloud Security Explorer</h1><div class="page-subtitle">Explore resource queries that combine exposure, alerts, and recommendations.</div></div></div>
   <div class="card card-body">
     <div class="alert-section-title">Saved exploration</div>
@@ -7582,20 +7582,20 @@ VIEWS['defender-cloud/explorer'] = () => `
 | project ResourceName, ResourceType, AlertCount, RecommendationCount, AttackPath</pre>
   </div>
   <div class="card" style="margin-top:16px;">
-    <div class="card-toolbar"><strong>Explorer results</strong><a class="chip-link" href="#/defender-cloud/inventory">Open inventory →</a></div>
+    <div class="card-toolbar"><strong>Explorer results</strong><a class="chip-link" href="#/cloud/inventory">Open inventory →</a></div>
     <table class="grid"><thead><tr><th>Resource</th><th>Exposure</th><th>Risk</th><th>Reason</th></tr></thead><tbody>${CLOUD_ASSETS.filter(a=>a.risk !== 'Low').map(a => `<tr><td><strong>${esc(a.name)}</strong></td><td>${esc(a.exposure)}</td><td><span class="sev ${a.risk === 'High' ? 'high' : 'medium'}">${esc(a.risk)}</span></td><td>${a.alerts} alert(s), ${a.recs} recommendation(s)</td></tr>`).join('')}</tbody></table>
   </div>`;
 
-VIEWS['defender-cloud/cloud-security'] = () => `
+VIEWS['cloud/cloud-security'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Cloud Security</strong></div><h1>Cloud Security</h1><div class="page-subtitle">Workload protection hub for alerts, attack paths, inventory, recommendations, and regulatory context.</div></div></div>
   <div class="tile-grid">
-    <a class="tile" href="#/defender-cloud/alerts"><strong>Security alerts</strong><span>Investigate active workload-protection findings.</span></a>
-    <a class="tile" href="#/defender-cloud/attack-paths"><strong>Attack paths</strong><span>Break exploitable paths across resources and identities.</span></a>
-    <a class="tile" href="#/defender-cloud/inventory"><strong>Inventory</strong><span>Prioritize resources by risk and exposure.</span></a>
-    <a class="tile" href="#/defender-cloud/recommendations"><strong>Recommendations</strong><span>Reduce posture findings that feed attack paths.</span></a>
+    <a class="tile" href="#/cloud/alerts"><strong>Security alerts</strong><span>Investigate active workload-protection findings.</span></a>
+    <a class="tile" href="#/cloud/attack-paths"><strong>Attack paths</strong><span>Break exploitable paths across resources and identities.</span></a>
+    <a class="tile" href="#/cloud/inventory"><strong>Inventory</strong><span>Prioritize resources by risk and exposure.</span></a>
+    <a class="tile" href="#/cloud/recommendations"><strong>Recommendations</strong><span>Reduce posture findings that feed attack paths.</span></a>
   </div>`;
 
-VIEWS['defender-cloud/environment'] = () => {
+VIEWS['cloud/environment'] = () => {
   const state = defenderCloudMulticloudState();
   const awsPlans = ['CSPM', 'Servers', 'Containers', 'Databases'];
   const gcpPlans = ['CSPM', 'Servers', 'Containers', 'Databases'];
@@ -7666,7 +7666,7 @@ VIEWS['defender-cloud/environment'] = () => {
   </div>`;
 };
 
-VIEWS['defender-cloud/workflow'] = () => `
+VIEWS['cloud/workflow'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › Management › <strong>Workflow automation</strong></div><h1>Workflow automation</h1><div class="page-subtitle">Route Defender for Cloud alerts and recommendations into local response steps.</div></div></div>
   <div class="two-col">
     <section class="card"><div class="card-toolbar"><strong>Automation rules</strong><span class="muted">No real Logic Apps called</span></div><table class="grid"><thead><tr><th>Status</th><th>Trigger</th><th>Action</th><th>Scope</th></tr></thead><tbody>
@@ -7680,12 +7680,12 @@ VIEWS['defender-cloud/workflow'] = () => `
 // ====================================================================
 // PURVIEW
 // ====================================================================
-VIEWS['purview/home'] = () => `
+VIEWS['governance/home'] = () => `
   <section class="purview-welcome">
     <div class="purview-welcome-visual" aria-label="Connected data estate">
       <div class="purview-source-map">
         ${PURVIEW_CONNECTED_SOURCES.map((s, index) => `
-          <button class="purview-source-node ${s.status === 'Connected' ? 'connected' : ''} node-${index}" onclick="navigate('${s.status === 'Connected' ? '#/purview/solutions' : '#/purview/settings'}')">
+          <button class="purview-source-node ${s.status === 'Connected' ? 'connected' : ''} node-${index}" onclick="navigate('${s.status === 'Connected' ? '#/governance/solutions' : '#/governance/settings'}')">
             <span>${esc(s.icon)}</span>
             <strong>${esc(s.name)}</strong>
           </button>
@@ -7711,8 +7711,8 @@ VIEWS['purview/home'] = () => `
         <span>Static lab mode · no real tenant data leaves this browser.</span>
       </div>
       <div class="page-actions">
-        <button class="btn btn-primary" onclick="navigate('#/purview/solutions')">Get started</button>
-        <button class="btn btn-secondary" onclick="navigate('#/purview/classic-governance')">Go to classic portal</button>
+        <button class="btn btn-primary" onclick="navigate('#/governance/solutions')">Get started</button>
+        <button class="btn btn-secondary" onclick="navigate('#/governance/classic-governance')">Go to classic portal</button>
       </div>
     </div>
   </section>
@@ -7726,12 +7726,12 @@ VIEWS['purview/home'] = () => `
   </div>
 
   <section class="purview-mode-grid" aria-label="Purview portal options">
-    <button class="purview-mode-card active" onclick="navigate('#/purview/solutions')">
+    <button class="purview-mode-card active" onclick="navigate('#/governance/solutions')">
       <span class="purview-mode-label">New portal</span>
       <strong>Purview portal</strong>
       <small>Unified data security, risk and compliance, audit, eDiscovery, records, and lifecycle workflows.</small>
     </button>
-    <button class="purview-mode-card classic" onclick="navigate('#/purview/classic-governance')">
+    <button class="purview-mode-card classic" onclick="navigate('#/governance/classic-governance')">
       <span class="purview-mode-label">Classic option</span>
       <strong>Classic governance portal</strong>
       <small>Use when a lab step mentions Data Catalog classic, Data Health Insights classic, Workflow classic, or web.purview.azure.com.</small>
@@ -7739,27 +7739,27 @@ VIEWS['purview/home'] = () => `
   </section>
 
   <section class="purview-solution-strip" aria-label="Purview solutions">
-    <button class="purview-solution-card" onclick="navigate('#/purview/classic-governance')">
+    <button class="purview-solution-card" onclick="navigate('#/governance/classic-governance')">
       <span class="purview-solution-icon">▥</span>
       <strong>Data Catalog classic</strong>
     </button>
-    <button class="purview-solution-card" onclick="navigate('#/purview/information-protection')">
+    <button class="purview-solution-card" onclick="navigate('#/governance/information-protection')">
       <span class="purview-solution-icon">🔐</span>
       <strong>Information Protection</strong>
     </button>
-    <button class="purview-solution-card" onclick="navigate('#/purview/dlp')">
+    <button class="purview-solution-card" onclick="navigate('#/governance/dlp')">
       <span class="purview-solution-icon">🛡</span>
       <strong>Data Loss Prevention</strong>
     </button>
-    <button class="purview-solution-card" onclick="navigate('#/purview/insider-risk')">
+    <button class="purview-solution-card" onclick="navigate('#/governance/insider-risk')">
       <span class="purview-solution-icon">👤</span>
       <strong>Insider Risk Management</strong>
     </button>
-    <button class="purview-solution-card" onclick="navigate('#/purview/ai-hub')">
+    <button class="purview-solution-card" onclick="navigate('#/governance/ai-hub')">
       <span class="purview-solution-icon">✦</span>
       <strong>AI Hub preview</strong>
     </button>
-    <button class="purview-solution-card" onclick="navigate('#/purview/solutions')">
+    <button class="purview-solution-card" onclick="navigate('#/governance/solutions')">
       <span class="purview-solution-icon">▦</span>
       <strong>View all solutions →</strong>
     </button>
@@ -7768,11 +7768,11 @@ VIEWS['purview/home'] = () => `
   <div class="section-title">Related portals</div>
   <section class="purview-related-grid">
     ${[
-      ['Privacy Center', 'Discover privacy risk workflows.', '🔒', '#/purview/solutions'],
-      ['Data Fabric', 'Analytics lakehouse and warehouse context.', '▣', '#/sentinel/logs'],
-      ['Defender', 'Monitor security incidents and alerts.', '🛡', '#/defender/home'],
-      ['Entra', 'Identity and access context.', '◈', '#/defender/identities'],
-      ['Service Trust', 'Compliance resources and trust documentation.', '▤', '#/purview/records'],
+      ['Privacy Center', 'Discover privacy risk workflows.', '🔒', '#/governance/solutions'],
+      ['Data Fabric', 'Analytics lakehouse and warehouse context.', '▣', '#/siem/logs'],
+      ['Defender', 'Monitor security incidents and alerts.', '🛡', '#/xdr/home'],
+      ['Entra', 'Identity and access context.', '◈', '#/xdr/identities'],
+      ['Service Trust', 'Compliance resources and trust documentation.', '▤', '#/governance/records'],
     ].map(([name, detail, icon, route]) => `
       <button class="purview-related-card" onclick="navigate('${route}')">
         <span class="purview-related-icon">${icon}</span>
@@ -7786,7 +7786,7 @@ VIEWS['purview/home'] = () => `
   </section>
 `;
 
-VIEWS['purview/classic-governance'] = () => `
+VIEWS['governance/classic-governance'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Purview › <strong>Classic governance portal</strong></div>
@@ -7794,8 +7794,8 @@ VIEWS['purview/classic-governance'] = () => `
       <div class="page-subtitle">Support-mode governance experience for older Azure Purview-style lab steps.</div>
     </div>
     <div class="page-actions">
-      <button class="btn btn-secondary" onclick="navigate('#/purview/home')">Back to Purview home</button>
-      <button class="btn btn-primary" onclick="navigate('#/purview/home')">Open Purview portal</button>
+      <button class="btn btn-secondary" onclick="navigate('#/governance/home')">Back to Purview home</button>
+      <button class="btn btn-primary" onclick="navigate('#/governance/home')">Open Purview portal</button>
     </div>
   </div>
 
@@ -7862,7 +7862,7 @@ VIEWS['purview/classic-governance'] = () => `
   </div>
 `;
 
-VIEWS['purview/solutions'] = () => `
+VIEWS['governance/solutions'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Purview › <strong>Solutions</strong></div>
@@ -7885,7 +7885,7 @@ VIEWS['purview/solutions'] = () => `
   `).join('')}
 `;
 
-VIEWS['purview/ai-hub'] = () => `
+VIEWS['governance/ai-hub'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Purview › <strong>AI Hub preview</strong></div>
@@ -7893,8 +7893,8 @@ VIEWS['purview/ai-hub'] = () => `
       <div class="page-subtitle">Synthetic view for monitoring AI app usage, risky prompts, and sensitive-data exposure in this lab.</div>
     </div>
     <div class="page-actions">
-      <button class="btn btn-secondary" onclick="navigate('#/purview/dlp')">Review DLP policies</button>
-      <button class="btn btn-primary" onclick="navigate('#/purview/audit')">Search audit events</button>
+      <button class="btn btn-secondary" onclick="navigate('#/governance/dlp')">Review DLP policies</button>
+      <button class="btn btn-primary" onclick="navigate('#/governance/audit')">Search audit events</button>
     </div>
   </div>
   <div class="kpi-strip">
@@ -7927,55 +7927,411 @@ VIEWS['purview/ai-hub'] = () => `
   </div>
 `;
 
-VIEWS['purview/dlp'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Purview › <strong>DLP</strong></div><h1>Data loss prevention policies</h1></div></div>
-  <div class="card" style="margin-bottom:16px;">
-    <div class="card-toolbar"><strong>DLP incidents</strong><span class="muted">SC-200 review and override workflow</span></div>
-    <table class="grid">
-      <thead><tr><th>Severity</th><th>Incident</th><th>User</th><th>Location</th><th>Sensitive info</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>
-        ${DLP_INCIDENTS.map(i => `
-          <tr>
-            <td><span class="sev ${i.severity}">${cap(i.severity)}</span></td>
-            <td><strong>${esc(i.id)}</strong><br><span class="muted">${esc(i.activity)} · ${fmtTime(i.time)}</span></td>
-            <td>${esc(i.user)}</td>
-            <td>${esc(i.location)}<br><span class="kv">${esc(i.item)}</span></td>
-            <td>${i.sensitiveInfo.map(s => `<span class="tag">${esc(s)}</span>`).join('')}</td>
-            <td>${esc(i.status)}</td>
-            <td>${i.actions.slice(0,3).map(a => `<span class="entity-chip">${esc(a)}</span>`).join('')}</td>
-          </tr>
-          <tr class="detail-row"><td></td><td colspan="6">
-            <ol class="mini-steps">${i.timeline.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
-          </td></tr>
-        `).join('')}
-      </tbody>
-    </table>
-  </div>
-  ${DLP_POLICIES.map(p => `
-    <div class="card">
-      <div class="card-toolbar">
-        <strong>${esc(p.name)}</strong>
-        <span><span class="status-dot ${p.enabled?'resolved':'warn'}"></span>${p.enabled?'Enabled':'Disabled'} · ${esc(p.scope)}</span>
-      </div>
-      <div class="card-body">
-        ${p.rules.map(r => `
-          <div style="margin-bottom:10px;">
-            <strong>${esc(r.name)}</strong>
-            <div class="alert-section-title" style="margin:8px 0 4px;">Conditions</div>
-            <ul style="margin:0; padding-left:18px; font-size:12px;">${r.conditions.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
-            <div class="alert-section-title" style="margin:8px 0 4px;">Actions</div>
-            <ul style="margin:0; padding-left:18px; font-size:12px;">${r.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('')}
-`;
+// Data loss prevention — the analyst's working surface, not a poster of it.
+//
+// Two tabs, because DLP work has two halves that teach different things:
+//
+//   Alerts   — the alert lifecycle: triage (true/false positive, owner,
+//              status), investigate (per-event verdicts), remediate, comment.
+//              Every action a learner takes is recorded in the alert's
+//              management history, so the workflow leaves a trace they can read
+//              back rather than a toast that vanishes.
+//   Policies — the piece that is usually learned wrong: the action a rule is
+//              CONFIGURED with is not the action that gets APPLIED. Changing a
+//              policy's state here recomputes the applied action live through
+//              dlpAppliedAction(), and the alert queue re-renders with it, so
+//              flipping a simulated policy to enforce visibly changes what
+//              would have happened to a real alert.
+//
+// State is per-learner and local, under hsl.dlp.* — resettable, and separate
+// from the fixture data so a reset restores the authored scenario exactly.
+VIEWS['governance/dlp'] = () => ({
+  html: `<div id="dlp-root"></div>`,
+  onMount: () => {
+    const STATE_KEY = 'hsl.dlp.state';
 
-VIEWS['purview/insider-risk'] = () => `
+    const seed = () => ({
+      tab: 'alerts',
+      selected: DLP_INCIDENTS[0].id,
+      filter: { severity: '', status: '', policy: '' },
+      detailTab: 'overview',
+      alerts: DLP_INCIDENTS.reduce((acc, a) => {
+        acc[a.id] = {
+          status: a.status, owner: a.owner || '', verdict: a.verdict || '',
+          comments: [],
+          eventVerdicts: a.events.map(() => ''),
+        };
+        return acc;
+      }, {}),
+      policies: DLP_POLICIES.reduce((acc, p) => { acc[p.id] = { state: p.state }; return acc; }, {}),
+    });
+
+    let state;
+    try {
+      const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
+      // A saved shape from an older fixture set must not half-restore; seed
+      // wins unless every alert the fixtures define is present.
+      state = saved && DLP_INCIDENTS.every(a => saved.alerts && saved.alerts[a.id]) ? saved : seed();
+    } catch (_) { state = seed(); }
+
+    const save = () => { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (_) {} };
+    const root = document.getElementById('dlp-root');
+    const alertById = id => DLP_INCIDENTS.find(a => a.id === id);
+    const policyByName = name => DLP_POLICIES.find(p => p.name === name);
+
+    // The applied action for an alert follows its policy's CURRENT state, not
+    // the state the fixture was authored with — that is the whole point of the
+    // policies tab.
+    function appliedFor(alert) {
+      const policy = policyByName(alert.policy);
+      if (!policy) return alert.appliedAction;
+      const st = state.policies[policy.id].state;
+      const configured = policy.rules[0].configuredAction;
+      return dlpAppliedAction(configured, st);
+    }
+
+    function logComment(id, text) {
+      state.alerts[id].comments.push({ at: new Date().toISOString(), text });
+    }
+
+    function actionPill(key) {
+      if (!key) return `<span class="tag">No action — policy off</span>`;
+      const a = DLP_ACTIONS[key];
+      const tone = ['green', 'blue', 'orange', 'red'][a.rank];
+      return `<span class="tag ${tone}" title="${esc(a.note)}">${esc(a.label)}</span>`;
+    }
+
+    /* ---------------------------------------------------------------- alerts */
+
+    function filteredAlerts() {
+      const f = state.filter;
+      return DLP_INCIDENTS.filter(a =>
+        (!f.severity || a.severity === f.severity) &&
+        (!f.status   || state.alerts[a.id].status === f.status) &&
+        (!f.policy   || a.policy === f.policy));
+    }
+
+    function renderAlertsTab() {
+      const rows = filteredAlerts();
+      const alert = alertById(state.selected) || rows[0] || DLP_INCIDENTS[0];
+      const open = rows.filter(a => state.alerts[a.id].status !== 'Resolved' && state.alerts[a.id].status !== 'Dismissed').length;
+      const statuses = ['Needs review', 'User override requested', 'Investigating', 'Resolved', 'Dismissed'];
+
+      return `
+        <div class="kpi-strip" style="margin-bottom:14px;">
+          <div class="kpi"><div class="kpi-label">Open alerts</div><div class="kpi-value">${open}</div></div>
+          <div class="kpi"><div class="kpi-label">High severity</div><div class="kpi-value">${rows.filter(a => a.severity === 'high').length}</div></div>
+          <div class="kpi"><div class="kpi-label">Unassigned</div><div class="kpi-value">${rows.filter(a => !state.alerts[a.id].owner).length}</div></div>
+          <div class="kpi"><div class="kpi-label">Policies enforcing</div><div class="kpi-value">${DLP_POLICIES.filter(p => state.policies[p.id].state === 'on').length}/${DLP_POLICIES.length}</div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-toolbar">
+            <strong>Alert queue</strong>
+            <span>
+              <select class="ipt" data-dlp-filter="severity">
+                <option value="">All severities</option>
+                ${['high','medium','low'].map(v => `<option value="${v}" ${state.filter.severity===v?'selected':''}>${cap(v)}</option>`).join('')}
+              </select>
+              <select class="ipt" data-dlp-filter="status">
+                <option value="">All statuses</option>
+                ${statuses.map(v => `<option value="${esc(v)}" ${state.filter.status===v?'selected':''}>${esc(v)}</option>`).join('')}
+              </select>
+              <select class="ipt" data-dlp-filter="policy">
+                <option value="">All policies</option>
+                ${DLP_POLICIES.map(p => `<option value="${esc(p.name)}" ${state.filter.policy===p.name?'selected':''}>${esc(p.name)}</option>`).join('')}
+              </select>
+            </span>
+          </div>
+          <table class="grid">
+            <thead><tr><th>Severity</th><th>Alert</th><th>User</th><th>Location</th><th>Sensitive info</th><th>Applied action</th><th>Status</th><th>Owner</th></tr></thead>
+            <tbody>
+              ${rows.length ? rows.map(a => {
+                const s = state.alerts[a.id];
+                const sel = a.id === alert.id ? ' class="selected-row"' : '';
+                return `
+                  <tr${sel} data-dlp-open="${esc(a.id)}" style="cursor:pointer;">
+                    <td><span class="sev ${a.severity}">${cap(a.severity)}</span></td>
+                    <td><strong>${esc(a.id)}</strong><br><span class="muted">${esc(a.activity)} · ${fmtTime(a.time)}</span></td>
+                    <td>${esc(a.user)}</td>
+                    <td>${esc(a.location)}<br><span class="kv">${esc(a.item)}</span></td>
+                    <td>${a.sensitiveInfo.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</td>
+                    <td>${actionPill(appliedFor(a))}</td>
+                    <td>${esc(s.status)}${s.verdict ? `<br><span class="kv">${esc(s.verdict)}</span>` : ''}</td>
+                    <td>${s.owner ? esc(s.owner) : '<span class="muted">—</span>'}</td>
+                  </tr>`;
+              }).join('') : `<tr><td colspan="8" class="muted" style="padding:18px;">No alerts match the current filters.</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+
+        ${rows.length ? renderAlertDetail(alert) : ''}
+      `;
+    }
+
+    function renderAlertDetail(a) {
+      const s = state.alerts[a.id];
+      const applied = appliedFor(a);
+      const policy = policyByName(a.policy);
+      const tabs = [['overview','Overview'],['events','Events'],['manage','Manage'],['history','History']];
+
+      return `
+        <div class="card">
+          <div class="card-toolbar">
+            <strong>${esc(a.id)} · ${esc(a.policy)}</strong>
+            <span class="muted">Insider-risk level for this user: ${esc(a.insiderRisk)}</span>
+          </div>
+          <div class="tabs" style="padding:0 16px;">
+            ${tabs.map(([k,label]) => `<button class="tab${state.detailTab===k?' active':''}" data-dlp-detail-tab="${k}">${label}</button>`).join('')}
+          </div>
+          <div class="card-body">
+            ${state.detailTab === 'overview' ? `
+              <div class="two-col">
+                <div>
+                  <div class="alert-section-title">What happened</div>
+                  <p>${esc(a.what)}</p>
+                  <div class="alert-section-title">Who</div>
+                  <p>${esc(a.who)}</p>
+                </div>
+                <div>
+                  <dl class="hd-dl">
+                    <dt>Policy</dt><dd>${esc(a.policy)}${policy ? ` <span class="kv">priority ${policy.priority}</span>` : ''}</dd>
+                    <dt>Policy state</dt><dd>${policy ? esc(DLP_POLICY_STATES[state.policies[policy.id].state].label) : '—'}</dd>
+                    <dt>Configured action</dt><dd>${policy ? actionPill(policy.rules[0].configuredAction) : '—'}</dd>
+                    <dt>Applied action</dt><dd>${actionPill(applied)}</dd>
+                    <dt>Matches</dt><dd>${a.matchCount} sensitive value${a.matchCount === 1 ? '' : 's'}</dd>
+                    <dt>Item</dt><dd>${esc(a.item)} <span class="kv">${esc(a.location)}</span></dd>
+                    <dt>Detected</dt><dd>${fmtTime(a.time)}</dd>
+                  </dl>
+                  ${policy && state.policies[policy.id].state !== 'on' ? `
+                    <div class="callout warn">This policy is not enforcing. The configured
+                    <strong>${esc(DLP_ACTIONS[policy.rules[0].configuredAction].label)}</strong> was applied as
+                    <strong>${applied ? esc(DLP_ACTIONS[applied].label) : 'nothing'}</strong>, so the activity was not stopped.
+                    Change the state on the Policies tab to see the difference.</div>` : ''}
+                </div>
+              </div>
+              <div class="alert-section-title" style="margin-top:14px;">Timeline</div>
+              <ol class="mini-steps">${a.timeline.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
+            ` : ''}
+
+            ${state.detailTab === 'events' ? `
+              <p class="muted">Mark each event as a true match or a false positive. The verdicts you
+              record here are what a real tuning pass is built from — a policy that produces mostly
+              false positives is a policy that needs its conditions narrowed, not an analyst who
+              needs to click faster.</p>
+              <table class="grid">
+                <thead><tr><th>Time</th><th>Activity</th><th>Detail</th><th>Verdict</th><th>Actions</th></tr></thead>
+                <tbody>
+                  ${a.events.map((e, i) => `
+                    <tr>
+                      <td>${fmtTime(e.time)}</td>
+                      <td><strong>${esc(e.activity)}</strong><br><span class="kv">${esc(e.item)}</span></td>
+                      <td>${esc(e.detail)}</td>
+                      <td>${s.eventVerdicts[i] ? `<span class="tag ${s.eventVerdicts[i] === 'True match' ? 'red' : 'green'}">${esc(s.eventVerdicts[i])}</span>` : '<span class="muted">Not reviewed</span>'}</td>
+                      <td>
+                        <button class="btn btn-secondary" data-dlp-verdict="${i}" data-value="True match">True match</button>
+                        <button class="btn btn-secondary" data-dlp-verdict="${i}" data-value="False positive">False positive</button>
+                      </td>
+                    </tr>`).join('')}
+                </tbody>
+              </table>
+            ` : ''}
+
+            ${state.detailTab === 'manage' ? `
+              <div class="two-col">
+                <div>
+                  <div class="alert-section-title">Triage</div>
+                  <label class="lbl"><span>Status</span>
+                    <select class="ipt" data-dlp-status>
+                      ${['Needs review','User override requested','Investigating','Resolved','Dismissed']
+                        .map(v => `<option value="${esc(v)}" ${s.status===v?'selected':''}>${esc(v)}</option>`).join('')}
+                    </select>
+                  </label>
+                  <label class="lbl"><span>Assigned owner</span>
+                    <select class="ipt" data-dlp-owner>
+                      <option value="">Unassigned</option>
+                      ${['A. Ansbergs','T. Martinez','A. Lee','Compliance review queue']
+                        .map(v => `<option value="${esc(v)}" ${s.owner===v?'selected':''}>${esc(v)}</option>`).join('')}
+                    </select>
+                  </label>
+                  <label class="lbl"><span>Alert verdict</span>
+                    <select class="ipt" data-dlp-alert-verdict>
+                      <option value="">Undetermined</option>
+                      <option value="True positive" ${s.verdict==='True positive'?'selected':''}>True positive</option>
+                      <option value="False positive" ${s.verdict==='False positive'?'selected':''}>False positive</option>
+                    </select>
+                  </label>
+                </div>
+                <div>
+                  <div class="alert-section-title">Remediation</div>
+                  <p class="muted">Recorded against the alert; nothing leaves the lab.</p>
+                  <div class="hd-action-grid">
+                    ${a.actions.map(act => `<button class="btn btn-secondary" data-dlp-action="${esc(act)}">${esc(act)}</button>`).join('')}
+                  </div>
+                  <div class="alert-section-title" style="margin-top:14px;">Comment</div>
+                  <textarea class="ipt" id="dlp-comment" rows="3" placeholder="What did you find, and what did you do about it?"></textarea>
+                  <button class="btn btn-primary" data-dlp-comment style="margin-top:8px;">Add comment</button>
+                </div>
+              </div>
+            ` : ''}
+
+            ${state.detailTab === 'history' ? (s.comments.length ? `
+              <ol class="mini-steps">
+                ${s.comments.map(c => `<li><span class="kv">${fmtTime(c.at)}</span> ${esc(c.text)}</li>`).join('')}
+              </ol>` : `<p class="muted">Nothing recorded yet. Triage actions, verdicts, and comments all land here.</p>`) : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    /* -------------------------------------------------------------- policies */
+
+    function renderPoliciesTab() {
+      return `
+        <div class="callout info" style="margin-bottom:14px;">
+          A rule's <strong>configured action</strong> is what it would do under full enforcement.
+          The <strong>applied action</strong> is what actually happens, and it depends on the policy's state.
+          Change a state below and watch both this table and the alert queue change.
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-toolbar"><strong>Runtime behaviour by policy state</strong><span class="muted">Reference</span></div>
+          <table class="grid">
+            <thead><tr><th>Configured action</th><th>Off</th><th>Simulation</th><th>Simulation + tips</th><th>On</th></tr></thead>
+            <tbody>
+              ${Object.keys(DLP_ACTIONS).map(cfg => `
+                <tr>
+                  <td>${actionPill(cfg)}</td>
+                  ${['off','simulation','simulation-tips','on'].map(st => `<td>${actionPill(dlpAppliedAction(cfg, st))}</td>`).join('')}
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        ${DLP_POLICIES.map(p => {
+          const st = state.policies[p.id].state;
+          return `
+            <div class="card">
+              <div class="card-toolbar">
+                <strong>${esc(p.name)}</strong>
+                <span>
+                  <span class="kv">priority ${p.priority}</span>
+                  <select class="ipt" data-dlp-policy-state="${esc(p.id)}">
+                    ${Object.entries(DLP_POLICY_STATES).map(([k, v]) =>
+                      `<option value="${k}" ${st===k?'selected':''}>${esc(v.label)}</option>`).join('')}
+                  </select>
+                </span>
+              </div>
+              <div class="card-body">
+                <p class="muted">${esc(DLP_POLICY_STATES[st].note)}</p>
+                <div class="kv" style="margin-bottom:10px;">Scope: ${esc(p.scope)}</div>
+                ${p.rules.map(r => {
+                  const applied = dlpAppliedAction(r.configuredAction, st);
+                  return `
+                    <div style="margin-bottom:10px;">
+                      <strong>${esc(r.name)}</strong>
+                      <div style="margin:6px 0;">
+                        Configured ${actionPill(r.configuredAction)}
+                        <span class="muted">→</span>
+                        Applied ${actionPill(applied)}
+                      </div>
+                      <div class="alert-section-title" style="margin:8px 0 4px;">Conditions</div>
+                      <ul style="margin:0; padding-left:18px; font-size:12px;">${r.conditions.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
+                      <div class="alert-section-title" style="margin:8px 0 4px;">Actions</div>
+                      <ul style="margin:0; padding-left:18px; font-size:12px;">${r.actions.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+                    </div>`;
+                }).join('')}
+              </div>
+            </div>`;
+        }).join('')}
+      `;
+    }
+
+    /* ----------------------------------------------------------------- shell */
+
+    function render() {
+      root.innerHTML = `
+        <div class="page-header">
+          <div>
+            <div class="breadcrumb">Data Governance › <strong>Data loss prevention</strong></div>
+            <h1>Data loss prevention</h1>
+            <div class="page-subtitle">Triage alerts, record verdicts, and see how policy state changes what a rule actually does.</div>
+          </div>
+          <div><button class="btn btn-secondary" data-dlp-reset>Reset lab state</button></div>
+        </div>
+        <div class="tabs" style="margin-bottom:14px;">
+          <button class="tab${state.tab==='alerts'?' active':''}" data-dlp-tab="alerts">Alerts</button>
+          <button class="tab${state.tab==='policies'?' active':''}" data-dlp-tab="policies">Policies</button>
+        </div>
+        ${state.tab === 'alerts' ? renderAlertsTab() : renderPoliciesTab()}
+      `;
+      bind();
+    }
+
+    function bind() {
+      const on = (sel, ev, fn) => root.querySelectorAll(sel).forEach(el => el.addEventListener(ev, fn));
+      const cur = () => state.alerts[state.selected];
+
+      on('[data-dlp-tab]', 'click', e => { state.tab = e.currentTarget.dataset.dlpTab; save(); render(); });
+      on('[data-dlp-open]', 'click', e => {
+        state.selected = e.currentTarget.dataset.dlpOpen; save(); render();
+      });
+      on('[data-dlp-detail-tab]', 'click', e => { state.detailTab = e.currentTarget.dataset.dlpDetailTab; save(); render(); });
+      on('[data-dlp-filter]', 'change', e => {
+        state.filter[e.currentTarget.dataset.dlpFilter] = e.currentTarget.value; save(); render();
+      });
+      on('[data-dlp-verdict]', 'click', e => {
+        const i = Number(e.currentTarget.dataset.dlpVerdict), v = e.currentTarget.dataset.value;
+        cur().eventVerdicts[i] = v;
+        logComment(state.selected, `Event ${i + 1} marked ${v}.`);
+        save(); render();
+      });
+      on('[data-dlp-status]', 'change', e => {
+        cur().status = e.currentTarget.value;
+        logComment(state.selected, `Status set to ${e.currentTarget.value}.`);
+        save(); render();
+      });
+      on('[data-dlp-owner]', 'change', e => {
+        cur().owner = e.currentTarget.value;
+        logComment(state.selected, e.currentTarget.value ? `Assigned to ${e.currentTarget.value}.` : 'Unassigned.');
+        save(); render();
+      });
+      on('[data-dlp-alert-verdict]', 'change', e => {
+        cur().verdict = e.currentTarget.value;
+        logComment(state.selected, `Alert marked ${e.currentTarget.value || 'undetermined'}.`);
+        save(); render();
+      });
+      on('[data-dlp-action]', 'click', e => {
+        logComment(state.selected, `Remediation: ${e.currentTarget.dataset.dlpAction}.`);
+        state.detailTab = 'history';
+        save(); render();
+      });
+      on('[data-dlp-comment]', 'click', () => {
+        const box = document.getElementById('dlp-comment');
+        const text = (box && box.value || '').trim();
+        if (!text) return;
+        logComment(state.selected, text);
+        state.detailTab = 'history';
+        save(); render();
+      });
+      on('[data-dlp-policy-state]', 'change', e => {
+        state.policies[e.currentTarget.dataset.dlpPolicyState].state = e.currentTarget.value;
+        save(); render();
+      });
+      on('[data-dlp-reset]', 'click', () => {
+        state = seed();
+        save(); render();
+      });
+    }
+
+    render();
+  },
+});
+
+VIEWS['governance/insider-risk'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Purview › <strong>Insider risk</strong></div><h1>Insider risk management</h1></div></div>
   <div class="card" style="margin-bottom:16px;">
-    <div class="card-toolbar"><strong>Cases</strong><a class="chip-link" href="#/purview/ediscovery">Open eDiscovery →</a></div>
+    <div class="card-toolbar"><strong>Cases</strong><a class="chip-link" href="#/governance/ediscovery">Open eDiscovery →</a></div>
     <table class="grid">
       <thead><tr><th>Priority</th><th>Case</th><th>User</th><th>Risk score</th><th>Evidence</th><th>Next steps</th></tr></thead>
       <tbody>
@@ -8009,7 +8365,7 @@ VIEWS['purview/insider-risk'] = () => `
   </div>
 `;
 
-VIEWS['purview/communication-compliance'] = () => `
+VIEWS['governance/communication-compliance'] = () => `
   <div class="page-header">
     <div><div class="breadcrumb">Purview › <strong>Communication compliance</strong></div><h1>Communication compliance</h1></div>
   </div>
@@ -8033,7 +8389,7 @@ VIEWS['purview/communication-compliance'] = () => `
   </div>
 `;
 
-VIEWS['purview/graph-activity'] = () => {
+VIEWS['governance/graph-activity'] = () => {
   const rows = MOCK_QUERY_RESULTS.GraphActivityLogs || [];
   return `
     <div class="page-header">
@@ -8043,8 +8399,8 @@ VIEWS['purview/graph-activity'] = () => {
         <div class="page-subtitle">Investigation guidance and fixture rows for API activity after OAuth consent, risky sign-ins, or compromised-token events.</div>
       </div>
       <div class="page-actions">
-        <a class="btn btn-secondary" href="#/defender/hunting">Advanced hunting</a>
-        <a class="btn btn-primary" href="#/purview/audit">Audit search</a>
+        <a class="btn btn-secondary" href="#/xdr/hunting">Advanced hunting</a>
+        <a class="btn btn-primary" href="#/governance/audit">Audit search</a>
       </div>
     </div>
     <div class="three-col">
@@ -8091,7 +8447,7 @@ VIEWS['purview/graph-activity'] = () => {
   `;
 };
 
-VIEWS['purview/ediscovery'] = () => `
+VIEWS['governance/ediscovery'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Purview › <strong>eDiscovery</strong></div>
@@ -8154,7 +8510,7 @@ VIEWS['purview/ediscovery'] = () => `
   </div>
 `;
 
-VIEWS['purview/records'] = () => `
+VIEWS['governance/records'] = () => `
   <div class="page-header">
     <div><div class="breadcrumb">Purview › <strong>Records management</strong></div><h1>Records management</h1></div>
   </div>
@@ -8177,7 +8533,7 @@ VIEWS['purview/records'] = () => `
   </div>
 `;
 
-VIEWS['purview/lifecycle'] = () => `
+VIEWS['governance/lifecycle'] = () => `
   <div class="page-header">
     <div><div class="breadcrumb">Purview › <strong>Data lifecycle management</strong></div><h1>Data lifecycle management</h1></div>
   </div>
@@ -8200,7 +8556,7 @@ VIEWS['purview/lifecycle'] = () => `
   </div>
 `;
 
-VIEWS['purview/settings'] = () => `
+VIEWS['governance/settings'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Purview › <strong>Settings</strong></div>
@@ -8215,7 +8571,7 @@ VIEWS['purview/settings'] = () => `
   </div>
 `;
 
-VIEWS['purview/information-protection'] = () => `
+VIEWS['governance/information-protection'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Purview › <strong>Information protection</strong></div><h1>Sensitivity labels</h1></div></div>
   <div class="two-col">
     <div class="card">
@@ -8255,7 +8611,7 @@ VIEWS['purview/information-protection'] = () => `
   </div>
 `;
 
-VIEWS['purview/audit'] = () => ({
+VIEWS['governance/audit'] = () => ({
   html: `<div id="audit-premium-root"></div>`,
   onMount: () => {
     const state = {
@@ -8648,7 +9004,7 @@ function renderAlertDetail(a) {
     ${a.event && a.event.user ? `
       <div class="alert-pivot">
         <button class="btn btn-secondary" type="button" data-pivot="signin-logs"
-                onclick="navigate('#/entra/sign-in-logs')">Investigate sign-ins for this account</button>
+                onclick="navigate('#/identity/sign-in-logs')">Investigate sign-ins for this account</button>
         <span class="muted">The alert summarizes; the sign-in log holds the records behind it.</span>
       </div>` : ''}
     ${a.scriptAnalysis ? `
@@ -8752,7 +9108,7 @@ function renderAttackStory(inc, incAlerts) {
             <p>${esc(story.steps[0].detail)}</p>
             <div class="attack-story-actions-inline">
               <button class="btn btn-secondary btn-sm" onclick="openAlert('${esc(story.steps[0].alertId)}')">Open alert</button>
-              <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/hunting')">Go hunt</button>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
             </div>
             <div class="attack-story-remediation"><strong>Response action:</strong> ${esc(story.steps[0].remediation || activeNode.remediation || 'Review the entity details and choose the least disruptive containment action.')}</div>
           ` : '<div class="muted">No ordered alerts available for this incident.</div>'}
@@ -8772,7 +9128,7 @@ function renderAttackStory(inc, incAlerts) {
               : `<button class="btn btn-secondary btn-sm" onclick="toast('Entity pivot opened for ${esc(activeNode.type || 'entity')} (lab stub).')">Open entity page</button>`}
             <button class="btn btn-primary btn-sm" onclick="viewBlastRadius('${esc(inc.id)}', '${esc(activeNode.id || '')}')">View blast radius</button>
             <button class="btn btn-secondary btn-sm" onclick="runSentinelEntityPlaybook('${esc(activeNode.label || inc.id)}', 'Defender incident side panel')">Run playbook (entity)</button>
-            <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/hunting')">Go hunt</button>
+            <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
           </div>
           <ul class="attack-evidence-list">
             ${(activeNode.evidence || story.steps.filter(step => step.node === activeNode.id).map(step => step.title)).map(item => `<li>${esc(item)}</li>`).join('') || '<li>No evidence attached to this entity.</li>'}
@@ -9106,7 +9462,7 @@ function renderIncidentEvidence(inc) {
             <td>${esc(e.action)}</td>
             <td>${e.remediation === 'Pending approval'
               ? `<button class="btn btn-primary btn-sm">Approve</button> <button class="btn btn-ghost btn-sm">Reject</button>`
-              : `<button class="btn btn-ghost btn-sm" onclick="navigate('#/defender/hunting')">Go hunt</button>`}</td>
+              : `<button class="btn btn-ghost btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>`}</td>
           </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9259,13 +9615,13 @@ function renderIncidentDetail(inc) {
 }
 
 // ---------- Sentinel › Hunting › ASIM DNS ----------
-VIEWS['sentinel/hunting/dns'] = () => renderMockAsimLab({
+VIEWS['siem/hunting/dns'] = () => renderMockAsimLab({
   crumb:'Sentinel › Hunting',
   title:'ASIM DNS',
   heading:'ASIM DNS hunting',
   subtitle:'Query the unifying _Im_Dns parser across normalized DNS sources, then pivot on clients, domains, response codes, and returned addresses.',
   schemaVersion:'ASIM 0.1.7',
-  nextHref:'#/sentinel/hunting/authentication',
+  nextHref:'#/siem/hunting/authentication',
   nextLabel:'Authentication',
   runFn:'runAsimDnsQuery',
   loadFn:'loadAsimDnsQuery',
@@ -9294,25 +9650,25 @@ VIEWS['sentinel/hunting/dns'] = () => renderMockAsimLab({
 // renderable while preserving richer hand-built views above.
 (function registerSecondaryNavViews() {
   const workloadNotes = {
-    defender: {
+    xdr: {
       context:'Defender XDR',
       goal:'Use this surface to orient where the portal feature sits during incident response, tuning, or tenant configuration.',
-      pivots:['#/defender/incidents', '#/defender/hunting', '#/defender/settings'],
+      pivots:['#/xdr/incidents', '#/xdr/hunting', '#/xdr/settings'],
     },
-    sentinel: {
+    siem: {
       context:'Sentinel',
       goal:'Use this surface as a map back to Sentinel operations: content, workspace configuration, hunting, and automation.',
-      pivots:['#/sentinel/incidents', '#/sentinel/data-connectors', '#/sentinel/analytics'],
+      pivots:['#/siem/incidents', '#/siem/data-connectors', '#/siem/analytics'],
     },
-    'defender-cloud': {
+    cloud: {
       context:'Defender for Cloud',
       goal:'Use this supporting surface for workload-protection and posture context while keeping SC-200 focus on alerts and response.',
-      pivots:['#/defender-cloud/alerts', '#/defender-cloud/recommendations', '#/defender-cloud/regulatory'],
+      pivots:['#/cloud/alerts', '#/cloud/recommendations', '#/cloud/regulatory'],
     },
-    purview: {
+    governance: {
       context:'Purview',
       goal:'Use this surface for investigation context that supports Audit, eDiscovery, Graph activity logs, and risk cases.',
-      pivots:['#/purview/audit', '#/purview/ediscovery', '#/purview/graph-activity'],
+      pivots:['#/governance/audit', '#/governance/ediscovery', '#/governance/graph-activity'],
     },
   };
 
@@ -9329,7 +9685,7 @@ VIEWS['sentinel/hunting/dns'] = () => renderMockAsimLab({
 
   Object.entries(routeMeta).forEach(([route, meta]) => {
     if (VIEWS[route]) return;
-    const note = workloadNotes[meta.workload] || workloadNotes.defender;
+    const note = workloadNotes[meta.workload] || workloadNotes.xdr;
     VIEWS[route] = () => `
       <div class="page-header">
         <div>
@@ -9396,7 +9752,7 @@ function copilotSelectedKnowledgeSource() {
   return sources.find(source => source.id === selectedId) || sources[0];
 }
 
-VIEWS['copilot/home'] = () => {
+VIEWS['ai-agent/home'] = () => {
   const sessions = copilotSessionsSorted();
   const promptbooks = getCopilotPromptbooks();
   const pinned = sessions.filter(s => s.pinned).slice(0, 4);
@@ -9429,7 +9785,7 @@ VIEWS['copilot/home'] = () => {
         <div class="sidepanel-footer">
           <button class="btn btn-primary" onclick="openCopilot(0)">Open in panel</button>
           <button class="btn btn-secondary" onclick="openCopilotSession('cs-009')">Open matching session</button>
-          <button class="btn btn-secondary" onclick="navigate('#/copilot/promptbooks')">Browse promptbooks</button>
+          <button class="btn btn-secondary" onclick="navigate('#/ai-agent/promptbooks')">Browse promptbooks</button>
         </div>
       </section>
 
@@ -9462,7 +9818,7 @@ VIEWS['copilot/home'] = () => {
         </div>
         <div class="copilot-shortcut-grid">
           ${promptbooks.slice(0, 4).map(book => `
-            <button class="copilot-shortcut" onclick="selectCopilotPromptbook('${esc(book.id)}'); navigate('#/copilot/promptbooks');">
+            <button class="copilot-shortcut" onclick="selectCopilotPromptbook('${esc(book.id)}'); navigate('#/ai-agent/promptbooks');">
               <span class="copilot-shortcut-title">${esc(book.name)}</span>
               <span class="copilot-shortcut-meta">${esc(book.source)} · ${book.prompts.length} steps</span>
             </button>
@@ -9486,7 +9842,7 @@ VIEWS['copilot/home'] = () => {
   `;
 };
 
-VIEWS['copilot/sessions'] = () => {
+VIEWS['ai-agent/sessions'] = () => {
   const sessions = copilotSessionsSorted();
   const selected = copilotSelectedSession();
   const transcript = getCopilotTranscript(selected?.id);
@@ -9499,7 +9855,7 @@ VIEWS['copilot/sessions'] = () => {
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary" onclick="openCopilot()">Open embedded panel</button>
-        <button class="btn btn-primary" onclick="navigate('#/copilot/promptbooks')">Run promptbook</button>
+        <button class="btn btn-primary" onclick="navigate('#/ai-agent/promptbooks')">Run promptbook</button>
       </div>
     </div>
 
@@ -9564,7 +9920,7 @@ VIEWS['copilot/sessions'] = () => {
   `;
 };
 
-VIEWS['copilot/session'] = () => {
+VIEWS['ai-agent/session'] = () => {
   const selected = copilotSelectedSession();
   const transcript = selected ? getCopilotTranscript(selected.id) : [];
   const firstAnalystPrompt = transcript.find(step => step.role === 'analyst')?.text || '';
@@ -9580,7 +9936,7 @@ VIEWS['copilot/session'] = () => {
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary" onclick="openCopilotPromptForSession('${esc(selected?.id || '')}')">Open embedded panel</button>
-        <button class="btn btn-secondary" onclick="navigate('#/copilot/sessions')">Back to sessions</button>
+        <button class="btn btn-secondary" onclick="navigate('#/ai-agent/sessions')">Back to sessions</button>
       </div>
     </div>
 
@@ -9652,7 +10008,7 @@ VIEWS['copilot/session'] = () => {
   `;
 };
 
-VIEWS['copilot/promptbooks'] = () => {
+VIEWS['ai-agent/promptbooks'] = () => {
   const tab = sessionStorage.getItem('defender-lab.copilot.promptbook.tab') || 'Hack Smarter Labs';
   const books = getCopilotPromptbooks();
   const filtered = books.filter(book => tab === 'All' || book.source === tab);
@@ -9665,7 +10021,7 @@ VIEWS['copilot/promptbooks'] = () => {
         <div class="page-subtitle">Browse built-in and custom promptbooks, then run one to create a canned session.</div>
       </div>
       <div class="page-actions">
-        <button class="btn btn-secondary" onclick="navigate('#/copilot/home')">Home</button>
+        <button class="btn btn-secondary" onclick="navigate('#/ai-agent/home')">Home</button>
         <button class="btn btn-primary" onclick="runCopilotPromptbook('${esc(selected?.id || books[0]?.id || '')}')">Run selected promptbook</button>
       </div>
     </div>
@@ -9747,7 +10103,7 @@ VIEWS['copilot/promptbooks'] = () => {
   `;
 };
 
-VIEWS['copilot/plugins'] = () => {
+VIEWS['ai-agent/plugins'] = () => {
   const plugins = getCopilotPlugins();
   const selected = copilotSelectedPlugin();
   return `
@@ -9758,7 +10114,7 @@ VIEWS['copilot/plugins'] = () => {
         <div class="page-subtitle">Manage first-party, third-party, and custom plugins that can ground a Copilot answer.</div>
       </div>
       <div class="page-actions">
-        <button class="btn btn-secondary" onclick="navigate('#/copilot/knowledge')">Knowledge</button>
+        <button class="btn btn-secondary" onclick="navigate('#/ai-agent/knowledge')">Knowledge</button>
         <button class="btn btn-primary" onclick="toast('platform-native plugins win before third-party or custom plugins when multiple are enabled.')">Precedence note</button>
       </div>
     </div>
@@ -9808,7 +10164,7 @@ VIEWS['copilot/plugins'] = () => {
   `;
 };
 
-VIEWS['copilot/knowledge'] = () => {
+VIEWS['ai-agent/knowledge'] = () => {
   const sources = getCopilotKnowledge();
   const selected = copilotSelectedKnowledgeSource();
   return `
@@ -9871,7 +10227,7 @@ VIEWS['copilot/knowledge'] = () => {
   `;
 };
 
-VIEWS['copilot/settings'] = () => {
+VIEWS['ai-agent/settings'] = () => {
   const settings = getCopilotSettings();
   const usage = COPILOT_USAGE;
   const avgUnits = usage.reduce((sum, row) => sum + row.unitsUsed, 0) / usage.length;
@@ -9945,7 +10301,7 @@ VIEWS['copilot/settings'] = () => {
 
 // --- v17-defender-vulnerabilities ---
 // nav: Endpoints | Vulnerability management | 🩹
-VIEWS['defender/vulnerabilities'] = () => {
+VIEWS['xdr/vulnerabilities'] = () => {
   const recs = currentTvmRecommendations();
   const tracker = currentTvmTracker().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const exceptions = currentTvmExceptionsWithDefaults().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -9965,8 +10321,8 @@ VIEWS['defender/vulnerabilities'] = () => {
       <div class="page-subtitle">Track exposed software, exploitable CVEs, remediation requests, and scoped exceptions for the lab tenant.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/defender/exposure">Exposure management</a>
-      <a class="btn btn-secondary" href="#/defender/device" onclick="openDevice('WKS-03', 'vulnerabilities')">Open device TVM</a>
+      <a class="btn btn-secondary" href="#/xdr/exposure">Exposure management</a>
+      <a class="btn btn-secondary" href="#/xdr/device" onclick="openDevice('WKS-03', 'vulnerabilities')">Open device TVM</a>
       <button class="btn btn-primary" onclick="openTvmRemediationFlow('tr-01')">Request remediation</button>
     </div>
   </div>
@@ -9982,7 +10338,7 @@ VIEWS['defender/vulnerabilities'] = () => {
     <section class="card card-body">
       <div class="card-toolbar">
         <strong>Exposure score trend</strong>
-        <a class="chip-link" href="#/defender/exposure">Open exposure management →</a>
+        <a class="chip-link" href="#/xdr/exposure">Open exposure management →</a>
       </div>
       <div class="tvm-trend">
         ${TVM_EXPOSURE_TREND.map(item => `
@@ -10122,7 +10478,7 @@ VIEWS['defender/vulnerabilities'] = () => {
 
 // --- v18-defender-threat-explorer ---
 // nav: Email & collaboration | Threat explorer | 📧
-VIEWS['defender/threat-explorer'] = () => ({
+VIEWS['xdr/threat-explorer'] = () => ({
   html: `<div id="threat-explorer-root"><div class="page-header"><div><h1>Threat explorer</h1><div class="page-subtitle">Loading the local message investigation queue…</div></div></div></div>`,
   onMount: () => {
     const root = document.getElementById('threat-explorer-root');
@@ -10224,8 +10580,8 @@ VIEWS['defender/threat-explorer'] = () => ({
             <div class="page-subtitle">Pivot by verdict or campaign, inspect message entities, and queue a mock remediation batch.</div>
           </div>
           <div class="page-actions">
-            <a class="btn btn-secondary" href="#/defender/email-collab">Email &amp; collaboration</a>
-            <a class="btn btn-secondary" href="#/defender/email-collab/threat-explorer/campaigns">Campaign pivots</a>
+            <a class="btn btn-secondary" href="#/xdr/email-collab">Email &amp; collaboration</a>
+            <a class="btn btn-secondary" href="#/xdr/email-collab/threat-explorer/campaigns">Campaign pivots</a>
             <button class="btn btn-primary" id="remediate-selected">Remediate selected</button>
           </div>
         </div>
@@ -10368,7 +10724,7 @@ VIEWS['defender/threat-explorer'] = () => ({
   }
 });
 
-VIEWS['defender/email-collab/threat-explorer/campaigns'] = () => `
+VIEWS['xdr/email-collab/threat-explorer/campaigns'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Email &amp; collaboration › <strong>Threat explorer › Campaigns</strong></div>
@@ -10376,7 +10732,7 @@ VIEWS['defender/email-collab/threat-explorer/campaigns'] = () => `
       <div class="page-subtitle">Break the mail corpus into lure waves, affected users, and the response pattern you would take in the portal.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/defender/threat-explorer">Back to explorer</a>
+      <a class="btn btn-secondary" href="#/xdr/threat-explorer">Back to explorer</a>
     </div>
   </div>
   <div class="two-col">
@@ -10452,7 +10808,7 @@ function entraMfaTag(mfa) {
   return `<span class="tag blue">${esc(mfa)}</span>`;
 }
 
-VIEWS['entra/overview'] = () => {
+VIEWS['identity/overview'] = () => {
   const rows       = entraUserRows();
   const filter     = currentEntraUserFilter();
   const search     = currentEntraUserSearch();
@@ -10474,7 +10830,7 @@ VIEWS['entra/overview'] = () => {
     </div>
     <div class="page-actions">
       <button class="btn btn-secondary" onclick="toast('Lab action: a user CSV export would be generated for ${ENTRA_USERS.length} principals.')">⬇ Export directory</button>
-      <button class="btn btn-primary" onclick="navigate('#/entra/identity-protection')">Open Identity Protection</button>
+      <button class="btn btn-primary" onclick="navigate('#/identity/identity-protection')">Open Identity Protection</button>
     </div>
   </div>
 
@@ -10507,7 +10863,7 @@ VIEWS['entra/overview'] = () => {
       <table class="grid compact-grid">
         <thead><tr><th>Detection type</th><th>Risk</th><th>Count</th><th>7-day change</th></tr></thead>
         <tbody>${ENTRA_RISK_DETECTION_SUMMARY.map(d => `
-          <tr onclick="navigate('#/entra/identity-protection')">
+          <tr onclick="navigate('#/identity/identity-protection')">
             <td><strong>${esc(d.type)}</strong></td>
             <td><span class="sev ${entraRiskClass(d.level)}">${esc(d.level)}</span></td>
             <td>${d.count}</td>
@@ -10593,7 +10949,7 @@ VIEWS['entra/overview'] = () => {
     <table class="grid compact-grid">
       <thead><tr><th>Recommendation</th><th>Impact</th><th>Status</th><th>Why it matters here</th></tr></thead>
       <tbody>${ENTRA_RECOMMENDATIONS.map(r => `
-        <tr onclick="navigate('#/entra/conditional-access')">
+        <tr onclick="navigate('#/identity/conditional-access')">
           <td><strong>${esc(r.title)}</strong></td>
           <td><span class="sev ${entraRiskClass(r.impact)}">${esc(r.impact)}</span></td>
           <td>${esc(r.status)}</td>
@@ -10603,11 +10959,11 @@ VIEWS['entra/overview'] = () => {
   </div>
 
   <div class="two-col">
-    <section class="card card-body" onclick="navigate('#/entra/identity-protection')" style="cursor:pointer;">
+    <section class="card card-body" onclick="navigate('#/identity/identity-protection')" style="cursor:pointer;">
       <div class="alert-section-title">🛡 Identity Protection</div>
       <p class="muted">Risk detections, risky users, and risky sign-ins from Entra ID Protection. Understand sign-in risk vs. user risk.</p>
     </section>
-    <section class="card card-body" onclick="navigate('#/entra/conditional-access')" style="cursor:pointer;">
+    <section class="card card-body" onclick="navigate('#/identity/conditional-access')" style="cursor:pointer;">
       <div class="alert-section-title">🔐 Conditional Access</div>
       <p class="muted">Build the sign-in risk-based policy that lets users self-remediate with MFA. Interactive builder inside.</p>
     </section>
@@ -10619,7 +10975,7 @@ VIEWS['entra/overview'] = () => {
 // reads, so it stays close to a real sign-in log: one row per attempt, an error
 // code on failures, and no verdict text anywhere. The filters are the lesson —
 // a burst is invisible in a mixed log until you narrow it to one account.
-VIEWS['entra/sign-in-logs'] = () => {
+VIEWS['identity/sign-in-logs'] = () => {
   const logType = sessionStorage.getItem('defender-lab.signin.logtype') || 'interactive';
   const userFilter = sessionStorage.getItem('defender-lab.signin.user') || '';
   const resultFilter = sessionStorage.getItem('defender-lab.signin.result') || '';
@@ -10701,7 +11057,7 @@ VIEWS['entra/sign-in-logs'] = () => {
 `;
 };
 
-VIEWS['entra/identity-protection'] = () => `
+VIEWS['identity/identity-protection'] = () => `
   <div class="page-header">
     <div>
       <div class="breadcrumb">Entra › Protection › <strong>Identity Protection</strong></div>
@@ -10725,7 +11081,7 @@ VIEWS['entra/identity-protection'] = () => `
   </div>
 `;
 
-VIEWS['entra/conditional-access'] = () => {
+VIEWS['identity/conditional-access'] = () => {
   const grant = sessionStorage.getItem('defender-lab.entra.ca.grant') || '';
   const stateSel = sessionStorage.getItem('defender-lab.entra.ca.state') || 'On';
   const riskCsv = sessionStorage.getItem('defender-lab.entra.ca.risk');
@@ -10866,7 +11222,7 @@ function m365ServiceTag(status) {
     : '<span class="tag orange">Advisory</span>';
 }
 
-VIEWS['m365-admin/home'] = () => {
+VIEWS['workspace/home'] = () => {
   const users = ENTRA_USERS.filter(u => u.userType !== 'Service principal');
   const licensed = users.filter(u => u.licenses.some(l => l.startsWith('365')));
   const assigned = M365_LICENSE_PRODUCTS.reduce((sum, p) => sum + p.assigned, 0);
@@ -10889,19 +11245,19 @@ VIEWS['m365-admin/home'] = () => {
 
     <div class="section-title">Common tasks</div>
     <div class="tile-grid" style="margin-bottom:16px;">
-      <button class="tile" onclick="navigate('#/m365-admin/users')"><span class="tile-title"><span class="tile-icon">👥</span>Manage users</span><span class="tile-sub">Add or review users, reset passwords, and inspect assigned products.</span><strong>Users › Active users</strong></button>
-      <button class="tile" onclick="navigate('#/m365-admin/licenses')"><span class="tile-title"><span class="tile-icon">🪪</span>Manage licenses</span><span class="tile-sub">Review product capacity and which assignments are direct or group based.</span><strong>Billing › Licenses</strong></button>
-      <button class="tile" onclick="navigate('#/m365-admin/service-health')"><span class="tile-title"><span class="tile-icon">💚</span>Check service health</span><span class="tile-sub">Review active incidents and advisories affecting 365 services.</span><strong>Health › Service health</strong></button>
-      <button class="tile" onclick="navigate('#/m365-admin/usage')"><span class="tile-title"><span class="tile-icon">📊</span>Review usage</span><span class="tile-sub">Compare enabled and active users across 365 products.</span><strong>Reports › Usage</strong></button>
+      <button class="tile" onclick="navigate('#/workspace/users')"><span class="tile-title"><span class="tile-icon">👥</span>Manage users</span><span class="tile-sub">Add or review users, reset passwords, and inspect assigned products.</span><strong>Users › Active users</strong></button>
+      <button class="tile" onclick="navigate('#/workspace/licenses')"><span class="tile-title"><span class="tile-icon">🪪</span>Manage licenses</span><span class="tile-sub">Review product capacity and which assignments are direct or group based.</span><strong>Billing › Licenses</strong></button>
+      <button class="tile" onclick="navigate('#/workspace/service-health')"><span class="tile-title"><span class="tile-icon">💚</span>Check service health</span><span class="tile-sub">Review active incidents and advisories affecting 365 services.</span><strong>Health › Service health</strong></button>
+      <button class="tile" onclick="navigate('#/workspace/usage')"><span class="tile-title"><span class="tile-icon">📊</span>Review usage</span><span class="tile-sub">Compare enabled and active users across 365 products.</span><strong>Reports › Usage</strong></button>
     </div>
 
     <div class="two-col">
       <section class="card">
-        <div class="card-toolbar"><strong>Service health</strong><button class="chip-link" onclick="navigate('#/m365-admin/service-health')">View all</button></div>
-        <table class="grid compact-grid"><tbody>${M365_SERVICE_HEALTH.slice(0,4).map(s => `<tr onclick="navigate('#/m365-admin/service-health')"><td><strong>${esc(s.service)}</strong><div class="muted">${esc(s.detail)}</div></td><td>${m365ServiceTag(s.status)}</td></tr>`).join('')}</tbody></table>
+        <div class="card-toolbar"><strong>Service health</strong><button class="chip-link" onclick="navigate('#/workspace/service-health')">View all</button></div>
+        <table class="grid compact-grid"><tbody>${M365_SERVICE_HEALTH.slice(0,4).map(s => `<tr onclick="navigate('#/workspace/service-health')"><td><strong>${esc(s.service)}</strong><div class="muted">${esc(s.detail)}</div></td><td>${m365ServiceTag(s.status)}</td></tr>`).join('')}</tbody></table>
       </section>
       <section class="card">
-        <div class="card-toolbar"><strong>Message center</strong><button class="chip-link" onclick="navigate('#/m365-admin/message-center')">View all</button></div>
+        <div class="card-toolbar"><strong>Message center</strong><button class="chip-link" onclick="navigate('#/workspace/message-center')">View all</button></div>
         <table class="grid compact-grid"><tbody>${M365_MESSAGE_CENTER.map(m => `<tr onclick="openM365Message('${esc(m.id)}')"><td><strong>${esc(m.title)}</strong><div class="muted">${esc(m.service)} · ${esc(m.id)}</div></td><td><span class="tag ${m.impact === 'Action required' ? 'orange' : 'blue'}">${esc(m.impact)}</span></td></tr>`).join('')}</tbody></table>
       </section>
     </div>`;
@@ -10938,7 +11294,7 @@ function m365AdminUserRows() {
     .filter(u => !query || [u.displayName, u.upn, u.department, u.jobTitle].some(v => String(v).toLowerCase().includes(query)));
 }
 
-VIEWS['m365-admin/users'] = () => {
+VIEWS['workspace/users'] = () => {
   const rows = m365AdminUserRows();
   const filter = currentM365UserFilter();
   const search = currentM365UserSearch();
@@ -10946,7 +11302,7 @@ VIEWS['m365-admin/users'] = () => {
   return `
     ${m365AdminHeader('Active users', 'Create and manage people who can access 365 apps and services.',
       '<button class="btn btn-secondary" onclick="toast(\'CSV user export prepared from fictional lab rows.\')">⬇ Export users</button><button class="btn btn-primary" onclick="toast(\'Lab-only flow: add identity details, assign a product license, choose optional roles, then review.\')">＋ Add a user</button>')}
-    <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Users › Active users</strong>. Select a user to review its shared Entra/Defender identity details. Product licenses can be managed here per user or from <button class="chip-link" onclick="navigate('#/m365-admin/licenses')">Billing › Licenses</button>.</div>
+    <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Users › Active users</strong>. Select a user to review its shared Entra/Defender identity details. Product licenses can be managed here per user or from <button class="chip-link" onclick="navigate('#/workspace/licenses')">Billing › Licenses</button>.</div>
     <div class="tabs">${M365_USER_FILTERS.map(f => `<button class="tab ${f.key === filter ? 'active' : ''}" onclick="setM365UserFilter('${f.key}')">${esc(f.label)}<span class="pill">${allUsers.filter(f.test).length}</span></button>`).join('')}</div>
     <div class="inventory-toolbar"><span class="muted">${rows.length} of ${allUsers.length} users</span><div class="inventory-toolbar-actions"><input class="input-sm" style="width:280px" type="search" placeholder="Search users" value="${esc(search)}" onchange="setM365UserSearch(this.value)">${search ? '<button class="chip active" onclick="setM365UserSearch(\'\')">Clear search ✕</button>' : ''}</div></div>
     <div class="card table-scroll"><table class="grid"><thead><tr><th>Display name</th><th>Username</th><th>Licenses</th><th>Admin roles</th><th>Sign-in status</th><th>User type</th><th>Last sign-in</th></tr></thead><tbody>
@@ -10954,24 +11310,24 @@ VIEWS['m365-admin/users'] = () => {
     </tbody></table></div>`;
 };
 
-VIEWS['m365-admin/licenses'] = () => `
+VIEWS['workspace/licenses'] = () => `
   ${m365AdminHeader('Licenses', 'Review subscriptions, assignment capacity, and license errors.', '<button class="btn btn-primary" onclick="toast(\'Lab-only purchase flow opened. No subscription is changed.\')">Buy licenses</button>')}
-  <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Billing › Licenses</strong>. Select a product to assign licenses by product; use <button class="chip-link" onclick="navigate('#/m365-admin/users')">Users › Active users</button> when managing one or more specific users.</div>
+  <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Billing › Licenses</strong>. Select a product to assign licenses by product; use <button class="chip-link" onclick="navigate('#/workspace/users')">Users › Active users</button> when managing one or more specific users.</div>
   <div class="card"><table class="grid"><thead><tr><th>Product</th><th>Status</th><th>Assigned</th><th>Available</th><th>Total purchased</th><th>Renewal</th><th></th></tr></thead><tbody>${M365_LICENSE_PRODUCTS.map(p => `<tr><td><strong>${esc(p.product)}</strong></td><td><span class="tag green">${esc(p.status)}</span></td><td>${p.assigned}</td><td>${p.purchased - p.assigned}</td><td>${p.purchased}</td><td>${esc(p.renewal)}</td><td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); toast('Assignment panel opened for ${esc(p.product)}. Changes remain local to the lab.')">Assign licenses</button></td></tr>`).join('')}</tbody></table></div>
   <div class="callout success" style="margin-top:14px;"><strong>Least privilege:</strong> the real workflow requires at least the License Administrator or User Administrator role. Global Administrator should be reserved for tasks that cannot use a narrower role.</div>`;
 
-VIEWS['m365-admin/usage'] = () => `
+VIEWS['workspace/usage'] = () => `
   ${m365AdminHeader('Usage', '365 product adoption for the fictional Hack Smarter Labs tenant.', '<button class="btn btn-secondary" onclick="toast(\'A fictional usage CSV would be exported.\')">⬇ Export</button>')}
   <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Reports › Usage</strong>. Real usage reports can cover 7, 30, 90, or 180 days and normally conceal user, group, and site names by default. This lab shows only aggregate fictional values.</div>
   <div class="card"><div class="card-toolbar"><strong>Active users by product</strong><span class="muted">Last 30 days</span></div><table class="grid"><thead><tr><th>Product</th><th>Enabled users</th><th>Active users</th><th>Adoption</th><th>Activity</th></tr></thead><tbody>${M365_USAGE_REPORTS.map(r => { const pct = Math.round(r.active / r.enabled * 100); return `<tr><td><strong>${esc(r.product)}</strong></td><td>${r.enabled}</td><td>${r.active}</td><td>${pct}%</td><td style="min-width:220px"><div style="height:8px;background:var(--bg-selected);border-radius:4px"><div style="height:8px;width:${pct}%;background:var(--workload);border-radius:4px"></div></div></td></tr>`; }).join('')}</tbody></table></div>`;
 
-VIEWS['m365-admin/service-health'] = () => `
+VIEWS['workspace/service-health'] = () => `
   ${m365AdminHeader('Service health', 'Current health and active advisories for services used by Hack Smarter Labs.', '<button class="btn btn-secondary" onclick="toast(\'Fictional service-health snapshot refreshed.\')">↻ Refresh</button>')}
   <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Health › Service health</strong>. The Health area also provides health history; Message center is where admins track upcoming product changes.</div>
   <div class="card"><table class="grid"><thead><tr><th>Service</th><th>Status</th><th>Current detail</th><th>Last updated</th></tr></thead><tbody>${M365_SERVICE_HEALTH.map(s => `<tr><td><strong>${esc(s.service)}</strong></td><td>${m365ServiceTag(s.status)}</td><td>${esc(s.detail)}</td><td>${fmtTime(s.updated)}</td></tr>`).join('')}</tbody></table></div>
-  <div class="two-col" style="margin-top:14px"><section class="card card-body"><div class="alert-section-title">Active issue</div><strong>SharePoint search indexing delay</strong><p class="muted">Classification: advisory. Search results can lag behind recent content changes; file access and collaboration remain available.</p><button class="btn btn-secondary btn-sm" onclick="toast('Notification preference saved locally for this fictional advisory.')">Notify me</button></section><section class="card card-body"><div class="alert-section-title">Operations note</div><p>Service incidents describe outages or degradation. Advisories describe a condition administrators should know about even when the service remains available.</p><button class="chip-link" onclick="navigate('#/m365-admin/message-center')">Open Message center →</button></section></div>`;
+  <div class="two-col" style="margin-top:14px"><section class="card card-body"><div class="alert-section-title">Active issue</div><strong>SharePoint search indexing delay</strong><p class="muted">Classification: advisory. Search results can lag behind recent content changes; file access and collaboration remain available.</p><button class="btn btn-secondary btn-sm" onclick="toast('Notification preference saved locally for this fictional advisory.')">Notify me</button></section><section class="card card-body"><div class="alert-section-title">Operations note</div><p>Service incidents describe outages or degradation. Advisories describe a condition administrators should know about even when the service remains available.</p><button class="chip-link" onclick="navigate('#/workspace/message-center')">Open Message center →</button></section></div>`;
 
-VIEWS['m365-admin/message-center'] = () => {
+VIEWS['workspace/message-center'] = () => {
   const state = currentM365MessageCenterState();
   const tab = currentM365MessageCenterTab();
   const active = M365_MESSAGE_CENTER.filter(m => !state.archived[m.id]);
@@ -10993,18 +11349,18 @@ VIEWS['m365-admin/message-center'] = () => {
   </tbody></table></div>`;
 };
 
-VIEWS['m365-admin/setup'] = () => `
+VIEWS['workspace/setup'] = () => `
   ${m365AdminHeader('Setup', 'Guided configuration tasks for domains, sign-in security, data protection, apps, and service readiness.')}
   <div class="callout info" style="margin-bottom:14px;">Product documentation places domains, multifactor authentication, admin access, mailbox migration, feature updates, and app installation guidance under <strong>Setup</strong>. This SC-200 lab links only the security-relevant exercises.</div>
   <div class="tile-grid">${M365_SETUP_TASKS.map(t => `<button class="tile" onclick="navigate('${t.route}')"><span class="tile-title"><span class="tile-icon">🧩</span>${esc(t.title)}</span><span class="tile-sub">${esc(t.category)}</span><span class="tag ${t.status === 'In progress' ? 'orange' : 'blue'}">${esc(t.status)}</span></button>`).join('')}</div>`;
 
-VIEWS['m365-admin/admin-centers'] = () => `
+VIEWS['workspace/admin-centers'] = () => `
   ${m365AdminHeader('Admin centers', 'Open specialist workspaces for deeper service-specific administration.')}
   <div class="callout info" style="margin-bottom:14px;">Product documentation describes 365 Admin as the common entry point. Specialist centers provide deeper controls and vary by subscription plan and region.</div>
   <div class="solution-grid sentinel-content-grid">
-    <button class="solution-card" onclick="navigate('#/defender/home')"><strong>Security</strong><span>Defender XDR incidents, alerts, hunting, identities, endpoints, and email security.</span></button>
-    <button class="solution-card" onclick="navigate('#/purview/home')"><strong>Compliance</strong><span>Purview data security, Audit, eDiscovery, and compliance workflows.</span></button>
-    <button class="solution-card" onclick="navigate('#/entra/overview')"><strong>Entra</strong><span>Identity, roles, Conditional Access, risky users, and sign-in protection.</span></button>
+    <button class="solution-card" onclick="navigate('#/xdr/home')"><strong>Security</strong><span>Defender XDR incidents, alerts, hunting, identities, endpoints, and email security.</span></button>
+    <button class="solution-card" onclick="navigate('#/governance/home')"><strong>Compliance</strong><span>Purview data security, Audit, eDiscovery, and compliance workflows.</span></button>
+    <button class="solution-card" onclick="navigate('#/identity/overview')"><strong>Entra</strong><span>Identity, roles, Conditional Access, risky users, and sign-in protection.</span></button>
     <button class="solution-card" onclick="toast('Exchange admin center is outside the SC-200 lab scope.')"><strong>Exchange</strong><span>Mail flow, recipients, calendars, and Exchange organization settings.</span></button>
     <button class="solution-card" onclick="toast('Teams admin center is outside the SC-200 lab scope.')"><strong>Teams</strong><span>Messaging, meetings, voice, teams, and organization-wide settings.</span></button>
     <button class="solution-card" onclick="toast('SharePoint admin center is outside the SC-200 lab scope.')"><strong>SharePoint</strong><span>Sites, sharing, OneDrive, migration, and content-service settings.</span></button>

@@ -29,6 +29,14 @@ result, email header, and vulnerability record is fixture data in `ui/data.js`.
 | `ui/workflow-automation.js` | SOAR / playbook surface |
 | `ui/coach.js`, `ui/coach-data.js` | Guided walkthrough layer (inert without `?coach=`) |
 
+## Route namespaces are vendor-neutral too
+
+The workload id in `#/<workload>/<page>` is learner-facing, so it carries no
+product name: `xdr`, `siem`, `cloud`, `governance`, `ai-agent`, `identity`,
+`workspace`. `PORTALS` in `ui/data.js` is the list, and it is the same key used
+by `NAV`, the `VIEWS` registry, `PORTAL_CONTEXT`, and the `route-<id>-<page>`
+body classes the stylesheet hooks — change one and you change all of them.
+
 ## Vendor-neutral naming is a product rule, not a preference
 
 `ui/neutral-terminology.js` rewrites vendor product names to generic
@@ -57,8 +65,9 @@ node bin/render_all.js    # render every view; sweep NAV routes for dead links
 bin/qa-sweep.sh           # syntax + render, logs to docs/QA_LOG.md
 ```
 
-`purview/audit: tiny/empty render` is a known pre-existing failure inherited
-from upstream; it is not a rebrand regression.
+Ten views return `{ html, onMount }` and build their markup against a live
+DOM, so the static harness reports them as *mount-time* rather than checking
+them. Those need a browser to verify — `bin/dev.sh start` and click through.
 
 ## Disclaimer
 

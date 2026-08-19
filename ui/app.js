@@ -22,15 +22,15 @@ function matchedRule(alert) {
 }
 
 // ---------- router ----------
-const DEFAULT_ROUTE = '#/defender/home';
+const DEFAULT_ROUTE = '#/xdr/home';
 const LAB_BRAND = 'Hack Smarter Labs';
 
 function currentRoute() {
-  return (location.hash || DEFAULT_ROUTE).replace(/^#\//, '');   // e.g. "defender/home"
+  return (location.hash || DEFAULT_ROUTE).replace(/^#\//, '');   // e.g. "xdr/home"
 }
 function workloadOf(route) {
   const id = route.split('/')[0];
-  return PORTALS.find(p => p.id === id) ? id : 'defender';
+  return PORTALS.find(p => p.id === id) ? id : 'xdr';
 }
 function navigate(hash) {
   if (!hash.startsWith('#')) hash = '#' + hash;
@@ -56,8 +56,8 @@ function render() {
   const shell = document.getElementById('shell');
   const azurePane = document.getElementById('pane-azure');
   const bladePane = document.getElementById('pane-blade');
-  const cleanPortal = wl === 'purview';
-  const singlePanePortal = wl === 'm365-admin';
+  const cleanPortal = wl === 'governance';
+  const singlePanePortal = wl === 'workspace';
   shell.classList.remove('no-azure', 'clean-portal');
   shell.classList.toggle('clean-portal', cleanPortal);
   shell.classList.toggle('no-azure', singlePanePortal);
@@ -82,18 +82,18 @@ function render() {
 // XDR and governance workloads use the XDR Security context; SIEM and cloud
 // security workloads use Cloud Console.
 const PORTAL_CONTEXT = {
-  'defender':       'defender',
-  'purview':        'defender',
-  'sentinel':       'azure',
-  'defender-cloud': 'azure',
-  'copilot':        'defender',
-  'entra':          'admin',
-  'm365-admin':     'admin',
+  'xdr':        'xdr',
+  'governance': 'xdr',
+  'siem':       'cloud',
+  'cloud':      'cloud',
+  'ai-agent':   'xdr',
+  'identity':   'admin',
+  'workspace':  'admin',
 };
 const PORTAL_CONTEXT_HOME = {
-  'defender': '#/defender/home',
-  'azure':    '#/defender-cloud/overview',
-  'admin':    '#/m365-admin/home',
+  'xdr':   '#/xdr/home',
+  'cloud': '#/cloud/overview',
+  'admin': '#/workspace/home',
 };
 function renderPortalTabs(wl) {
   const active = PORTAL_CONTEXT[wl];
@@ -110,12 +110,12 @@ window.switchPortalContext = switchPortalContext;
 
 // Which Cloud app to highlight for the active workload.
 const CLOUD_HIGHLIGHT = {
-  'defender':       'XDR Security',
-  'sentinel':       'SIEM & SOAR',
-  'defender-cloud': 'Cloud Console',
-  'purview':        'Data Governance',
-  'entra':          'Identity & Access',
-  'm365-admin':     'Workspace Admin',
+  'xdr':        'XDR Security',
+  'siem':       'SIEM & SOAR',
+  'cloud':      'Cloud Console',
+  'governance': 'Data Governance',
+  'identity':   'Identity & Access',
+  'workspace':  'Workspace Admin',
 };
 function renderAzurePane(wl) {
   const target = CLOUD_HIGHLIGHT[wl];
@@ -412,7 +412,7 @@ function openIncidentPage(id) {
   sessionStorage.setItem('defender-lab.incident.id', id);
   sessionStorage.setItem('defender-lab.incident.tab', 'attack-story');
   hidePanels();
-  navigate('#/defender/incident');
+  navigate('#/xdr/incident');
 }
 function setIncidentTab(tab) {
   sessionStorage.setItem('defender-lab.incident.tab', tab);
@@ -483,7 +483,7 @@ function setAttackStoryStep(incidentId, stepIndex = 0) {
       <p>${esc(step.detail)}</p>
       <div class="attack-story-actions-inline">
         <button class="btn btn-secondary btn-sm" onclick="openAlert('${esc(step.alertId)}')">Open alert</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/hunting')">Go hunt</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
       </div>
       <div class="attack-story-remediation"><strong>Response action:</strong> ${esc(remediation)}</div>
     `;
@@ -556,7 +556,7 @@ function updateAttackStoryEntity(panel, story, nodeId, activeAlertId) {
         : `<button class="btn btn-secondary btn-sm" onclick="openEntityPivot('${esc(node.type || 'Entity')}', '${esc(node.label || '')}')">Open entity page</button>`}
       <button class="btn btn-primary btn-sm" onclick="viewBlastRadius('${esc(panel.dataset.incidentId)}', '${esc(node.id || '')}')">View blast radius</button>
       <button class="btn btn-secondary btn-sm" onclick="runSentinelEntityPlaybook('${esc(node.label || panel.dataset.incidentId)}', 'Defender incident side panel')">Run playbook (entity)</button>
-      <button class="btn btn-secondary btn-sm" onclick="navigate('#/defender/hunting')">Go hunt</button>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
     </div>
     <ul class="attack-evidence-list">
       ${(evidence.length ? evidence : ['No evidence attached to this entity.']).map(item => `<li>${esc(item)}</li>`).join('')}
@@ -1407,7 +1407,7 @@ function openCopilotSession(sessionId) {
   if (!sessionId) return;
   sessionStorage.setItem('defender-lab.copilot.session.id', sessionId);
   hidePanels();
-  navigate('#/copilot/session');
+  navigate('#/ai-agent/session');
 }
 
 function openCopilotPromptForSession(sessionId) {
@@ -1446,7 +1446,7 @@ function selectCopilotPrompt(i) {
       <div class="sidepanel-footer">
         <button class="btn btn-primary" onclick="openCopilotSession('${esc(sessionId)}')">Open standalone session</button>
         <button class="btn btn-primary" onclick="openIncidentPage('INC-1042')">Open incident</button>
-        <button class="btn btn-secondary" onclick="navigate('#/defender/cases'); hidePanels();">Open case</button>
+        <button class="btn btn-secondary" onclick="navigate('#/xdr/cases'); hidePanels();">Open case</button>
       </div>
     `;
     return;
@@ -1480,7 +1480,7 @@ function persistCopilotSession(session, transcriptSteps) {
 
 function promptbookPluginSelection(book) {
   const title = `${book.name} ${book.source || ''}`.toLowerCase();
-  if (title.includes('email') || title.includes('purview') || title.includes('dlp')) return ['Purview', 'Defender XDR'];
+  if (title.includes('email') || title.includes('governance') || title.includes('dlp')) return ['Purview', 'Defender XDR'];
   if (title.includes('vulnerability')) return ['Defender XDR', 'Sentinel'];
   if (title.includes('hunting') || title.includes('threat')) return ['Sentinel', 'Defender Threat Intelligence'];
   return ['Defender XDR'];
@@ -1510,7 +1510,7 @@ function runCopilotPromptbook(bookId) {
   }, steps);
   sessionStorage.setItem('defender-lab.copilot.session.id', sessionId);
   toast(`Ran promptbook ${book.name} and created a canned session.`);
-  navigate('#/copilot/session');
+  navigate('#/ai-agent/session');
 }
 
 function saveCopilotPromptbook() {
@@ -1607,7 +1607,7 @@ function exportCopilotSession(sessionId) {
 }
 
 function copyCopilotSessionLink(sessionId) {
-  const text = `#/copilot/session :: ${sessionId}`;
+  const text = `#/ai-agent/session :: ${sessionId}`;
   if (!navigator.clipboard?.writeText) {
     toast(`Session reference: ${text}`);
     return;
@@ -1634,12 +1634,12 @@ function rerunCopilotPrompt(sessionId) {
 // ---------- app switcher ----------
 // Map Cloud app labels to the workloads navigable in this lab.
 const CLOUD_APP_ROUTE = {
-  'XDR Security':      '#/defender/home',
-  'Cloud Console':     '#/defender-cloud/overview',
-  'Data Governance':   '#/purview/home',
-  'SIEM & SOAR':       '#/sentinel/home',
-  'Identity & Access': '#/entra/overview',
-  'Workspace Admin':   '#/m365-admin/home',
+  'XDR Security':      '#/xdr/home',
+  'Cloud Console':     '#/cloud/overview',
+  'Data Governance':   '#/governance/home',
+  'SIEM & SOAR':       '#/siem/home',
+  'Identity & Access': '#/identity/overview',
+  'Workspace Admin':   '#/workspace/home',
 };
 function renderSwitcher() {
   const grid = document.getElementById('switcher-grid');
@@ -2387,7 +2387,7 @@ function setInventoryTab(tab) {
   // version), which would read as an empty inventory rather than a tab change.
   // Clear them so a tab always lands on visible rows.
   saveInventoryFacets({});
-  if (currentRoute() === 'defender/devices') render();
+  if (currentRoute() === 'xdr/devices') render();
 }
 function toggleInventoryFacet(group, option) {
   const facets = currentInventoryFacets();
@@ -2523,7 +2523,7 @@ function openDiscoveredDevice(id) {
   sessionStorage.setItem('defender-lab.discovered.id', id);
   sessionStorage.setItem('defender-lab.discovered.tab', 'overview');
   hidePanels();
-  navigate('#/defender/discovered-device');
+  navigate('#/xdr/discovered-device');
 }
 function currentDiscoveredDevice() {
   const id = sessionStorage.getItem('defender-lab.discovered.id');
@@ -2542,7 +2542,7 @@ function openDevice(id, tab) {
   sessionStorage.setItem('defender-lab.device.id', id);
   sessionStorage.setItem('defender-lab.device.tab', tab || 'overview');
   hidePanels();
-  navigate('#/defender/device');
+  navigate('#/xdr/device');
 }
 function setDeviceTab(tab) {
   sessionStorage.setItem('defender-lab.device.tab', tab);
@@ -3170,7 +3170,7 @@ DeviceEvents
   sessionStorage.setItem('defender-lab.hunting.prefill', kql);
   sessionStorage.setItem('defender-lab.hunting.autorun', '1');
   hidePanels();
-  navigate('#/defender/hunting');
+  navigate('#/xdr/hunting');
   toast(`Loaded hunt for ${payload.techniqueId} on ${payload.deviceName}.`);
 }
 
@@ -3244,7 +3244,7 @@ function openIdentity(id, tab) {
   sessionStorage.setItem('defender-lab.identity.id', id);
   sessionStorage.setItem('defender-lab.identity.tab', tab || 'overview');
   hidePanels();
-  navigate('#/defender/identity');
+  navigate('#/xdr/identity');
 }
 function setIdentityTab(tab) {
   sessionStorage.setItem('defender-lab.identity.tab', tab);
@@ -3444,12 +3444,12 @@ function openSyslogAmaConnector() {
   const state = currentSyslogAmaState();
   if (!state.solutionInstalled) {
     toast('Install the Syslog solution from Content hub first.');
-    navigate('#/sentinel/content-hub');
+    navigate('#/siem/content-hub');
     return;
   }
   saveSyslogAmaState({ connectorOpened:true });
   toast('Syslog via AMA connector opened. Create the DCR from this connector page.');
-  navigate('#/sentinel/data-connectors');
+  navigate('#/siem/data-connectors');
 }
 function createSyslogAmaDcr() {
   const state = currentSyslogAmaState();
@@ -3577,12 +3577,12 @@ function openSentinelIngestionConnector(id) {
   const state = currentSentinelIngestionState(id);
   if (!state.solutionInstalled && lab.id !== 'azure-activity' && lab.id !== 'custom-logs') {
     toast(`Confirm the ${lab.solution} solution in Content hub first.`);
-    navigate('#/sentinel/content-hub');
+    navigate('#/siem/content-hub');
     return;
   }
   saveSentinelIngestionState(id, { connectorOpened:true });
   toast(`${lab.connector} connector opened.`);
-  navigate('#/sentinel/data-connectors');
+  navigate('#/siem/data-connectors');
 }
 function advanceSentinelIngestionLab(id, step) {
   const lab = ingestionLabById(id);
@@ -4064,7 +4064,7 @@ function openCloudResourceByName(name, tab) {
   const asset = defenderCloudInventoryRows().find(item => cloudAssetKeys(item).includes(target));
   if (!asset) {
     hidePanels();
-    navigate('#/defender-cloud/inventory');
+    navigate('#/cloud/inventory');
     toast(`No inventory asset is mapped to ${name}.`);
     return;
   }
@@ -4430,7 +4430,7 @@ function runSentinelEntityPlaybook(entityName, source) {
   sessionStorage.setItem('defender-lab.sentinel.playbook.selected', 'PB-ContainEntity');
   sessionStorage.setItem('defender-lab.sentinel.playbook.entity', entityName);
   toast(`Loaded PB-ContainEntity for ${entityName}.`);
-  navigate('#/sentinel/automation');
+  navigate('#/siem/automation');
 }
 
 function sentinelEntityPlaybookContext() {
@@ -4545,7 +4545,7 @@ function openMsspTenant(id) {
       ${isActive
         ? `<button class="btn btn-secondary" disabled>Active publish target</button>`
         : `<button class="btn btn-primary" onclick="setMsspTenant('${esc(t.id)}')">Set as active tenant</button>`}
-      <button class="btn btn-secondary" onclick="hidePanels();navigate('#/defender/mto')">View all tenant incidents</button>
+      <button class="btn btn-secondary" onclick="hidePanels();navigate('#/xdr/mto')">View all tenant incidents</button>
     </div>`;
   showPanel('panel-tenant');
 }
@@ -4553,7 +4553,7 @@ window.openMsspTenant = openMsspTenant;
 
 function loadSentinelLogsQuery(query) {
   sessionStorage.setItem('defender-lab.sentinel.logs.query', query);
-  navigate('#/sentinel/logs');
+  navigate('#/siem/logs');
 }
 window.loadSentinelLogsQuery = loadSentinelLogsQuery;
 
@@ -4703,7 +4703,7 @@ window.toggleM365MessageArchive = toggleM365MessageArchive;
 window.shareM365Message = shareM365Message;
 
 // ---------- Entra admin center: user detail ----------
-// Opens the directory properties for a principal listed on #/entra/overview.
+// Opens the directory properties for a principal listed on #/identity/overview.
 // Reuses the generic right-side panel. When the principal is onboarded to
 // Defender for Identity, the footer offers the cross-portal pivot to its XDR
 // identity page — the same pivot an analyst makes during a real investigation.
@@ -4766,7 +4766,7 @@ function openEntraUser(upn) {
 }
 window.openEntraUser = openEntraUser;
 
-// ---------- sign-in logs (#/entra/sign-in-logs) ----------
+// ---------- sign-in logs (#/identity/sign-in-logs) ----------
 // Filters live in sessionStorage so a coach step can navigate away and back
 // without the learner losing the narrowing they just applied.
 function setSigninFilter(kind, value) {

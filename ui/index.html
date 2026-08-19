@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hack Smarter Labs</title>
 <link rel="icon" type="image/png" href="assets/hacksmarter-mark.png" />
-<link rel="stylesheet" href="styles.css?v=20260819a" />
+<link rel="stylesheet" href="styles.css?v=20260819c" />
 </head>
 <body>
 
@@ -41,8 +41,8 @@
 </header>
 
 <div class="portal-tabs" id="portal-tabs">
-  <button class="portal-tab" data-portal="defender" onclick="switchPortalContext('defender')">XDR Security</button>
-  <button class="portal-tab" data-portal="azure" onclick="switchPortalContext('azure')">Cloud Console</button>
+  <button class="portal-tab" data-portal="xdr" onclick="switchPortalContext('xdr')">XDR Security</button>
+  <button class="portal-tab" data-portal="cloud" onclick="switchPortalContext('cloud')">Cloud Console</button>
   <button class="portal-tab" data-portal="admin" onclick="switchPortalContext('admin')">Workspace Admin</button>
 </div>
 <div class="workload-strip" id="workload-strip"></div>
@@ -429,7 +429,7 @@
 <script src="guided-hunting.js?v=20260817"></script>
 <script src="views.js?v=20260817"></script>
 <script src="app.js?v=20260817"></script>
-<!-- Loaded last: overrides the static VIEWS['defender-cloud/workflow'] registration. -->
+<!-- Loaded last: overrides the static VIEWS['cloud/workflow'] registration. -->
 <script src="workflow-automation.js?v=20260817"></script>
 <script src="helpdesk.js?v=20260817"></script>
 <!-- Loaded after every view registration so its badge sits above the app. -->

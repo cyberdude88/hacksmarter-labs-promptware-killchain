@@ -1627,6 +1627,9 @@ button.tile {
   font-size: 13px; font-family: inherit; background: #fff;
 }
 .ipt:focus { outline: 2px solid var(--workload); outline-offset: -2px; }
+/* .ipt is full-width by default, which is right inside a form column and
+   wrong in a toolbar, where several controls share one row. */
+.card-toolbar .ipt { width: auto; min-width: 150px; margin-left: 6px; }
 textarea.ipt { height: auto; padding: 8px; font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; }
 
 .callout {
@@ -2134,31 +2137,31 @@ textarea.ipt { height: auto; padding: 8px; font-family: ui-monospace, "Cascadia 
 }
 
 /* Defender advanced hunting route */
-body.route-defender-hunting .shell {
+body.route-xdr-hunting .shell {
   grid-template-columns: 56px 220px minmax(0, 1fr);
 }
-body.route-defender-hunting .pane-azure {
+body.route-xdr-hunting .pane-azure {
   background: #f7f7f7;
 }
-body.route-defender-hunting .pane-azure .pane-header {
+body.route-xdr-hunting .pane-azure .pane-header {
   justify-content: center;
   padding: 8px 4px;
 }
-body.route-defender-hunting .pane-azure .pane-title,
-body.route-defender-hunting .pane-azure .pane-toggle,
-body.route-defender-hunting .pane-azure .navlabel,
-body.route-defender-hunting .pane-azure .navsection {
+body.route-xdr-hunting .pane-azure .pane-title,
+body.route-xdr-hunting .pane-azure .pane-toggle,
+body.route-xdr-hunting .pane-azure .navlabel,
+body.route-xdr-hunting .pane-azure .navsection {
   display: none;
 }
-body.route-defender-hunting .pane-azure .pane-list li {
+body.route-xdr-hunting .pane-azure .pane-list li {
   justify-content: center;
   gap: 0;
   padding: 11px 0;
 }
-body.route-defender-hunting .pane-azure .navicon {
+body.route-xdr-hunting .pane-azure .navicon {
   font-size: 16px;
 }
-body.route-defender-hunting .content {
+body.route-xdr-hunting .content {
   padding: 18px 22px 32px;
 }
 .hunting-page-header {
@@ -2316,14 +2319,14 @@ body.route-defender-hunting .content {
 /* The three ASIM terminals place wide normalized source tables in a two-card
    study grid. Keep those tables scrollable inside their cards instead of
    widening the entire portal canvas at laptop widths. */
-body.route-sentinel-hunting-dns .two-col,
-body.route-sentinel-hunting-authentication .two-col,
-body.route-sentinel-hunting-network-session .two-col {
+body.route-siem-hunting-dns .two-col,
+body.route-siem-hunting-authentication .two-col,
+body.route-siem-hunting-network-session .two-col {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-body.route-sentinel-hunting-dns .two-col > .card,
-body.route-sentinel-hunting-authentication .two-col > .card,
-body.route-sentinel-hunting-network-session .two-col > .card {
+body.route-siem-hunting-dns .two-col > .card,
+body.route-siem-hunting-authentication .two-col > .card,
+body.route-siem-hunting-network-session .two-col > .card {
   min-width: 0;
   overflow-x: auto;
 }
@@ -4020,7 +4023,7 @@ body.route-sentinel-hunting-network-session .two-col > .card {
   .scenario-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .three-col { grid-template-columns: 1fr; }
   .syslog-progress { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  body.route-defender-hunting .shell {
+  body.route-xdr-hunting .shell {
     grid-template-columns: 56px minmax(180px, 220px) minmax(0, 1fr);
   }
   .hunting-status-cards {
@@ -4052,17 +4055,17 @@ body.route-sentinel-hunting-network-session .two-col > .card {
     grid-template-columns: 1fr;
     height: auto;
   }
-  body.route-defender-hunting .shell,
-  body.route-defender-hunting .hunting-workspace {
+  body.route-xdr-hunting .shell,
+  body.route-xdr-hunting .hunting-workspace {
     grid-template-columns: 1fr;
   }
-  body.route-defender-hunting .pane-azure {
+  body.route-xdr-hunting .pane-azure {
     display: none;
   }
-  body.route-defender-hunting .pane-blade {
+  body.route-xdr-hunting .pane-blade {
     max-height: 220px;
   }
-  body.route-defender-hunting .content {
+  body.route-xdr-hunting .content {
     padding: 16px;
   }
   .pane { max-height: 220px; }
@@ -4151,11 +4154,11 @@ body.route-sentinel-hunting-network-session .two-col > .card {
 /* ---------- Defender for Endpoint device page (look-alike, not ported) ---------- */
 /* Bleed out of #content's 20/28 padding so the device page hugs the viewport
    the way the real Defender portal page does. */
-body.route-defender-device .content {
+body.route-xdr-device .content {
   padding: 0;
   background: #fff;
 }
-body.route-defender-device .page-header { margin: 0; }
+body.route-xdr-device .page-header { margin: 0; }
 
 .dev-crumbs {
   display: flex;
@@ -5801,7 +5804,7 @@ body.coach-locked #workload-strip,
 body.coach-locked #btn-waffle,
 body.coach-locked .topbar-search { pointer-events: none; opacity: 0.45; }
 
-/* Sign-in logs (#/entra/sign-in-logs) */
+/* Sign-in logs (#/identity/sign-in-logs) */
 .signin-filterbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .signin-filter { font-size: 12px; color: var(--fg-muted); display: inline-flex; align-items: center; gap: 6px; }
 .signin-filter select { font-size: 12px; padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 3px; }

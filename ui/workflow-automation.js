@@ -1,7 +1,7 @@
 // Defender for Cloud > Workflow automation.
 //
 // Loaded after views.js and app.js, so it overrides the placeholder registration
-// of VIEWS['defender-cloud/workflow'] without editing those files.
+// of VIEWS['cloud/workflow'] without editing those files.
 //
 // Behaviour follows the Product documentation article "Workflow automation" for
 // Defender for Cloud (ms.date 2025-10-19):
@@ -292,7 +292,7 @@ function createWorkflowAutomation() {
 }
 
 // ---------- view ----------
-VIEWS['defender-cloud/workflow'] = () => ({
+VIEWS['cloud/workflow'] = () => ({
   html: `
   <div class="page-header">
     <div>

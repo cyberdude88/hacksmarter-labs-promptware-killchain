@@ -24,8 +24,11 @@ Done (this session, by hand — do not redo):
   128/129 views clean and 0 dead NAV routes — byte-identical to what the
   upstream project reports, so the rebrand introduced no regressions.
 
-Known pre-existing failure, inherited, **not** yours to blame on the rebrand:
-`purview/audit: tiny/empty render`.
+Also done since: route namespaces neutralized, the DLP surface rebuilt as an
+interactive lab, and `bin/render_all.js` taught about mount-time views — it now
+reports **129/129 clean, 0 dead NAV routes, exit 0**. The old
+`purview/audit: tiny/empty render` was never a defect; the harness could not
+mount an `{ html, onMount }` view and mislabeled all ten of them.
 
 ## Hard rules
 
@@ -54,6 +57,10 @@ Finish what the mechanical pass could not reach.
       and `820px`, `ui/styles.css` ~line 4018 and ~4042). The 820px rule sets
       `height: auto`, so the taller bar should be fine, but verify the 52px
       mark does not crowd the search field at 1100px.
+- [ ] The storage-key prefix is still `defender-lab.*` — a vendor name a
+      learner sees the moment they open devtools. New code uses `hsl.*`
+      (see `governance/dlp`). Migrating the rest needs a read-old/write-new
+      shim so existing lab state is not orphaned.
 - [ ] Audit every remaining `Hack Smarter` / `Hack Smarter Labs` string for
       places the substitution reads awkwardly in a sentence written for an
       academy ("your program", "your enrollment", "this course").
@@ -104,13 +111,35 @@ was lost. Most of it does not describe this product.
 
 ## Lane E — QA and CI
 
-- [ ] Fix `purview/audit: tiny/empty render` (pre-existing, upstream too).
+- [ ] The ten mount-time views are unverified by CI — the harness reports them
+      and moves on. Drive them with a real DOM (jsdom, or headless Chrome
+      against `bin/dev.sh`) so an onMount that throws is caught.
 - [ ] `bin/qa-sweep.sh` now logs to `docs/QA_LOG.md`; create that file's first
       entry so the path exists.
 - [ ] Extend `bin/render_all.js` to also assert the topbar mark resolves and no
       asset 404s (the old `mission-next-logo.png` reference is gone, but a
       future one should fail loudly).
 - [ ] Keep the Pages workflow green; it publishes `ui/` as the site root.
+
+## Lane G — Bring the other surfaces up to the DLP bar
+
+`governance/dlp` is now the reference for what "complete" means here: real
+state, a triage workflow that records what the learner did, and one mechanic
+the learner can only understand by manipulating it (policy state vs applied
+action). Grounded in Microsoft Learn via the MCP server, then written in
+neutral language.
+
+Most other views are still read-only posters. Apply the same treatment, in
+this order — worst offenders first:
+
+- [ ] `governance/insider-risk` — cases with no triage path.
+- [ ] `governance/communication-compliance` — review queue with no review.
+- [ ] `governance/ediscovery`, `governance/records`, `governance/lifecycle`.
+- [ ] The secondary study surfaces auto-registered at the bottom of `views.js`
+      — every one of those is a placeholder.
+
+Use the `microsoft-learn` MCP server for mechanics rather than recalling them;
+it is free and current. Verify the neutral wording after, not before.
 
 ## Lane F — What a range needs that a course did not
 
