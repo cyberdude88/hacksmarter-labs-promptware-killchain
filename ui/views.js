@@ -1551,10 +1551,10 @@ function renderIncidentAssets(inc, incAlerts) {
 }
 
 VIEWS['xdr/incident'] = () => {
-  const selectedId = sessionStorage.getItem('defender-lab.incident.id') || INCIDENTS[0].id;
+  const selectedId = sessionStorage.getItem('hsl.incident.id') || INCIDENTS[0].id;
   const inc = INCIDENTS.find(i => i.id === selectedId) || INCIDENTS[0];
   const incAlerts = alerts.filter(a => inc.alertIds.includes(a.id));
-  const tab = sessionStorage.getItem('defender-lab.incident.tab') || 'attack-story';
+  const tab = sessionStorage.getItem('hsl.incident.tab') || 'attack-story';
 
   const tabBtn = t => `
     <button class="tab ${tab===t.key?'active':''}" onclick="setIncidentTab('${t.key}')">${esc(t.label)}</button>`;
@@ -1776,10 +1776,10 @@ VIEWS['xdr/cases'] = () => `
 `;
 
 VIEWS['xdr/hunting'] = () => {
-  const prefilled = sessionStorage.getItem('defender-lab.hunting.prefill');
-  const autorun = sessionStorage.getItem('defender-lab.hunting.autorun') === '1';
-  sessionStorage.removeItem('defender-lab.hunting.prefill');
-  sessionStorage.removeItem('defender-lab.hunting.autorun');
+  const prefilled = sessionStorage.getItem('hsl.hunting.prefill');
+  const autorun = sessionStorage.getItem('hsl.hunting.autorun') === '1';
+  sessionStorage.removeItem('hsl.hunting.prefill');
+  sessionStorage.removeItem('hsl.hunting.autorun');
   const initialQuery = prefilled || SAVED_QUERIES[0].query;
   const initialTable = SAVED_QUERIES[0].table;
   const schemaGroups = HUNTING_SCHEMA_GROUPS;
@@ -1882,7 +1882,7 @@ VIEWS['xdr/hunting'] = () => {
   `,
     onMount: () => {
       const editor = attachKqlEditor(document.getElementById('kql'), {
-        storageKey: 'defender-lab.hunting',
+        storageKey: 'hsl.hunting',
         onRun: () => runKqlQuery(),
       });
       // A query handed over from another page outranks the stored draft.
@@ -1919,7 +1919,7 @@ VIEWS['xdr/hunting'] = () => {
       guidedHuntingInit();
       // A query handed over from another page implies advanced mode; otherwise
       // restore whichever mode was last used.
-      const storedMode = localStorage.getItem('defender-lab.hunting.mode');
+      const storedMode = localStorage.getItem('hsl.hunting.mode');
       setHuntingMode(prefilled ? 'advanced' : (storedMode === 'guided' ? 'guided' : 'advanced'));
       if (autorun) {
         setTimeout(() => runKqlQuery(), 0);
@@ -1942,7 +1942,7 @@ VIEWS['siem/hunting/authentication'] = () => renderMockAsimLab({
   resultsId:'asim-auth-results',
   statusId:'asim-auth-status',
   listId:'asim-auth-list',
-  storageKey:'defender-lab.asim-auth.query',
+  storageKey:'hsl.asim-auth.query',
   queryHint:'Query the unifying _Im_Authentication parser. Filter rows from Windows and Entra sources with one query.',
   sourceLabel:'ASIM Authentication rows',
   sourceColumns:['TimeGenerated','EventProduct','SrcIpAddr','TargetUserName','EventResult','DvcAction'],
@@ -1972,7 +1972,7 @@ VIEWS['siem/hunting/network-session'] = () => renderMockAsimLab({
   resultsId:'asim-network-results',
   statusId:'asim-network-status',
   listId:'asim-network-list',
-  storageKey:'defender-lab.asim-network.query',
+  storageKey:'hsl.asim-network.query',
   queryHint:'Query the unifying _Im_NetworkSession parser. Use the normalized fields to follow blocked or allowed traffic.',
   sourceLabel:'ASIM Network Session rows',
   sourceColumns:['TimeGenerated','SrcIpAddr','DstIpAddr','SrcHostname','DstHostname','EventResult','NetworkDirection'],
@@ -3186,9 +3186,9 @@ const DEVICE_TABS = [
 ];
 
 VIEWS['xdr/device'] = () => {
-  const selectedId = sessionStorage.getItem('defender-lab.device.id') || DEVICES[0].id;
+  const selectedId = sessionStorage.getItem('hsl.device.id') || DEVICES[0].id;
   const d = DEVICES.find(x => x.id === selectedId) || DEVICES[0];
-  const tab = sessionStorage.getItem('defender-lab.device.tab') || 'overview';
+  const tab = sessionStorage.getItem('hsl.device.tab') || 'overview';
   const events = (DEVICE_TIMELINE_EVENTS[d.id] || [])
     .slice().sort((a,b) => new Date(b.time) - new Date(a.time));
   const incAlerts = (typeof alerts !== 'undefined' ? alerts : SEED_ALERTS).filter(a => a.asset === d.id);
@@ -3762,9 +3762,9 @@ function identityAssetRows(identity) {
 }
 
 VIEWS['xdr/identity'] = () => {
-  const selectedId = sessionStorage.getItem('defender-lab.identity.id') || IDENTITIES[0].id;
+  const selectedId = sessionStorage.getItem('hsl.identity.id') || IDENTITIES[0].id;
   const i = IDENTITIES.find(x => x.id === selectedId) || IDENTITIES[0];
-  const tab = sessionStorage.getItem('defender-lab.identity.tab') || 'overview';
+  const tab = sessionStorage.getItem('hsl.identity.tab') || 'overview';
   const timeline = (IDENTITY_TIMELINE[i.id] || [])
     .slice().sort((a,b) => new Date(b.time) - new Date(a.time));
   const incAlerts = (typeof alerts !== 'undefined' ? alerts : SEED_ALERTS)
@@ -5101,7 +5101,7 @@ VIEWS['siem/logs'] = () => {
   const auxiliaryQuery = `ArchiveDns_CL
 | where DnsQuery == "sync-a.bad-demo.example"
 | project TimeGenerated, DnsQuery, QueryCount, UniqueHosts`;
-  const prefilledQuery = sessionStorage.getItem('defender-lab.sentinel.logs.query') || auxiliaryQuery;
+  const prefilledQuery = sessionStorage.getItem('hsl.siem.logs.query') || auxiliaryQuery;
   const queryLoadedFromWorkspace = /^workspace\s*\(/i.test(prefilledQuery.trim());
   return {
     html: `
@@ -5275,12 +5275,12 @@ VIEWS['siem/logs'] = () => {
       const taskButtons = Array.from(document.querySelectorAll('[data-kql-task]'));
       const taskById = Object.fromEntries(KQL_PRACTICE_TASKS.map(task => [task.id, task]));
       const practiceEditor = attachKqlEditor(document.getElementById('sentinel-kql-query'), {
-        storageKey: 'defender-lab.kql-practice',
+        storageKey: 'hsl.kql-practice',
         onRun: () => runSentinelKqlPractice(),
       });
       function setActiveTask(taskId) {
         const task = taskById[taskId] || initialTask;
-        sessionStorage.setItem('defender-lab.kql-practice.task', task.id);
+        sessionStorage.setItem('hsl.kql-practice.task', task.id);
         document.getElementById('sentinel-kql-query').value = task.query;
         document.getElementById('kql-practice-check').innerHTML = `Loaded task: <strong>${esc(task.title)}</strong> · expected ${task.expectedRows} rows.`;
         taskButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.kqlTask === task.id));
@@ -5289,7 +5289,7 @@ VIEWS['siem/logs'] = () => {
       window.loadSentinelKqlPractice = taskId => setActiveTask(taskId);
       window.runSentinelKqlPractice = () => {
         const query = document.getElementById('sentinel-kql-query').value;
-        const task = Object.values(taskById).find(t => t.query.trim() === query.trim()) || taskById[sessionStorage.getItem('defender-lab.kql-practice.task')] || initialTask;
+        const task = Object.values(taskById).find(t => t.query.trim() === query.trim()) || taskById[sessionStorage.getItem('hsl.kql-practice.task')] || initialTask;
         const result = mockKqlEvaluate(query);
         const ok = result.rows.length === task.expectedRows;
         document.getElementById('sentinel-kql-results').innerHTML = `
@@ -5327,7 +5327,7 @@ VIEWS['siem/logs'] = () => {
           ${mockKqlRenderResult(result, { resultsId: 'sentinel-limited-results', queryId: 'sentinel-limited-query' })}`;
       };
       taskButtons.forEach(btn => btn.addEventListener('click', () => setActiveTask(btn.dataset.kqlTask)));
-      setActiveTask(sessionStorage.getItem('defender-lab.kql-practice.task') || initialTask.id);
+      setActiveTask(sessionStorage.getItem('hsl.kql-practice.task') || initialTask.id);
       if (practiceEditor.restoreDraft()) runSentinelKqlPractice();
       if (document.getElementById('sentinel-limited-query')) {
         window.runSentinelLimitedQuery();
@@ -5337,7 +5337,7 @@ VIEWS['siem/logs'] = () => {
 };
 
 VIEWS['siem/hunting'] = () => {
-  const jobComplete = localStorage.getItem('defender-lab.sentinel.networklogs.searchJob') === 'complete';
+  const jobComplete = localStorage.getItem('hsl.siem.networklogs.searchJob') === 'complete';
   const activeTab = currentSentinelHuntingTab();
   const bookmarks = currentSentinelBookmarks();
   const livestream = currentSentinelLivestreamState();
@@ -5674,7 +5674,7 @@ VIEWS['siem/summary-rules'] = () => `
 `;
 
 VIEWS['siem/data-lake-jobs'] = () => {
-  const complete = localStorage.getItem('defender-lab.sentinel.dataLakeJob') === 'complete';
+  const complete = localStorage.getItem('hsl.siem.dataLakeJob') === 'complete';
   return `
   <div class="page-header">
     <div>
@@ -5801,7 +5801,7 @@ VIEWS['siem/workbooks'] = () => `
 
 VIEWS['siem/automation'] = () => {
   const lab = SENTINEL_AUTOMATION_LAB;
-  const selectedTrigger = sessionStorage.getItem('defender-lab.sentinel.rule.trigger') || lab.ruleDraft.trigger;
+  const selectedTrigger = sessionStorage.getItem('hsl.siem.rule.trigger') || lab.ruleDraft.trigger;
   const isAlertTrigger = selectedTrigger === 'When alert is created';
   // Incident-level actions require an incident trigger; the alert trigger supports only Run playbook.
   const INCIDENT_ACTIONS = ['Change status', 'Change severity', 'Assign owner', 'Add tags', 'Add task'];
@@ -5829,17 +5829,17 @@ VIEWS['siem/automation'] = () => {
   };
   const selectedCondProp = isAlertTrigger
     ? 'Analytic rule name'
-    : (CONDITION_PROPS.includes(sessionStorage.getItem('defender-lab.sentinel.rule.condProp'))
-        ? sessionStorage.getItem('defender-lab.sentinel.rule.condProp')
+    : (CONDITION_PROPS.includes(sessionStorage.getItem('hsl.siem.rule.condProp'))
+        ? sessionStorage.getItem('hsl.siem.rule.condProp')
         : 'Incident provider');
   const condOperators = OPERATORS_BY_PROP[selectedCondProp] || ['Equals', 'Does not equal'];
   const condValueOptions = VALUE_OPTIONS[selectedCondProp] || null;
 
   // User-created rules persist in localStorage so they show up in the rules list.
   let createdRules = [];
-  try { createdRules = JSON.parse(localStorage.getItem('defender-lab.sentinel.rules.created') || '[]'); } catch { createdRules = []; }
-  const hasPermission = localStorage.getItem('defender-lab.sentinel.playbook1Permission') === 'granted';
-  const selectedPlaybookName = sessionStorage.getItem('defender-lab.sentinel.playbook.selected') || (hasPermission ? 'Playbook1' : 'PB-RevokeOAuthConsent');
+  try { createdRules = JSON.parse(localStorage.getItem('hsl.siem.rules.created') || '[]'); } catch { createdRules = []; }
+  const hasPermission = localStorage.getItem('hsl.siem.playbook1Permission') === 'granted';
+  const selectedPlaybookName = sessionStorage.getItem('hsl.siem.playbook.selected') || (hasPermission ? 'Playbook1' : 'PB-RevokeOAuthConsent');
   const selectedPlaybook = SENTINEL_PLAYBOOKS.find(p => p.name === selectedPlaybookName) || SENTINEL_PLAYBOOKS.find(p => p.name === 'Playbook1');
   const entityContext = sentinelEntityPlaybookContext();
   const playbookState = hasPermission ? 'Available' : 'Grayed out';
@@ -9629,7 +9629,7 @@ VIEWS['siem/hunting/dns'] = () => renderMockAsimLab({
   resultsId:'asim-dns-results',
   statusId:'asim-dns-status',
   listId:'asim-dns-list',
-  storageKey:'defender-lab.asim-dns.query',
+  storageKey:'hsl.asim-dns.query',
   queryHint:'Use parser parameters for filter pushdown, then add standard KQL operators to shape the normalized rows.',
   sourceLabel:'ASIM DNS rows',
   sourceColumns:['TimeGenerated','EventProduct','SrcHostname','SrcIpAddr','DnsQuery','DnsQueryTypeName','EventResultDetails'],
@@ -9728,27 +9728,27 @@ function copilotSessionsSorted() {
 
 function copilotSelectedSession() {
   const sessions = copilotSessionsSorted();
-  const selectedId = sessionStorage.getItem('defender-lab.copilot.session.id') || sessions[0]?.id;
+  const selectedId = sessionStorage.getItem('hsl.ai-agent.session.id') || sessions[0]?.id;
   return getCopilotSession(selectedId) || sessions[0];
 }
 
 function copilotSelectedPromptbook() {
   const books = getCopilotPromptbooks();
-  const tab = sessionStorage.getItem('defender-lab.copilot.promptbook.tab') || 'Hack Smarter Labs';
-  const selectedId = sessionStorage.getItem('defender-lab.copilot.promptbook.id');
+  const tab = sessionStorage.getItem('hsl.ai-agent.promptbook.tab') || 'Hack Smarter Labs';
+  const selectedId = sessionStorage.getItem('hsl.ai-agent.promptbook.id');
   const list = books.filter(book => tab === 'All' || book.source === tab);
   return books.find(book => book.id === selectedId) || list.find(book => book.id === selectedId) || list[0] || books[0];
 }
 
 function copilotSelectedPlugin() {
   const plugins = getCopilotPlugins();
-  const selectedId = sessionStorage.getItem('defender-lab.copilot.plugin.id');
+  const selectedId = sessionStorage.getItem('hsl.ai-agent.plugin.id');
   return plugins.find(plugin => plugin.id === selectedId) || plugins[0];
 }
 
 function copilotSelectedKnowledgeSource() {
   const sources = getCopilotKnowledge();
-  const selectedId = sessionStorage.getItem('defender-lab.copilot.knowledge.id');
+  const selectedId = sessionStorage.getItem('hsl.ai-agent.knowledge.id');
   return sources.find(source => source.id === selectedId) || sources[0];
 }
 
@@ -9756,7 +9756,7 @@ VIEWS['ai-agent/home'] = () => {
   const sessions = copilotSessionsSorted();
   const promptbooks = getCopilotPromptbooks();
   const pinned = sessions.filter(s => s.pinned).slice(0, 4);
-  const activePrompt = sessionStorage.getItem('defender-lab.copilot.home.prompt') || 'Summarize incident INC-1042';
+  const activePrompt = sessionStorage.getItem('hsl.ai-agent.home.prompt') || 'Summarize incident INC-1042';
   return `
     <div class="page-header">
       <div>
@@ -9924,8 +9924,8 @@ VIEWS['ai-agent/session'] = () => {
   const selected = copilotSelectedSession();
   const transcript = selected ? getCopilotTranscript(selected.id) : [];
   const firstAnalystPrompt = transcript.find(step => step.role === 'analyst')?.text || '';
-  const draft = sessionStorage.getItem(`defender-lab.copilot.prompt.${selected?.id || ''}`) || firstAnalystPrompt;
-  const rerun = sessionStorage.getItem(`defender-lab.copilot.rerun.${selected?.id || ''}`);
+  const draft = sessionStorage.getItem(`hsl.ai-agent.prompt.${selected?.id || ''}`) || firstAnalystPrompt;
+  const rerun = sessionStorage.getItem(`hsl.ai-agent.rerun.${selected?.id || ''}`);
   const pinned = transcript.filter(step => step.pinned);
   return `
     <div class="page-header">
@@ -10009,7 +10009,7 @@ VIEWS['ai-agent/session'] = () => {
 };
 
 VIEWS['ai-agent/promptbooks'] = () => {
-  const tab = sessionStorage.getItem('defender-lab.copilot.promptbook.tab') || 'Hack Smarter Labs';
+  const tab = sessionStorage.getItem('hsl.ai-agent.promptbook.tab') || 'Hack Smarter Labs';
   const books = getCopilotPromptbooks();
   const filtered = books.filter(book => tab === 'All' || book.source === tab);
   const selected = copilotSelectedPromptbook();
@@ -10028,7 +10028,7 @@ VIEWS['ai-agent/promptbooks'] = () => {
 
     <div class="copilot-tabbar">
       ${['Hack Smarter Labs', 'Custom', 'All'].map(source => `
-        <button class="copilot-tab ${tab === source ? 'active' : ''}" onclick="sessionStorage.setItem('defender-lab.copilot.promptbook.tab', '${source}'); render();">${source}</button>
+        <button class="copilot-tab ${tab === source ? 'active' : ''}" onclick="sessionStorage.setItem('hsl.ai-agent.promptbook.tab', '${source}'); render();">${source}</button>
       `).join('')}
     </div>
 
@@ -10188,7 +10188,7 @@ VIEWS['ai-agent/knowledge'] = () => {
         </div>
         <div class="copilot-knowledge-list">
           ${sources.map(source => `
-            <button class="copilot-knowledge-card ${selected?.id === source.id ? 'active' : ''}" onclick="sessionStorage.setItem('defender-lab.copilot.knowledge.id','${esc(source.id)}'); render();">
+            <button class="copilot-knowledge-card ${selected?.id === source.id ? 'active' : ''}" onclick="sessionStorage.setItem('hsl.ai-agent.knowledge.id','${esc(source.id)}'); render();">
               <span class="copilot-knowledge-title">${esc(source.name)}</span>
               <span class="copilot-knowledge-meta">${esc(source.type)} · ${esc(source.status)}</span>
               <span class="copilot-knowledge-meta">${esc(source.scope)} · Added by ${esc(source.addedBy)}</span>
@@ -10240,7 +10240,7 @@ VIEWS['ai-agent/settings'] = () => {
         <div class="page-subtitle">Provision SCUs, choose ownership, and decide how much data the tenant shares with Copilot.</div>
       </div>
       <div class="page-actions">
-        <button class="btn btn-secondary" onclick="sessionStorage.removeItem('defender-lab.copilot.settings'); render();">Reset defaults</button>
+        <button class="btn btn-secondary" onclick="sessionStorage.removeItem('hsl.ai-agent.settings'); render();">Reset defaults</button>
         <button class="btn btn-primary" onclick="toast('Settings are persisted locally in browser storage.')">Saved locally</button>
       </div>
     </div>
@@ -10545,7 +10545,7 @@ VIEWS['xdr/threat-explorer'] = () => ({
           <div><span class="k">Message-ID:</span> &lt;${esc(email.id)}@mail.lab.example&gt;</div>
           <div><span class="k">Authentication-Results:</span> ${esc(authResults)}</div>
           <div><span class="k">Return-Path:</span> ${esc(email.sender)}</div>
-          <div><span class="k">Received:</span> from mail-gateway.lab.example by defender-lab</div>
+          <div><span class="k">Received:</span> from mail-gateway.lab.example by mail-relay-01.lab.example</div>
         </div>
         <div class="alert-section-title">Delivery and ZAP actions</div>
         <div class="callout ${email.verdict === 'Malware' ? 'warn' : 'info'}">
@@ -10774,18 +10774,18 @@ const ENTRA_USER_FILTERS = [
 ];
 
 function currentEntraUserFilter() {
-  const key = sessionStorage.getItem('defender-lab.entra.users.filter') || 'all';
+  const key = sessionStorage.getItem('hsl.identity.users.filter') || 'all';
   return ENTRA_USER_FILTERS.some(f => f.key === key) ? key : 'all';
 }
 function setEntraUserFilter(key) {
-  sessionStorage.setItem('defender-lab.entra.users.filter', key);
+  sessionStorage.setItem('hsl.identity.users.filter', key);
   render();
 }
 function currentEntraUserSearch() {
-  return sessionStorage.getItem('defender-lab.entra.users.search') || '';
+  return sessionStorage.getItem('hsl.identity.users.search') || '';
 }
 function setEntraUserSearch(value) {
-  sessionStorage.setItem('defender-lab.entra.users.search', value);
+  sessionStorage.setItem('hsl.identity.users.search', value);
   render();
 }
 function entraUserRows() {
@@ -10976,9 +10976,9 @@ VIEWS['identity/overview'] = () => {
 // code on failures, and no verdict text anywhere. The filters are the lesson —
 // a burst is invisible in a mixed log until you narrow it to one account.
 VIEWS['identity/sign-in-logs'] = () => {
-  const logType = sessionStorage.getItem('defender-lab.signin.logtype') || 'interactive';
-  const userFilter = sessionStorage.getItem('defender-lab.signin.user') || '';
-  const resultFilter = sessionStorage.getItem('defender-lab.signin.result') || '';
+  const logType = sessionStorage.getItem('hsl.signin.logtype') || 'interactive';
+  const userFilter = sessionStorage.getItem('hsl.signin.user') || '';
+  const resultFilter = sessionStorage.getItem('hsl.signin.result') || '';
   const users = [...new Set(SIGNIN_LOG_EVENTS.map(e => e.user))].sort();
   const rows = SIGNIN_LOG_EVENTS
     .slice()
@@ -11082,21 +11082,21 @@ VIEWS['identity/identity-protection'] = () => `
 `;
 
 VIEWS['identity/conditional-access'] = () => {
-  const grant = sessionStorage.getItem('defender-lab.entra.ca.grant') || '';
-  const stateSel = sessionStorage.getItem('defender-lab.entra.ca.state') || 'On';
-  const riskCsv = sessionStorage.getItem('defender-lab.entra.ca.risk');
+  const grant = sessionStorage.getItem('hsl.identity.ca.grant') || '';
+  const stateSel = sessionStorage.getItem('hsl.identity.ca.state') || 'On';
+  const riskCsv = sessionStorage.getItem('hsl.identity.ca.risk');
   const riskLevels = (riskCsv === null ? 'High,Medium' : riskCsv).split(',').filter(Boolean);
   const RISK_CHOICES = ['High', 'Medium', 'Low'];
 
   let createdPolicies = [];
-  try { createdPolicies = JSON.parse(localStorage.getItem('defender-lab.entra.ca.policies.created') || '[]'); } catch { createdPolicies = []; }
+  try { createdPolicies = JSON.parse(localStorage.getItem('hsl.identity.ca.policies.created') || '[]'); } catch { createdPolicies = []; }
   const allPolicies = [...ENTRA_CA_POLICIES, ...createdPolicies];
 
   // Which row (if any) is currently open in the blade: '', 'seed:<i>' or 'created:<i>'.
-  const selectedPtr = sessionStorage.getItem('defender-lab.entra.ca.selected') || '';
+  const selectedPtr = sessionStorage.getItem('hsl.identity.ca.selected') || '';
   const isSeedSel = selectedPtr.startsWith('seed:');
   const isEditing = selectedPtr !== '';
-  const workingName = sessionStorage.getItem('defender-lab.entra.ca.name');
+  const workingName = sessionStorage.getItem('hsl.identity.ca.name');
   const nameValue = workingName !== null ? workingName : 'Require MFA for medium and high sign-in risk';
 
   // Feedback keyed on the grant control the learner picked for a SIGN-IN risk policy.
@@ -11271,18 +11271,18 @@ const M365_USER_FILTERS = [
   { key:'guests', label:'Guest users', test:u => u.userType === 'Guest' },
 ];
 function currentM365UserFilter() {
-  const key = sessionStorage.getItem('defender-lab.m365.users.filter') || 'all';
+  const key = sessionStorage.getItem('hsl.workspace.users.filter') || 'all';
   return M365_USER_FILTERS.some(f => f.key === key) ? key : 'all';
 }
 function setM365UserFilter(key) {
-  sessionStorage.setItem('defender-lab.m365.users.filter', key);
+  sessionStorage.setItem('hsl.workspace.users.filter', key);
   render();
 }
 function currentM365UserSearch() {
-  return sessionStorage.getItem('defender-lab.m365.users.search') || '';
+  return sessionStorage.getItem('hsl.workspace.users.search') || '';
 }
 function setM365UserSearch(value) {
-  sessionStorage.setItem('defender-lab.m365.users.search', value);
+  sessionStorage.setItem('hsl.workspace.users.search', value);
   render();
 }
 function m365AdminUserRows() {

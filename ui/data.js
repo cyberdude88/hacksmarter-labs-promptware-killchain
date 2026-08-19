@@ -6606,7 +6606,7 @@ function readStoredJson(key, fallback) {
 }
 
 function getCopilotCustomSessions() {
-  return readStoredJson('defender-lab.copilot.sessions.custom', []);
+  return readStoredJson('hsl.ai-agent.sessions.custom', []);
 }
 
 function getCopilotSessions() {
@@ -6614,7 +6614,7 @@ function getCopilotSessions() {
 }
 
 function getCopilotTranscriptRecords() {
-  return [...COPILOT_TRANSCRIPTS, ...readStoredJson('defender-lab.copilot.transcripts.custom', [])];
+  return [...COPILOT_TRANSCRIPTS, ...readStoredJson('hsl.ai-agent.transcripts.custom', [])];
 }
 
 function getCopilotTranscript(sessionId) {
@@ -6626,11 +6626,11 @@ function getCopilotSession(sessionId) {
 }
 
 function getCopilotPromptbooks() {
-  return [...COPILOT_PROMPTBOOKS, ...readStoredJson('defender-lab.copilot.promptbooks.custom', [])];
+  return [...COPILOT_PROMPTBOOKS, ...readStoredJson('hsl.ai-agent.promptbooks.custom', [])];
 }
 
 function getCopilotPlugins() {
-  const enabled = readStoredJson('defender-lab.copilot.plugins.enabled', {});
+  const enabled = readStoredJson('hsl.ai-agent.plugins.enabled', {});
   return COPILOT_PLUGINS.map(plugin => ({
     ...plugin,
     status: enabled[plugin.id] === undefined ? plugin.status : (enabled[plugin.id] ? 'On' : 'Off'),
@@ -6638,11 +6638,11 @@ function getCopilotPlugins() {
 }
 
 function getCopilotKnowledge() {
-  return [...COPILOT_KNOWLEDGE, ...readStoredJson('defender-lab.copilot.knowledge.custom', [])];
+  return [...COPILOT_KNOWLEDGE, ...readStoredJson('hsl.ai-agent.knowledge.custom', [])];
 }
 
 function getCopilotSettings() {
-  return { ...COPILOT_SETTINGS_DEFAULTS, ...readStoredJson('defender-lab.copilot.settings', {}) };
+  return { ...COPILOT_SETTINGS_DEFAULTS, ...readStoredJson('hsl.ai-agent.settings', {}) };
 }
 // === end local-tasks fixtures ===
 
@@ -6902,7 +6902,7 @@ const SIGNIN_LOG_TYPES = [
 // benign traffic: the failure burst is findable, but only by filtering. Nothing
 // in the rows states a verdict; the analyst supplies that.
 //
-// `id` values are stable so the coach can spotlight specific rows by selector.
+// `id` values are stable so a view can address specific rows by selector.
 const SIGNIN_LOG_EVENTS = [
   { id:'SL-020', time:'2026-06-28T09:14:22Z', user:'m.okafor@hacksmarterlabs.example', display:'Miriam Okafor',
     app:'365 portal', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-2104 (managed)',

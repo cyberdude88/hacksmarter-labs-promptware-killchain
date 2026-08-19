@@ -57,10 +57,6 @@ Finish what the mechanical pass could not reach.
       and `820px`, `ui/styles.css` ~line 4018 and ~4042). The 820px rule sets
       `height: auto`, so the taller bar should be fine, but verify the 52px
       mark does not crowd the search field at 1100px.
-- [ ] The storage-key prefix is still `defender-lab.*` — a vendor name a
-      learner sees the moment they open devtools. New code uses `hsl.*`
-      (see `governance/dlp`). Migrating the rest needs a read-old/write-new
-      shim so existing lab state is not orphaned.
 - [ ] Audit every remaining `Hack Smarter` / `Hack Smarter Labs` string for
       places the substitution reads awkwardly in a sentence written for an
       academy ("your program", "your enrollment", "this course").
@@ -79,20 +75,19 @@ Finish what the mechanical pass could not reach.
       (KQL, MITRE ATT&CK, SPF/DKIM/DMARC) and write it down in the README so
       the next agent does not over-neutralize.
 
-## Lane C — Cut the last portal cords
+## Lane C — Cut the last portal cords ✅ DONE
 
-The portal is gone but the range still has back-references to it.
+The coach layer is deleted, not made self-contained — Alex's call: no coach is
+needed in the range. `ui/coach.js` and `ui/coach-data.js` are gone, along with
+their script tags, the two `typeof coach… === 'function'` hooks in `app.js`, and
+241 lines of coach CSS. No `8768`/`SIM_ORIGIN` reference survives anywhere.
 
-- [ ] `ui/coach.js` builds URLs to `:8768` (`portalUrl()`, ~line 53–56) and
-      posts `hsl-coach-complete` to `window.opener` (~line 357–369). With no
-      portal these are dead paths. Either make the coach fully self-contained
-      inside the range, or delete the coach layer. **Recommend: keep it and
-      make it self-contained** — a guided walkthrough is a real range feature,
-      it just should not phone home to a portal.
-- [ ] `?coach=<id>` is the only entry point today, so the coach is invisible.
-      If it is kept, give the range its own way to start a walkthrough.
-- [ ] Grep for other `8767`/`8768` assumptions and any `SIM_ORIGIN` leftovers.
-- [ ] Depends on nothing; blocks Lane E's CI green.
+Storage keys moved with it. Everything is under `hsl.*` now, with the vendor
+names gone from the middle segments too (`.copilot.` → `.ai-agent.`, `.entra.` →
+`.identity.`, `.sentinel.` → `.siem.`, `.defender-cloud.` → `.cloud.`, `.m365.`
+→ `.workspace.`) so keys match the route ids. `ui/storage-keys.js` loads first
+and carries any pre-existing `defender-lab.*` state across once, so nobody who
+had already used the range loses their filters and drafts.
 
 ## Lane D — Docs triage
 

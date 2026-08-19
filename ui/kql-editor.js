@@ -636,7 +636,7 @@
   }
 
   // --- saved queries (the portal's Save / Save as, persisted locally) -----
-  function savedQueryKey(storageKey) { return (storageKey || 'defender-lab.kql') + '.saved'; }
+  function savedQueryKey(storageKey) { return (storageKey || 'hsl.kql') + '.saved'; }
   function loadSavedKqlQueries(storageKey) {
     try {
       const raw = localStorage.getItem(savedQueryKey(storageKey));

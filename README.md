@@ -27,7 +27,7 @@ result, email header, and vulnerability record is fixture data in `ui/data.js`.
 | `ui/helpdesk*.js` | IT Service Desk workload |
 | `ui/kql-editor.js`, `ui/guided-hunting.js` | Hunting query surface |
 | `ui/workflow-automation.js` | SOAR / playbook surface |
-| `ui/coach.js`, `ui/coach-data.js` | Guided walkthrough layer (inert without `?coach=`) |
+| `ui/storage-keys.js` | One-time migration of legacy `defender-lab.*` storage keys |
 
 ## Route namespaces are vendor-neutral too
 
@@ -36,6 +36,9 @@ product name: `xdr`, `siem`, `cloud`, `governance`, `ai-agent`, `identity`,
 `workspace`. `PORTALS` in `ui/data.js` is the list, and it is the same key used
 by `NAV`, the `VIEWS` registry, `PORTAL_CONTEXT`, and the `route-<id>-<page>`
 body classes the stylesheet hooks — change one and you change all of them.
+
+Browser-storage keys follow the same rule: lab state lives under `hsl.<workload>.*`.
+`ui/storage-keys.js` migrates anything left under the old `defender-lab.*` names.
 
 ## Vendor-neutral naming is a product rule, not a preference
 

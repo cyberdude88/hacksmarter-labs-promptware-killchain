@@ -6,12 +6,12 @@ let rules = loadRules();
 let lastAttackStorySelection = null;
 
 function loadRules() {
-  const raw = localStorage.getItem('defender-lab.rules');
+  const raw = localStorage.getItem('hsl.rules');
   if (raw) { try { return JSON.parse(raw); } catch {} }
   return [DEFAULT_SUPPRESSION_RULE];
 }
 function saveRules() {
-  localStorage.setItem('defender-lab.rules', JSON.stringify(rules));
+  localStorage.setItem('hsl.rules', JSON.stringify(rules));
 }
 function matchedRule(alert) {
   return rules.find(r =>
@@ -34,8 +34,6 @@ function workloadOf(route) {
 }
 function navigate(hash) {
   if (!hash.startsWith('#')) hash = '#' + hash;
-  // A running module coach can restrict the app to its own set of pages.
-  if (typeof coachAllowsRoute === 'function' && !coachAllowsRoute(hash)) return;
   if (location.hash === hash) render();
   else location.hash = hash;
 }
@@ -75,7 +73,6 @@ function render() {
   renderPortalTabs(wl);
   mountView(route);
   scheduleGuideRefresh();
-  if (typeof coachAfterRender === 'function') coachAfterRender();
 }
 
 // Top-of-page neutral simulator context strip.
@@ -139,7 +136,7 @@ function subKey(section, subsection) {
 }
 
 function navSectionKey(wl, section) {
-  return `defender-lab.nav.section.${wl}.${section.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  return `hsl.nav.section.${wl}.${section.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 }
 
 function navSectionExpanded(wl, section) {
@@ -206,15 +203,15 @@ function toggleNavSection(wl, section) {
 }
 
 function applyPaneCollapseState() {
-  const azCollapsed = localStorage.getItem('defender-lab.pane.azure') === 'collapsed';
-  const blCollapsed = localStorage.getItem('defender-lab.pane.blade') === 'collapsed';
+  const azCollapsed = localStorage.getItem('hsl.pane.azure') === 'collapsed';
+  const blCollapsed = localStorage.getItem('hsl.pane.blade') === 'collapsed';
   document.getElementById('pane-azure').classList.toggle('collapsed', azCollapsed);
   document.getElementById('pane-blade').classList.toggle('collapsed', blCollapsed);
   document.getElementById('toggle-azure').textContent = azCollapsed ? '»' : '«';
   document.getElementById('toggle-blade').textContent = blCollapsed ? '»' : '«';
 }
 function togglePane(which) {
-  const key = 'defender-lab.pane.' + which;
+  const key = 'hsl.pane.' + which;
   const cur = localStorage.getItem(key);
   localStorage.setItem(key, cur === 'collapsed' ? 'expanded' : 'collapsed');
   applyPaneCollapseState();
@@ -409,13 +406,13 @@ function openIncident(id) {
 }
 
 function openIncidentPage(id) {
-  sessionStorage.setItem('defender-lab.incident.id', id);
-  sessionStorage.setItem('defender-lab.incident.tab', 'attack-story');
+  sessionStorage.setItem('hsl.incident.id', id);
+  sessionStorage.setItem('hsl.incident.tab', 'attack-story');
   hidePanels();
   navigate('#/xdr/incident');
 }
 function setIncidentTab(tab) {
-  sessionStorage.setItem('defender-lab.incident.tab', tab);
+  sessionStorage.setItem('hsl.incident.tab', tab);
   render();
 }
 window.setIncidentTab = setIncidentTab;
@@ -836,12 +833,12 @@ function setAnalyticsWizardStep(step) {
 }
 
 function readCreatedAnalyticsRules() {
-  try { return JSON.parse(localStorage.getItem('defender-lab.sentinel.analytics.created') || '[]'); }
+  try { return JSON.parse(localStorage.getItem('hsl.siem.analytics.created') || '[]'); }
   catch { return []; }
 }
 function deleteAnalyticsRule(id) {
   const rules = readCreatedAnalyticsRules().filter(r => r.id !== id);
-  localStorage.setItem('defender-lab.sentinel.analytics.created', JSON.stringify(rules));
+  localStorage.setItem('hsl.siem.analytics.created', JSON.stringify(rules));
   toast('Deleted analytics rule.');
   render();
 }
@@ -850,7 +847,7 @@ function deleteAnalyticsRule(id) {
    built-in template to get ONE customizable copy, which runs in Flighting
    alongside the Production original. Promoting the copy to Production flips
    the original to Flighting. Only one copy per rule is allowed. */
-const ANOMALY_DUP_KEY = 'defender-lab.sentinel.anomaly.duplicates';
+const ANOMALY_DUP_KEY = 'hsl.siem.anomaly.duplicates';
 function readAnomalyDuplicates() {
   try { return JSON.parse(localStorage.getItem(ANOMALY_DUP_KEY) || '[]'); }
   catch { return []; }
@@ -912,7 +909,7 @@ function moveAnalyticsWizardStep(delta) {
     const rule = { id: 'ar-' + Date.now(), workspaceId: ws.id, name, type: type.badge, severity, enabled: true, frequency, tactics, query };
     const rules = readCreatedAnalyticsRules();
     rules.push(rule);
-    localStorage.setItem('defender-lab.sentinel.analytics.created', JSON.stringify(rules));
+    localStorage.setItem('hsl.siem.analytics.created', JSON.stringify(rules));
 
     hidePanels();
     toast(`Created "${name}" — added to ${ws.name}.`);
@@ -1115,7 +1112,7 @@ function previewAnalyticsWizardResults() {
 }
 
 // ---------- Defender hunting graph ----------
-const HUNTING_GRAPH_STATE_KEY = 'defender-lab.huntingGraph.state';
+const HUNTING_GRAPH_STATE_KEY = 'hsl.huntingGraph.state';
 
 function emptyHuntingGraphState() {
   return {
@@ -1405,7 +1402,7 @@ function openCopilot(promptIndex = 0) {
 
 function openCopilotSession(sessionId) {
   if (!sessionId) return;
-  sessionStorage.setItem('defender-lab.copilot.session.id', sessionId);
+  sessionStorage.setItem('hsl.ai-agent.session.id', sessionId);
   hidePanels();
   navigate('#/ai-agent/session');
 }
@@ -1465,17 +1462,17 @@ function selectCopilotPrompt(i) {
 }
 
 function getCopilotSessionState() {
-  const id = sessionStorage.getItem('defender-lab.copilot.session.id') || getCopilotSessions()[0]?.id;
+  const id = sessionStorage.getItem('hsl.ai-agent.session.id') || getCopilotSessions()[0]?.id;
   return getCopilotSession(id);
 }
 
 function persistCopilotSession(session, transcriptSteps) {
-  const sessions = readCopilotStorage('defender-lab.copilot.sessions.custom', []);
-  const transcripts = readCopilotStorage('defender-lab.copilot.transcripts.custom', []);
+  const sessions = readCopilotStorage('hsl.ai-agent.sessions.custom', []);
+  const transcripts = readCopilotStorage('hsl.ai-agent.transcripts.custom', []);
   sessions.unshift(session);
   transcripts.unshift({ sessionId: session.id, steps: transcriptSteps });
-  writeCopilotStorage('defender-lab.copilot.sessions.custom', sessions);
-  writeCopilotStorage('defender-lab.copilot.transcripts.custom', transcripts);
+  writeCopilotStorage('hsl.ai-agent.sessions.custom', sessions);
+  writeCopilotStorage('hsl.ai-agent.transcripts.custom', transcripts);
 }
 
 function promptbookPluginSelection(book) {
@@ -1508,7 +1505,7 @@ function runCopilotPromptbook(bookId) {
     pinned: true,
     generatedFrom: book.id,
   }, steps);
-  sessionStorage.setItem('defender-lab.copilot.session.id', sessionId);
+  sessionStorage.setItem('hsl.ai-agent.session.id', sessionId);
   toast(`Ran promptbook ${book.name} and created a canned session.`);
   navigate('#/ai-agent/session');
 }
@@ -1528,7 +1525,7 @@ function saveCopilotPromptbook() {
     toast('Add a name and at least one prompt before saving.');
     return;
   }
-  const custom = readCopilotStorage('defender-lab.copilot.promptbooks.custom', []);
+  const custom = readCopilotStorage('hsl.ai-agent.promptbooks.custom', []);
   const book = {
     id: `pb-custom-${Date.now().toString(36)}`,
     name,
@@ -1538,41 +1535,41 @@ function saveCopilotPromptbook() {
     prompts,
   };
   custom.unshift(book);
-  writeCopilotStorage('defender-lab.copilot.promptbooks.custom', custom);
-  sessionStorage.setItem('defender-lab.copilot.promptbook.tab', 'Custom');
-  sessionStorage.setItem('defender-lab.copilot.promptbook.id', book.id);
+  writeCopilotStorage('hsl.ai-agent.promptbooks.custom', custom);
+  sessionStorage.setItem('hsl.ai-agent.promptbook.tab', 'Custom');
+  sessionStorage.setItem('hsl.ai-agent.promptbook.id', book.id);
   toast(`Saved promptbook ${name}.`);
   render();
 }
 
 function selectCopilotPromptbook(id) {
   const book = getCopilotPromptbooks().find(pb => pb.id === id);
-  sessionStorage.setItem('defender-lab.copilot.promptbook.id', id);
-  if (book?.source) sessionStorage.setItem('defender-lab.copilot.promptbook.tab', book.source);
+  sessionStorage.setItem('hsl.ai-agent.promptbook.id', id);
+  if (book?.source) sessionStorage.setItem('hsl.ai-agent.promptbook.tab', book.source);
   render();
 }
 
 function toggleCopilotPlugin(id) {
-  const enabled = readCopilotStorage('defender-lab.copilot.plugins.enabled', {});
+  const enabled = readCopilotStorage('hsl.ai-agent.plugins.enabled', {});
   enabled[id] = !enabled[id];
-  writeCopilotStorage('defender-lab.copilot.plugins.enabled', enabled);
+  writeCopilotStorage('hsl.ai-agent.plugins.enabled', enabled);
   render();
 }
 
 function selectCopilotPlugin(id) {
-  sessionStorage.setItem('defender-lab.copilot.plugin.id', id);
+  sessionStorage.setItem('hsl.ai-agent.plugin.id', id);
   render();
 }
 
 function updateCopilotSetting(key, value) {
-  const settings = readCopilotStorage('defender-lab.copilot.settings', { ...COPILOT_SETTINGS_DEFAULTS });
+  const settings = readCopilotStorage('hsl.ai-agent.settings', { ...COPILOT_SETTINGS_DEFAULTS });
   settings[key] = value;
-  writeCopilotStorage('defender-lab.copilot.settings', settings);
+  writeCopilotStorage('hsl.ai-agent.settings', settings);
   render();
 }
 
 function addCopilotKnowledgeSource(kind) {
-  const custom = readCopilotStorage('defender-lab.copilot.knowledge.custom', []);
+  const custom = readCopilotStorage('hsl.ai-agent.knowledge.custom', []);
   const stamp = new Date().toISOString();
   custom.unshift({
     id: `kb-custom-${Date.now().toString(36)}`,
@@ -1584,7 +1581,7 @@ function addCopilotKnowledgeSource(kind) {
     addedBy: 'You',
     createdAt: stamp,
   });
-  writeCopilotStorage('defender-lab.copilot.knowledge.custom', custom);
+  writeCopilotStorage('hsl.ai-agent.knowledge.custom', custom);
   toast(kind === 'search' ? 'Added a mock Azure AI Search source.' : 'Added a mock file upload source.');
   render();
 }
@@ -1619,14 +1616,14 @@ function copyCopilotSessionLink(sessionId) {
 
 function editCopilotPrompt(sessionId) {
   const value = document.getElementById('copilot-prompt-edit')?.value || '';
-  sessionStorage.setItem(`defender-lab.copilot.prompt.${sessionId}`, value);
+  sessionStorage.setItem(`hsl.ai-agent.prompt.${sessionId}`, value);
   toast('Saved the prompt draft locally.');
   render();
 }
 
 function rerunCopilotPrompt(sessionId) {
   const value = document.getElementById('copilot-prompt-edit')?.value || '';
-  sessionStorage.setItem(`defender-lab.copilot.rerun.${sessionId}`, value);
+  sessionStorage.setItem(`hsl.ai-agent.rerun.${sessionId}`, value);
   toast('Queued a canned rerun of the prompt in the lab.');
   render();
 }
@@ -1681,12 +1678,12 @@ function toast(msg) {
 
 // ---------- Sentinel automation lab ----------
 function grantPlaybookPermissions() {
-  localStorage.setItem('defender-lab.sentinel.playbook1Permission', 'granted');
+  localStorage.setItem('hsl.siem.playbook1Permission', 'granted');
   toast('Granted Sentinel access to RG-Playbooks.');
   render();
 }
 function resetPlaybookPermissions() {
-  localStorage.removeItem('defender-lab.sentinel.playbook1Permission');
+  localStorage.removeItem('hsl.siem.playbook1Permission');
   toast('Reset: Playbook1 is grayed out until Sentinel gets resource group access.');
   render();
 }
@@ -1697,7 +1694,7 @@ function selectSentinelPlaybook(name) {
   toast(`${name} selected for the Run playbook action.`);
 }
 function selectAutomationTrigger(value) {
-  sessionStorage.setItem('defender-lab.sentinel.rule.trigger', value);
+  sessionStorage.setItem('hsl.siem.rule.trigger', value);
   if (value === 'When alert is created') {
     toast('Alert trigger: only the Run playbook action is available.');
   } else {
@@ -1706,11 +1703,11 @@ function selectAutomationTrigger(value) {
   render();
 }
 function selectConditionProperty(value) {
-  sessionStorage.setItem('defender-lab.sentinel.rule.condProp', value);
+  sessionStorage.setItem('hsl.siem.rule.condProp', value);
   render();
 }
 function readCreatedRules() {
-  try { return JSON.parse(localStorage.getItem('defender-lab.sentinel.rules.created') || '[]'); }
+  try { return JSON.parse(localStorage.getItem('hsl.siem.rules.created') || '[]'); }
   catch { return []; }
 }
 function createAutomationRule() {
@@ -1718,7 +1715,7 @@ function createAutomationRule() {
   const name = val('newRuleName');
   if (!name) { toast('Enter an automation rule name first.'); return; }
 
-  const trigger = sessionStorage.getItem('defender-lab.sentinel.rule.trigger') || 'When incident is created';
+  const trigger = sessionStorage.getItem('hsl.siem.rule.trigger') || 'When incident is created';
   const isAlert = trigger === 'When alert is created';
   // Alert trigger allows only Run playbook, regardless of what the disabled dropdown shows.
   const action = isAlert ? 'Run playbook' : (val('newRuleAction') || 'Run playbook');
@@ -1728,10 +1725,10 @@ function createAutomationRule() {
   const condVal = val('newRuleCondValue') || '(any)';
   const condition = `If ${condProp} ${condOp} ${condVal}`;
 
-  const hasPermission = localStorage.getItem('defender-lab.sentinel.playbook1Permission') === 'granted';
+  const hasPermission = localStorage.getItem('hsl.siem.playbook1Permission') === 'granted';
   let actions, status;
   if (action === 'Run playbook') {
-    const playbook = sessionStorage.getItem('defender-lab.sentinel.playbook.selected') || (hasPermission ? 'Playbook1' : '(not selected)');
+    const playbook = sessionStorage.getItem('hsl.siem.playbook.selected') || (hasPermission ? 'Playbook1' : '(not selected)');
     actions = `Run playbook: ${playbook}`;
     // A Run playbook rule can't run until Sentinel has permission on the playbook's resource group.
     status = hasPermission ? 'Enabled' : 'Disabled';
@@ -1742,45 +1739,45 @@ function createAutomationRule() {
 
   const rules = readCreatedRules();
   rules.push({ name, trigger, condition, actions, status });
-  localStorage.setItem('defender-lab.sentinel.rules.created', JSON.stringify(rules));
+  localStorage.setItem('hsl.siem.rules.created', JSON.stringify(rules));
   toast(`Created "${name}" — ${trigger} · ${condition}`);
   render();
 }
 function deleteAutomationRule(index) {
   const rules = readCreatedRules();
   const [removed] = rules.splice(index, 1);
-  localStorage.setItem('defender-lab.sentinel.rules.created', JSON.stringify(rules));
+  localStorage.setItem('hsl.siem.rules.created', JSON.stringify(rules));
   toast(removed ? `Deleted "${removed.name}".` : 'Rule deleted.');
   render();
 }
 function resetCreatedRules() {
-  localStorage.removeItem('defender-lab.sentinel.rules.created');
+  localStorage.removeItem('hsl.siem.rules.created');
   toast('Cleared all created automation rules.');
   render();
 }
 // ---------- Entra Conditional Access lab ----------
 function selectCaGrant(id) {
-  sessionStorage.setItem('defender-lab.entra.ca.grant', id);
+  sessionStorage.setItem('hsl.identity.ca.grant', id);
   render();
 }
 function selectCaState(value) {
-  sessionStorage.setItem('defender-lab.entra.ca.state', value);
+  sessionStorage.setItem('hsl.identity.ca.state', value);
   render();
 }
 function toggleCaRisk(level) {
-  const csv = sessionStorage.getItem('defender-lab.entra.ca.risk');
+  const csv = sessionStorage.getItem('hsl.identity.ca.risk');
   const set = new Set((csv === null ? 'High,Medium' : csv).split(',').filter(Boolean));
   if (set.has(level)) set.delete(level); else set.add(level);
-  sessionStorage.setItem('defender-lab.entra.ca.risk', [...set].join(','));
+  sessionStorage.setItem('hsl.identity.ca.risk', [...set].join(','));
   render();
 }
 function readCaPolicies() {
-  try { return JSON.parse(localStorage.getItem('defender-lab.entra.ca.policies.created') || '[]'); }
+  try { return JSON.parse(localStorage.getItem('hsl.identity.ca.policies.created') || '[]'); }
   catch { return []; }
 }
 // Persist the name field as the user types so re-renders (toggling risk/grant) don't wipe it.
 function setCaName(value) {
-  sessionStorage.setItem('defender-lab.entra.ca.name', value);
+  sessionStorage.setItem('hsl.identity.ca.name', value);
 }
 function caGrantIdFromLabel(label) {
   const g = ENTRA_CA_GRANTS.find(x => x.label === label);
@@ -1788,35 +1785,35 @@ function caGrantIdFromLabel(label) {
 }
 // Load a policy's values into the blade's working state.
 function loadCaWorkingFrom(p) {
-  sessionStorage.setItem('defender-lab.entra.ca.name', p.name || '');
-  sessionStorage.setItem('defender-lab.entra.ca.grant', caGrantIdFromLabel(p.grant));
+  sessionStorage.setItem('hsl.identity.ca.name', p.name || '');
+  sessionStorage.setItem('hsl.identity.ca.grant', caGrantIdFromLabel(p.grant));
   const m = /sign-in risk:\s*(.+)$/i.exec(p.conditions || '');
   const risk = m ? m[1].split(',').map(s => s.trim()).filter(x => ['High', 'Medium', 'Low'].includes(x)).join(',') : '';
-  sessionStorage.setItem('defender-lab.entra.ca.risk', risk);
-  sessionStorage.setItem('defender-lab.entra.ca.state', p.state || 'On');
+  sessionStorage.setItem('hsl.identity.ca.risk', risk);
+  sessionStorage.setItem('hsl.identity.ca.state', p.state || 'On');
 }
 function selectCaPolicy(source, index) {
   const p = source === 'seed' ? ENTRA_CA_POLICIES[index] : readCaPolicies()[index];
   if (!p) return;
-  sessionStorage.setItem('defender-lab.entra.ca.selected', source + ':' + index);
+  sessionStorage.setItem('hsl.identity.ca.selected', source + ':' + index);
   loadCaWorkingFrom(p);
   render();
 }
 function newCaPolicy() {
-  ['selected', 'name', 'grant', 'risk', 'state'].forEach(k => sessionStorage.removeItem('defender-lab.entra.ca.' + k));
+  ['selected', 'name', 'grant', 'risk', 'state'].forEach(k => sessionStorage.removeItem('hsl.identity.ca.' + k));
   render();
 }
 // Build a policy object from the current blade state, or null (with a toast) if invalid.
 function buildCaPolicyFromForm() {
   const name = (document.getElementById('caName')?.value || '').trim();
   if (!name) { toast('Enter a policy name first.'); return null; }
-  const grantId = sessionStorage.getItem('defender-lab.entra.ca.grant') || '';
+  const grantId = sessionStorage.getItem('hsl.identity.ca.grant') || '';
   if (!grantId) { toast('Select a grant control first.'); return null; }
   const grant = (ENTRA_CA_GRANTS.find(g => g.id === grantId) || {}).label || 'Grant access';
-  const csv = sessionStorage.getItem('defender-lab.entra.ca.risk');
+  const csv = sessionStorage.getItem('hsl.identity.ca.risk');
   const risk = (csv === null ? 'High,Medium' : csv).split(',').filter(Boolean);
   const conditions = risk.length ? `Sign-in risk: ${risk.join(', ')}` : 'Sign-in risk: (none selected)';
-  const state = sessionStorage.getItem('defender-lab.entra.ca.state') || 'On';
+  const state = sessionStorage.getItem('hsl.identity.ca.state') || 'On';
   return { policy: { name, assignment: 'All users (excl. break-glass)', conditions, grant, state }, grantId };
 }
 function createCaPolicy() {
@@ -1824,14 +1821,14 @@ function createCaPolicy() {
   if (!built) return;
   const policies = readCaPolicies();
   policies.push(built.policy);
-  localStorage.setItem('defender-lab.entra.ca.policies.created', JSON.stringify(policies));
-  sessionStorage.setItem('defender-lab.entra.ca.selected', 'created:' + (policies.length - 1));
+  localStorage.setItem('hsl.identity.ca.policies.created', JSON.stringify(policies));
+  sessionStorage.setItem('hsl.identity.ca.selected', 'created:' + (policies.length - 1));
   if (built.grantId === 'mfa') toast(`Created "${built.policy.name}" — users can self-remediate sign-in risk with MFA.`);
   else toast(`Created "${built.policy.name}" — note: ${built.policy.grant} does not self-remediate sign-in risk.`);
   render();
 }
 function saveCaPolicy() {
-  const ptr = sessionStorage.getItem('defender-lab.entra.ca.selected') || '';
+  const ptr = sessionStorage.getItem('hsl.identity.ca.selected') || '';
   if (!ptr.startsWith('created:')) { toast('Only created policies can be saved. Use Duplicate as new.'); return; }
   const index = Number(ptr.split(':')[1]);
   const policies = readCaPolicies();
@@ -1839,22 +1836,22 @@ function saveCaPolicy() {
   const built = buildCaPolicyFromForm();
   if (!built) return;
   policies[index] = built.policy;
-  localStorage.setItem('defender-lab.entra.ca.policies.created', JSON.stringify(policies));
+  localStorage.setItem('hsl.identity.ca.policies.created', JSON.stringify(policies));
   toast(`Saved "${built.policy.name}".`);
   render();
 }
 function deleteCaPolicy(index) {
   const policies = readCaPolicies();
   const [removed] = policies.splice(index, 1);
-  localStorage.setItem('defender-lab.entra.ca.policies.created', JSON.stringify(policies));
+  localStorage.setItem('hsl.identity.ca.policies.created', JSON.stringify(policies));
   // If the open policy was deleted or shifted, drop the selection to avoid pointing at the wrong row.
-  const ptr = sessionStorage.getItem('defender-lab.entra.ca.selected') || '';
+  const ptr = sessionStorage.getItem('hsl.identity.ca.selected') || '';
   if (ptr.startsWith('created:')) newCaPolicy();
   toast(removed ? `Deleted "${removed.name}".` : 'Policy deleted.');
   render();
 }
 function resetCaPolicies() {
-  localStorage.removeItem('defender-lab.entra.ca.policies.created');
+  localStorage.removeItem('hsl.identity.ca.policies.created');
   toast('Cleared created Conditional Access policies.');
   render();
 }
@@ -1870,9 +1867,9 @@ window.deleteCaPolicy = deleteCaPolicy;
 window.resetCaPolicies = resetCaPolicies;
 
 function selectSentinelAutomationPlaybook(name) {
-  sessionStorage.setItem('defender-lab.sentinel.playbook.selected', name);
+  sessionStorage.setItem('hsl.siem.playbook.selected', name);
   if (name === 'PB-ContainEntity') {
-    sessionStorage.setItem('defender-lab.sentinel.playbook.entity', sentinelEntityPlaybookContext().entityName || sessionStorage.getItem('defender-lab.sentinel.playbook.entity') || '');
+    sessionStorage.setItem('hsl.siem.playbook.entity', sentinelEntityPlaybookContext().entityName || sessionStorage.getItem('hsl.siem.playbook.entity') || '');
   }
   render();
 }
@@ -1888,7 +1885,7 @@ window.selectSentinelPlaybook = selectSentinelPlaybook;
 window.selectSentinelAutomationPlaybook = selectSentinelAutomationPlaybook;
 
 // ---------- Sentinel incident graph learning state ----------
-const SENTINEL_GRAPH_STATE_KEY = 'defender-lab.sentinel.graph.state';
+const SENTINEL_GRAPH_STATE_KEY = 'hsl.siem.graph.state';
 
 function defaultSentinelGraphState() {
   return {
@@ -2351,38 +2348,38 @@ function wireGlobalSearch() {
 
 // ---------- Device inventory tabs / discovery ----------
 function currentInventoryTab() {
-  return sessionStorage.getItem('defender-lab.inventory.tab') || 'computers';
+  return sessionStorage.getItem('hsl.inventory.tab') || 'computers';
 }
 // Facet selections: { <group key>: [<checked option>, ...] }.
 function currentInventoryFacets() {
-  const raw = sessionStorage.getItem('defender-lab.inventory.facets');
+  const raw = sessionStorage.getItem('hsl.inventory.facets');
   if (raw) { try { return JSON.parse(raw); } catch {} }
   return {};
 }
 function saveInventoryFacets(facets) {
-  sessionStorage.setItem('defender-lab.inventory.facets', JSON.stringify(facets));
+  sessionStorage.setItem('hsl.inventory.facets', JSON.stringify(facets));
   setInventoryPage(1, false); // a new result set always starts at the first page
 }
 // The inventory runs to hundreds of rows, so it pages like the real portal.
 const INVENTORY_PAGE_SIZE = 50;
 function currentInventoryPage() {
-  const n = Number(sessionStorage.getItem('defender-lab.inventory.page') || 1);
+  const n = Number(sessionStorage.getItem('hsl.inventory.page') || 1);
   return Number.isFinite(n) && n >= 1 ? n : 1;
 }
 function setInventoryPage(page, rerender = true) {
-  sessionStorage.setItem('defender-lab.inventory.page', String(Math.max(1, page)));
+  sessionStorage.setItem('hsl.inventory.page', String(Math.max(1, page)));
   if (rerender) render();
 }
 function currentInventoryRange() {
-  return sessionStorage.getItem('defender-lab.inventory.range') || '30 days';
+  return sessionStorage.getItem('hsl.inventory.range') || '30 days';
 }
 function setInventoryRange() {
   const next = INVENTORY_RANGES[(INVENTORY_RANGES.indexOf(currentInventoryRange()) + 1) % INVENTORY_RANGES.length];
-  sessionStorage.setItem('defender-lab.inventory.range', next);
+  sessionStorage.setItem('hsl.inventory.range', next);
   render();
 }
 function setInventoryTab(tab) {
-  sessionStorage.setItem('defender-lab.inventory.tab', tab);
+  sessionStorage.setItem('hsl.inventory.tab', tab);
   // Facets from the previous tab may match nothing here (a switch has no Windows 10
   // version), which would read as an empty inventory rather than a tab change.
   // Clear them so a tab always lands on visible rows.
@@ -2471,19 +2468,19 @@ function exportInventoryCsv() {
 // Column picker. null = never customized, so the view falls back to each column's
 // own default rather than to an empty table.
 function currentInventoryColumns() {
-  const raw = sessionStorage.getItem('defender-lab.inventory.columns');
+  const raw = sessionStorage.getItem('hsl.inventory.columns');
   if (raw) { try { return JSON.parse(raw); } catch {} }
   return null;
 }
 function toggleInventoryColumn(key) {
   const current = currentInventoryColumns() || INVENTORY_COLUMNS.filter(c => c.on).map(c => c.key);
   const next = current.includes(key) ? current.filter(k => k !== key) : [...current, key];
-  sessionStorage.setItem('defender-lab.inventory.columns', JSON.stringify(next));
+  sessionStorage.setItem('hsl.inventory.columns', JSON.stringify(next));
   render();
   renderInventoryColumnsPanel();
 }
 function resetInventoryColumns() {
-  sessionStorage.removeItem('defender-lab.inventory.columns');
+  sessionStorage.removeItem('hsl.inventory.columns');
   render();
   renderInventoryColumnsPanel();
 }
@@ -2520,32 +2517,32 @@ function setDiscoveryMode(mode) {
 // Unmanaged assets get their own full page, mirroring how every onboarded device
 // has a device page — a side pane isn't enough room to triage an onboarding decision.
 function openDiscoveredDevice(id) {
-  sessionStorage.setItem('defender-lab.discovered.id', id);
-  sessionStorage.setItem('defender-lab.discovered.tab', 'overview');
+  sessionStorage.setItem('hsl.discovered.id', id);
+  sessionStorage.setItem('hsl.discovered.tab', 'overview');
   hidePanels();
   navigate('#/xdr/discovered-device');
 }
 function currentDiscoveredDevice() {
-  const id = sessionStorage.getItem('defender-lab.discovered.id');
+  const id = sessionStorage.getItem('hsl.discovered.id');
   return DISCOVERED_DEVICES.find(d => d.id === id) || DISCOVERED_DEVICES[0];
 }
 function currentDiscoveredTab() {
-  return sessionStorage.getItem('defender-lab.discovered.tab') || 'overview';
+  return sessionStorage.getItem('hsl.discovered.tab') || 'overview';
 }
 function setDiscoveredTab(tab) {
-  sessionStorage.setItem('defender-lab.discovered.tab', tab);
+  sessionStorage.setItem('hsl.discovered.tab', tab);
   render();
 }
 
 // ---------- Defender for Endpoint device pages ----------
 function openDevice(id, tab) {
-  sessionStorage.setItem('defender-lab.device.id', id);
-  sessionStorage.setItem('defender-lab.device.tab', tab || 'overview');
+  sessionStorage.setItem('hsl.device.id', id);
+  sessionStorage.setItem('hsl.device.tab', tab || 'overview');
   hidePanels();
   navigate('#/xdr/device');
 }
 function setDeviceTab(tab) {
-  sessionStorage.setItem('defender-lab.device.tab', tab);
+  sessionStorage.setItem('hsl.device.tab', tab);
   render();
 }
 
@@ -2702,9 +2699,9 @@ function openDeviceTimelineEvent(deviceId, index) {
 }
 
 // ---------- Defender Vulnerability Management ----------
-const TVM_STATE_KEY = 'defender-lab.tvm';
-const TVM_PANEL_RECOMMENDATION_KEY = 'defender-lab.tvm.recommendation';
-const TVM_PANEL_MODE_KEY = 'defender-lab.tvm.mode';
+const TVM_STATE_KEY = 'hsl.tvm';
+const TVM_PANEL_RECOMMENDATION_KEY = 'hsl.tvm.recommendation';
+const TVM_PANEL_MODE_KEY = 'hsl.tvm.mode';
 
 function currentTvmState() {
   return readStoredJson(TVM_STATE_KEY, { tickets: [], exceptions: [] });
@@ -3167,8 +3164,8 @@ DeviceEvents
 | where SyntheticHuntId == "${huntId}"
 | project Timestamp, SourceTable, DeviceName, ActionType, FileName, FolderPath, ProcessCommandLine, AccountName, RemoteIP, RemoteUrl, RegistryKey, AdditionalFields, AttackTechniques
 | sort by Timestamp desc`;
-  sessionStorage.setItem('defender-lab.hunting.prefill', kql);
-  sessionStorage.setItem('defender-lab.hunting.autorun', '1');
+  sessionStorage.setItem('hsl.hunting.prefill', kql);
+  sessionStorage.setItem('hsl.hunting.autorun', '1');
   hidePanels();
   navigate('#/xdr/hunting');
   toast(`Loaded hunt for ${payload.techniqueId} on ${payload.deviceName}.`);
@@ -3241,13 +3238,13 @@ function wireHuntingResults() {
 
 // ---------- Defender for Identity ↔ XDR identity pages ----------
 function openIdentity(id, tab) {
-  sessionStorage.setItem('defender-lab.identity.id', id);
-  sessionStorage.setItem('defender-lab.identity.tab', tab || 'overview');
+  sessionStorage.setItem('hsl.identity.id', id);
+  sessionStorage.setItem('hsl.identity.tab', tab || 'overview');
   hidePanels();
   navigate('#/xdr/identity');
 }
 function setIdentityTab(tab) {
-  sessionStorage.setItem('defender-lab.identity.tab', tab);
+  sessionStorage.setItem('hsl.identity.tab', tab);
   render();
 }
 
@@ -3412,9 +3409,9 @@ window.openCopilot       = openCopilot;
 window.selectCopilotPrompt = selectCopilotPrompt;
 
 // ---------- Sentinel connector and DCR labs ----------
-const SYSLOG_AMA_STATE_KEY = 'defender-lab.sentinel.syslogAma';
-const SENTINEL_INGESTION_STATE_PREFIX = 'defender-lab.sentinel.ingestion.';
-const DIAGNOSTIC_SETTINGS_PRACTICE_KEY = 'defender-lab.sentinel.diagnosticSettingsPractice';
+const SYSLOG_AMA_STATE_KEY = 'hsl.siem.syslogAma';
+const SENTINEL_INGESTION_STATE_PREFIX = 'hsl.siem.ingestion.';
+const DIAGNOSTIC_SETTINGS_PRACTICE_KEY = 'hsl.siem.diagnosticSettingsPractice';
 function currentSyslogAmaState() {
   const empty = {
     solutionInstalled:false,
@@ -3666,7 +3663,7 @@ function resetSentinelIngestionLab(id) {
 }
 
 // ---------- Defender for Cloud multicloud onboarding ----------
-const DEFENDER_CLOUD_MULTICLOUD_STATE_KEY = 'defender-lab.defender-cloud.multicloud';
+const DEFENDER_CLOUD_MULTICLOUD_STATE_KEY = 'hsl.cloud.multicloud';
 
 function defaultDefenderCloudMulticloudState() {
   const aws = MC_CONNECTORS.find(c => c.cloud === 'AWS') || {};
@@ -3809,7 +3806,7 @@ function resetDefenderCloudMulticloudState() {
 // This state is deliberately separate from the AWS/GCP connector wizard. In
 // the portal, Azure plan selection is scoped to a subscription (or supported
 // workspace), while non-Azure coverage is configured on its cloud connector.
-const DEFENDER_CLOUD_SETUP_STATE_KEY = 'defender-lab.defender-cloud.setup';
+const DEFENDER_CLOUD_SETUP_STATE_KEY = 'hsl.cloud.setup';
 
 function defaultDefenderCloudSetupState() {
   return {
@@ -3905,8 +3902,8 @@ function resetDefenderCloudSetupState() {
 // ---------- Defender for Cloud attack paths ----------
 // Navigation/filter state is session-only. Recommendation progress persists so
 // learners can observe a path move from Pending to In progress to Resolved.
-const DEFENDER_CLOUD_ATTACK_PATH_UI_KEY = 'defender-lab.defender-cloud.attack-path-ui';
-const DEFENDER_CLOUD_ATTACK_PATH_REMEDIATION_KEY = 'defender-lab.defender-cloud.attack-path-remediation';
+const DEFENDER_CLOUD_ATTACK_PATH_UI_KEY = 'hsl.cloud.attack-path-ui';
+const DEFENDER_CLOUD_ATTACK_PATH_REMEDIATION_KEY = 'hsl.cloud.attack-path-remediation';
 
 function currentDefenderCloudAttackPathUi() {
   const fallback = {
@@ -3989,8 +3986,8 @@ function resetDefenderCloudAttackPathRemediation(pathId) {
 // Alert status changes survive a refresh so the Dismissed/Resolved filter
 // behavior is actually observable. Filters and the open pane are session
 // state, so a new tab starts on the unfiltered list.
-const DEFENDER_CLOUD_ALERT_STATUS_KEY = 'defender-lab.defender-cloud.alert-status';
-const DEFENDER_CLOUD_ALERT_FILTER_KEY = 'defender-lab.defender-cloud.alert-filters';
+const DEFENDER_CLOUD_ALERT_STATUS_KEY = 'hsl.cloud.alert-status';
+const DEFENDER_CLOUD_ALERT_FILTER_KEY = 'hsl.cloud.alert-filters';
 
 function currentDefenderCloudAlertStatuses() {
   try { return JSON.parse(localStorage.getItem(DEFENDER_CLOUD_ALERT_STATUS_KEY)) || {}; }
@@ -4015,14 +4012,14 @@ function setCloudAlertStatus(id, status) {
   localStorage.setItem(DEFENDER_CLOUD_ALERT_STATUS_KEY, JSON.stringify(map));
   toast(`Alert status changed to ${status}.`);
   render();
-  openCloudAlert(id, sessionStorage.getItem('defender-lab.defender-cloud.alert-tab') || 'action');
+  openCloudAlert(id, sessionStorage.getItem('hsl.cloud.alert-tab') || 'action');
 }
 
 function openCloudAlert(id, tab) {
   const alert = defenderCloudAlertById(id);
   if (!alert) return;
-  sessionStorage.setItem('defender-lab.defender-cloud.alert-id', id);
-  sessionStorage.setItem('defender-lab.defender-cloud.alert-tab', tab || 'details');
+  sessionStorage.setItem('hsl.cloud.alert-id', id);
+  sessionStorage.setItem('hsl.cloud.alert-tab', tab || 'details');
   document.getElementById('cloud-alert-title').textContent = alert.title;
   document.getElementById('cloud-alert-body').innerHTML = renderCloudAlertDetail(alert, tab || 'details');
   hidePanels();
@@ -4032,8 +4029,8 @@ function openCloudAlert(id, tab) {
 function openCloudRecommendation(id, tab) {
   const rec = DEFENDER_CLOUD_RECS.find(item => item.id === id);
   if (!rec) return;
-  sessionStorage.setItem('defender-lab.defender-cloud.recommendation-id', id);
-  sessionStorage.setItem('defender-lab.defender-cloud.recommendation-tab', tab || 'overview');
+  sessionStorage.setItem('hsl.cloud.recommendation-id', id);
+  sessionStorage.setItem('hsl.cloud.recommendation-tab', tab || 'overview');
   document.getElementById('cloud-recommendation-title').textContent = rec.title;
   document.getElementById('cloud-recommendation-body').innerHTML = renderCloudRecommendationDetail(rec, tab || 'overview');
   hidePanels();
@@ -4041,14 +4038,14 @@ function openCloudRecommendation(id, tab) {
 }
 
 function setCloudRecommendationTab(tab) {
-  openCloudRecommendation(sessionStorage.getItem('defender-lab.defender-cloud.recommendation-id'), tab);
+  openCloudRecommendation(sessionStorage.getItem('hsl.cloud.recommendation-id'), tab);
 }
 
 function openCloudResource(id, tab) {
   const asset = defenderCloudInventoryRows().find(item => item.id === id);
   if (!asset) return;
-  sessionStorage.setItem('defender-lab.defender-cloud.resource-id', id);
-  sessionStorage.setItem('defender-lab.defender-cloud.resource-tab', tab || 'overview');
+  sessionStorage.setItem('hsl.cloud.resource-id', id);
+  sessionStorage.setItem('hsl.cloud.resource-tab', tab || 'overview');
   document.getElementById('cloud-resource-title').textContent = `${asset.name} — Resource health`;
   document.getElementById('cloud-resource-body').innerHTML = renderCloudResourceDetail(asset, tab || 'overview');
   hidePanels();
@@ -4056,7 +4053,7 @@ function openCloudResource(id, tab) {
 }
 
 function setCloudResourceTab(tab) {
-  openCloudResource(sessionStorage.getItem('defender-lab.defender-cloud.resource-id'), tab);
+  openCloudResource(sessionStorage.getItem('hsl.cloud.resource-id'), tab);
 }
 
 function openCloudResourceByName(name, tab) {
@@ -4072,7 +4069,7 @@ function openCloudResourceByName(name, tab) {
 }
 
 function setCloudAlertTab(tab) {
-  openCloudAlert(sessionStorage.getItem('defender-lab.defender-cloud.alert-id'), tab);
+  openCloudAlert(sessionStorage.getItem('hsl.cloud.alert-id'), tab);
 }
 
 function openCloudIncident(id) {
@@ -4141,11 +4138,11 @@ window.commitDefenderCloudSetupPlans = commitDefenderCloudSetupPlans;
 window.resetDefenderCloudSetupState = resetDefenderCloudSetupState;
 
 // ---------- Sentinel hunting bookmarks / livestream / restore jobs ----------
-const SENTINEL_HUNTING_TAB_KEY = 'defender-lab.sentinel.hunting.tab';
-const SENTINEL_BOOKMARKS_KEY = 'defender-lab.sentinel.bookmarks';
-const SENTINEL_LIVESTREAM_KEY = 'defender-lab.sentinel.livestream';
-const SENTINEL_RESTORE_JOB_KEY = 'defender-lab.sentinel.restoreJob';
-const SENTINEL_ENTITY_PLAYBOOK_KEY = 'defender-lab.sentinel.entity.playbook';
+const SENTINEL_HUNTING_TAB_KEY = 'hsl.siem.hunting.tab';
+const SENTINEL_BOOKMARKS_KEY = 'hsl.siem.bookmarks';
+const SENTINEL_LIVESTREAM_KEY = 'hsl.siem.livestream';
+const SENTINEL_RESTORE_JOB_KEY = 'hsl.siem.restoreJob';
+const SENTINEL_ENTITY_PLAYBOOK_KEY = 'hsl.siem.entity.playbook';
 let sentinelLivestreamTimer = null;
 
 function readSentinelJSON(key, fallback) {
@@ -4375,7 +4372,7 @@ function elevateSentinelLivestreamToAlert() {
     source: 'Hunting livestream',
   };
   saveSentinelLivestreamState({ elevated: true, alertStub: stub, updatedAt: new Date().toISOString() });
-  writeSentinelJSON('defender-lab.sentinel.livestream.rule', stub);
+  writeSentinelJSON('hsl.siem.livestream.rule', stub);
   toast('Analytics rule stub created from the livestream.');
   render();
 }
@@ -4427,8 +4424,8 @@ function runSentinelEntityPlaybook(entityName, source) {
     source,
     playbookId: 'PB-ContainEntity',
   });
-  sessionStorage.setItem('defender-lab.sentinel.playbook.selected', 'PB-ContainEntity');
-  sessionStorage.setItem('defender-lab.sentinel.playbook.entity', entityName);
+  sessionStorage.setItem('hsl.siem.playbook.selected', 'PB-ContainEntity');
+  sessionStorage.setItem('hsl.siem.playbook.entity', entityName);
   toast(`Loaded PB-ContainEntity for ${entityName}.`);
   navigate('#/siem/automation');
 }
@@ -4460,14 +4457,14 @@ window.finalizeSentinelRestoreJobIfReady = finalizeSentinelRestoreJobIfReady;
 
 // ---------- Sentinel search jobs ----------
 function runSentinelSearchJob() {
-  localStorage.setItem('defender-lab.sentinel.networklogs.searchJob', 'complete');
+  localStorage.setItem('hsl.siem.networklogs.searchJob', 'complete');
   toast('Search job completed. Retained Basic table rows are available for analysis.');
   render();
 }
 window.runSentinelSearchJob = runSentinelSearchJob;
 
 function runSentinelDataLakeJob() {
-  localStorage.setItem('defender-lab.sentinel.dataLakeJob', 'complete');
+  localStorage.setItem('hsl.siem.dataLakeJob', 'complete');
   toast('Data lake KQL job completed. Results table is ready.');
   render();
 }
@@ -4475,11 +4472,11 @@ window.runSentinelDataLakeJob = runSentinelDataLakeJob;
 
 // ---------- Sentinel workspace selector ----------
 function currentWorkspace() {
-  const id = localStorage.getItem('defender-lab.sentinel.workspace');
+  const id = localStorage.getItem('hsl.siem.workspace');
   return SENTINEL_WORKSPACES.find(w => w.id === id) || SENTINEL_WORKSPACES[0];
 }
 function setWorkspace(id) {
-  localStorage.setItem('defender-lab.sentinel.workspace', id);
+  localStorage.setItem('hsl.siem.workspace', id);
   render();
 }
 window.currentWorkspace = currentWorkspace;
@@ -4487,11 +4484,11 @@ window.setWorkspace      = setWorkspace;
 
 // ---------- MSSP / MTO state ----------
 function currentMsspTenant() {
-  const id = localStorage.getItem('defender-lab.sentinel.mssp.tenant');
+  const id = localStorage.getItem('hsl.siem.mssp.tenant');
   return MSSP_TENANTS.find(t => t.id === id) || MSSP_TENANTS[0];
 }
 function setMsspTenant(id) {
-  localStorage.setItem('defender-lab.sentinel.mssp.tenant', id);
+  localStorage.setItem('hsl.siem.mssp.tenant', id);
   render();
 }
 window.currentMsspTenant = currentMsspTenant;
@@ -4552,14 +4549,14 @@ function openMsspTenant(id) {
 window.openMsspTenant = openMsspTenant;
 
 function loadSentinelLogsQuery(query) {
-  sessionStorage.setItem('defender-lab.sentinel.logs.query', query);
+  sessionStorage.setItem('hsl.siem.logs.query', query);
   navigate('#/siem/logs');
 }
 window.loadSentinelLogsQuery = loadSentinelLogsQuery;
 
 // ---------- 365 admin center: Message center reading pane ----------
-const M365_MESSAGE_CENTER_STATE_KEY = 'defender-lab.m365.message-center';
-const M365_MESSAGE_CENTER_TAB_KEY = 'defender-lab.m365.message-center.tab';
+const M365_MESSAGE_CENTER_STATE_KEY = 'hsl.workspace.message-center';
+const M365_MESSAGE_CENTER_TAB_KEY = 'hsl.workspace.message-center.tab';
 
 function currentM365MessageCenterState() {
   const fallback = { read:{}, favorites:{}, archived:{} };
@@ -4646,13 +4643,13 @@ function openM365Message(id) {
   const state = currentM365MessageCenterState();
   state.read[id] = true;
   saveM365MessageCenterState(state);
-  sessionStorage.setItem('defender-lab.m365.message-center.open', id);
+  sessionStorage.setItem('hsl.workspace.message-center.open', id);
   render();
   if (renderM365MessageReadingPane(id)) showPanel('panel-m365-message');
 }
 
 function moveM365Message(direction) {
-  const id = sessionStorage.getItem('defender-lab.m365.message-center.open');
+  const id = sessionStorage.getItem('hsl.workspace.message-center.open');
   const state = currentM365MessageCenterState();
   const archived = Boolean(state.archived[id]);
   const visible = M365_MESSAGE_CENTER.filter(item => Boolean(state.archived[item.id]) === archived);
@@ -4767,20 +4764,20 @@ function openEntraUser(upn) {
 window.openEntraUser = openEntraUser;
 
 // ---------- sign-in logs (#/identity/sign-in-logs) ----------
-// Filters live in sessionStorage so a coach step can navigate away and back
+// Filters live in sessionStorage so a pivot can navigate away and back
 // without the learner losing the narrowing they just applied.
 function setSigninFilter(kind, value) {
-  sessionStorage.setItem('defender-lab.signin.' + kind, value || '');
+  sessionStorage.setItem('hsl.signin.' + kind, value || '');
   render();
 }
 function setSigninLogType(kind) {
-  sessionStorage.setItem('defender-lab.signin.logtype', kind);
+  sessionStorage.setItem('hsl.signin.logtype', kind);
   render();
 }
 
 function clearSigninFilters() {
-  sessionStorage.removeItem('defender-lab.signin.user');
-  sessionStorage.removeItem('defender-lab.signin.result');
+  sessionStorage.removeItem('hsl.signin.user');
+  sessionStorage.removeItem('hsl.signin.result');
   render();
 }
 

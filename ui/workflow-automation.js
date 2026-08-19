@@ -18,7 +18,7 @@
 //
 // Nothing here calls a real Logic App. State is local to the browser.
 
-const WORKFLOW_AUTOMATION_KEY = 'defender-lab.defender-cloud.workflow-automations';
+const WORKFLOW_AUTOMATION_KEY = 'hsl.cloud.workflow-automations';
 
 // The exact trigger set the logic app designer supports. Attack paths are NOT a
 // workflow automation trigger, despite being a Defender for Cloud feature — a

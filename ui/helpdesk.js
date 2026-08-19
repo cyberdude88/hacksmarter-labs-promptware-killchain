@@ -31,7 +31,7 @@ PORTAL_CONTEXT.helpdesk = 'admin';
 CLOUD_HIGHLIGHT.helpdesk = 'IT Service Desk';
 CLOUD_APP_ROUTE['IT Service Desk'] = '#/helpdesk/dashboard';
 
-const HD_STATE_KEY = 'defender-lab.helpdesk.state.v1';
+const HD_STATE_KEY = 'hsl.helpdesk.state.v1';
 const HD_SHIFT_NOW = new Date('2026-08-17T13:00:00Z');
 const HD_STATUSES = ['New', 'Assigned', 'In Progress', 'Pending User', 'Pending Vendor', 'Escalated', 'Resolved', 'Closed'];
 const HD_STATUS_NEXT = {

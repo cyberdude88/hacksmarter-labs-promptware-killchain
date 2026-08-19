@@ -11,7 +11,7 @@
 // runnable against the bundled fixtures — and makes "the schema decides the
 // table" concrete.
 
-const GUIDED_STATE_KEY = 'defender-lab.hunting.guided';
+const GUIDED_STATE_KEY = 'hsl.hunting.guided';
 
 function guidedDefaultState() {
   return { domain: 'endpoints', allFilters: false, join: 'and', conditions: [] };
@@ -295,6 +295,6 @@ function setHuntingMode(mode) {
   const a = document.getElementById('advanced-panel');
   if (g) g.classList.toggle('hidden', !guided);
   if (a) a.classList.toggle('hidden', guided);
-  try { localStorage.setItem('defender-lab.hunting.mode', mode); } catch {}
+  try { localStorage.setItem('hsl.hunting.mode', mode); } catch {}
   if (guided) guidedSyncEditor();
 }
