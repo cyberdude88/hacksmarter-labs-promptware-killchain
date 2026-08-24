@@ -3,7 +3,7 @@ import { useSoc } from '../state/SocContext.jsx';
 // Vertical nav. All pages always accessible — milestones are informational.
 const ITEMS = [
   { key: 'alerts',        label: 'Alerts',       icon: '◉', milestone: 'correctAssign' },
-  { key: 'investigation', label: 'Kill Chain',   icon: '⛓', milestone: 'firstTriage' },
+  { key: 'investigation', label: 'Detection',   icon: '⛓', milestone: 'firstTriage' },
   { key: 'detection',     label: 'Containment',  icon: '◈', milestone: 'ruleBuilt' },
   { key: 'replay',        label: 'Recovery',     icon: '⟲', milestone: 'replayPassed' },
   { key: 'report',        label: 'Incident Report', icon: '✎', milestone: 'reportReady' },
