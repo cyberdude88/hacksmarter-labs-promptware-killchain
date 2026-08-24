@@ -33,6 +33,9 @@ export default function ReportDrawer() {
                     {e.graded && !e.correct && <span className="report-bump" title="This entry didn't hold up under grading" />}
                   </div>
                   <div className="report-entry-label">{e.label}</div>
+                  {e.filedStage && (
+                    <div className="dim small mono">stage: {e.filedStage}</div>
+                  )}
                   <button className="btn-link danger" onClick={() => dispatch({ type: 'REMOVE_FROM_REPORT', id: e.id })}>
                     remove
                   </button>

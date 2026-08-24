@@ -36,7 +36,7 @@ const initial = {
   // Per-stage judgment-question answers: stageId -> optionId.
   stageAnswers: {},
 
-  // Per-stage analyst notebook: stageId -> { finding, evidenceIds, confidence, disposition, savedAt }
+  // Per-stage analyst notebook: stageId -> { evidenceIds, confidence, disposition, savedAt }
   notebook: {},
 
   // Containment + attribution + final assessment.
@@ -192,7 +192,9 @@ function reducer(state, action) {
         refId: action.refId,
         label: action.label,
         chosenOptionId: action.chosenOptionId ?? null,
-        filedStage: action.filedStage ?? null,
+        filedStage: action.kind === 'evidence'
+          ? (action.filedStage || state.boardAssignments[action.refId] || null)
+          : (action.filedStage ?? null),
         addedAt: Date.now(),
         graded: false,
         correct: null,
@@ -200,7 +202,24 @@ function reducer(state, action) {
       const entries = state.report.entries.some((e) => e.kind === action.kind && e.refId === action.refId)
         ? state.report.entries.map((e) => (e.kind === action.kind && e.refId === action.refId ? { ...e, ...entry, id: e.id } : e))
         : [...state.report.entries, entry];
-      return { ...state, report: { ...state.report, entries } };
+
+      // Filing a raw timeline log (refId is an EVT-### id, not an evidence
+      // card's own id) also stands in for marking any curated evidence
+      // card it backs — a student who has already committed the artifact
+      // to the report shouldn't have to separately hunt down the matching
+      // tab and click "mark as evidence" for the same fact.
+      let markedEvidence = state.markedEvidence;
+      if (action.kind === 'evidence') {
+        const matchingCards = EVIDENCE_CATALOG.filter(
+          (card) => card.sourceEventIds.includes(action.refId) && !state.markedEvidence[card.id],
+        );
+        if (matchingCards.length > 0) {
+          markedEvidence = { ...state.markedEvidence };
+          matchingCards.forEach((card) => { markedEvidence[card.id] = true; });
+        }
+      }
+
+      return { ...state, report: { ...state.report, entries }, markedEvidence };
     }
     case 'REMOVE_FROM_REPORT':
       return { ...state, report: { ...state.report, entries: state.report.entries.filter((e) => e.id !== action.id) } };

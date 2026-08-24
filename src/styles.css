@@ -496,6 +496,12 @@ input, select, textarea { font-family: inherit; }
 .alert-row.sev-medium   { border-left: 3px solid var(--med); }
 .alert-row.sev-low      { border-left: 3px solid var(--low); }
 .alert-row.sev-info     { border-left: 3px solid var(--info); }
+.timeline-row { cursor: pointer; }
+.timeline-row:hover { background: rgba(255, 255, 255, 0.03); }
+.timeline-row.is-selected {
+  background: rgba(90, 164, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(90, 164, 255, 0.18);
+}
 
 /* Real threats (true_positive / escalate) stand out from the benign noise. */
 .alert-row.is-priority {

@@ -154,3 +154,37 @@ content untouched) — that data needs a real promptware-themed rewrite before
 this is coherent end-to-end. Same "complete tasks to light up the sidebar dot,
 then unlock the next stage, flag at the end" pattern as before — preserve it
 when authoring real stage content.
+
+## 2026-08-24 — Timeline volume, evidence-ID fix, evidence auto-linking
+
+`src/content/killChainCase.js`:
+- `EVENTS` grew from 60 to 300 (Email 55 / AI 30 / Tool 75 / Data 30 /
+  Identity 40 / Network 30 / Endpoint 40), keeping the original ratio. The
+  original 60 are unchanged and renamed `REAL_EVENTS` (still EVT-001..060,
+  still what `EVIDENCE_CATALOG` cites); a seeded, deterministic generator
+  appends 240 `NOISE_EVENTS` (EVT-061+) spread across a 10-day window
+  (`INCIDENT_DATE = '2026-08-17'`, ±1 week) so events now carry a `date`
+  field, not just `ts`. Includes three decoy IDENTITY
+  baseline/re-check `PERMISSION_SNAPSHOT` pairs for other service accounts
+  (`svc-backup-agent`, `svc-reporting-bot`, `svc-crm-sync`) — same shape as
+  the real EVID-004 evidence, deliberately, as red herrings.
+- **Fixed a pre-existing bug**: `EVIDENCE_CATALOG`'s `sourceEventIds` were
+  systematically miscounted against actual EVT- ids (e.g. EVID-004 cited
+  EVT-047, a workstation login, instead of EVT-057, the actual re-check
+  snapshot; EVID-009 cited the wrong four events entirely). Re-derived every
+  reference against real event content — see git history for the full diff.
+  This had been silently defeating any evidence-to-source-event linkage.
+- Added `EVENT_TO_EVIDENCE`, a reverse index (EVT-id → [EVID-ids]) for the
+  Timeline tab.
+
+`src/components/killchain/tabs/TimelineTab.jsx`:
+- Added Date (two `<input type=date>`) and Time-of-day (two `<input
+  type=time>`) range filters, plus a Date column and a "Clear filter"
+  control. Rows now sort chronologically across the full 10-day span.
+- "Add Artifact to Incident Report" now also checks `EVENT_TO_EVIDENCE` for
+  the selected row: if it's the cited source of a catalog card, clicking it
+  also dispatches `MARK_EVIDENCE` for that card, so it shows up MARKED on
+  the Evidence Board without the student having to re-find it in a
+  per-category tab. Previously this button only wrote an inert report
+  entry that `gradeEntry()` could never match to `EVIDENCE_CATALOG` (refId
+  was an EVT- id, catalog keys are EVID- ids) — it did nothing gradeable.

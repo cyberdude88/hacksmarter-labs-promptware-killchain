@@ -127,6 +127,287 @@ export const EMAIL = {
 };
 
 // ---------------------------------------------------------------------
+// EMAILS — the full mailbox the Email tab's inbox list renders. MSG-0417
+// (above) is the injected message and stays the one wired into the claim /
+// evidence / prompt-analysis flow; everything else here is inbox volume —
+// mostly the background traffic already named in EVENTS (given real
+// content instead of a one-line summary), plus extra filler so the inbox
+// reads like a mailbox rather than a single exhibit. Same header shape
+// throughout so the View Headers toggle always renders something.
+// Internal mail shows the corporate relay's address (10.50.2.10); external
+// senders get their own IP — a mix of ordinary-looking addresses, since
+// most of the mailbox (including a cold-outreach recruiter and a SaaS
+// invoice) is external and entirely benign.
+// ---------------------------------------------------------------------
+const INTERNAL_RELAY_IP = '10.50.2.10';
+const mkHeaders = (fromAddr, ip, msgId, internal) => ({
+  'Return-Path': `<${fromAddr}>`,
+  'Received-SPF': internal ? `PASS (internal relay ${ip})` : `PASS (${fromAddr.split('@')[1]} designates sending IP)`,
+  'Authentication-Results': `spf=pass dkim=pass dmarc=pass header.from=${fromAddr.split('@')[1]}`,
+  'X-Originating-IP': ip,
+  'Message-ID': `<${msgId}@${fromAddr.split('@')[1]}>`,
+});
+
+export const EMAILS = [
+  EMAIL,
+  {
+    messageId: 'MSG-0402',
+    from: 'comms@northstar-research.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'Northstar Weekly — Q3 Town Hall Recap',
+    receivedAt: '08:44:20',
+    headers: mkHeaders('comms@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0402', true),
+    raw:
+      'Hi all,\n\nThanks to everyone who joined yesterday’s Q3 town hall. Slides and the ' +
+      'recording are on the intranet under Company > All-Hands. Quick highlights: the ' +
+      'Procurement team closed out vendor renewals a week early, Facilities has the ' +
+      'Building 2 elevator work scheduled for next week, and HR opened enrollment for the ' +
+      'winter benefits window.\n\nAs always, reply to this thread with questions.\n\nComms Team',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0405',
+    from: 'r.chen@northstar-research.test',
+    to: 'm.doyle@northstar-research.test',
+    subject: 'Re: Q3 vendor invoice reconciliation',
+    receivedAt: '08:50:14',
+    headers: mkHeaders('r.chen@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0405', true),
+    raw:
+      'Marcus,\n\nI think we’re square on the Q3 vendor invoices except for the two from ' +
+      'the equipment supplier — pricing sheet hasn’t landed yet. I’ll ping ' +
+      'procurement@vendor-example.test again today.\n\nRosa',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0408',
+    from: 'billing@saas-vendor-example.test',
+    to: 'p.singh@northstar-research.test',
+    subject: 'Invoice #8841 is ready',
+    receivedAt: '08:58:41',
+    headers: mkHeaders('billing@saas-vendor-example.test', '203.0.113.88', 'MSG-0408', false),
+    raw:
+      'Hi Priya,\n\nYour invoice #8841 for the September billing cycle is ready. Amount due: ' +
+      '$1,240.00, due in 30 days. You can view and pay it from your account dashboard.\n\n' +
+      'Thanks for being a customer,\nSaaS Vendor Example Billing',
+    attachments: [{ name: 'invoice-8841.pdf', sizeKb: 88 }],
+  },
+  {
+    messageId: 'MSG-0409',
+    from: 'calendar@northstar-research.test',
+    to: 'facilities@northstar-research.test',
+    subject: 'Accepted: Q3 Facilities Walkthrough',
+    receivedAt: '09:01:12',
+    headers: mkHeaders('calendar@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0409', true),
+    raw:
+      'facilities@northstar-research.test has accepted this event:\n\nQ3 Facilities ' +
+      'Walkthrough\nWhen: Thursday, 2:00 PM – 3:00 PM\nWhere: Building 2, Lobby\n\n' +
+      'This is an automated message from the Northstar scheduling system.',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0411',
+    from: 'k.osei@northstar-research.test',
+    to: 'p.singh@northstar-research.test',
+    subject: 'Badge access renewal — Building 2',
+    receivedAt: '09:04:30',
+    headers: mkHeaders('k.osei@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0411', true),
+    raw:
+      'Priya,\n\nMy Building 2 badge access lapses at the end of the month — can you approve ' +
+      'the renewal in the access portal? Same level as before, nothing’s changed.\n\nThanks,\nKwame',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0413',
+    from: 'hr-compliance@northstar-research.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'Reminder: Quarterly Compliance Training Due Friday',
+    receivedAt: '09:10:05',
+    headers: mkHeaders('hr-compliance@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0413', true),
+    raw:
+      'This is a reminder that quarterly security and compliance training is due by end of ' +
+      'day Friday. It takes about 20 minutes and is available on the training portal. ' +
+      'Employees who have not completed it will receive a follow-up from their manager.\n\n' +
+      'HR Compliance',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0415',
+    from: 'no-reply@northstar-research.test',
+    to: 'd.park@northstar-research.test',
+    subject: 'Your password expires in 5 days',
+    receivedAt: '09:12:20',
+    headers: mkHeaders('no-reply@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0415', true),
+    raw:
+      'Your Northstar account password expires in 5 days. Change it any time before then from ' +
+      'the account portal to avoid interruption. This is an automated message; replies are ' +
+      'not monitored.',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0416',
+    from: 'l.fischer@northstar-research.test',
+    to: 'j.alvarez@northstar-research.test',
+    subject: 'Draft slides for Friday sync',
+    receivedAt: '09:13:45',
+    headers: mkHeaders('l.fischer@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0416', true),
+    raw:
+      'Jordan,\n\nAttached is a first pass at the slides for Friday’s sync. Sections 1 and 2 ' +
+      'are solid, section 3 (roadmap) still needs your numbers. Let me know if Thursday ' +
+      'morning works to review together.\n\nLena',
+    attachments: [{ name: 'Q3-Sync-Slides.pptx', sizeKb: 3140 }],
+  },
+  {
+    messageId: 'MSG-0418',
+    from: 'talent@recruiting-example.test',
+    to: 'a.novak@northstar-research.test',
+    subject: 'Following up on your application',
+    receivedAt: '09:15:02',
+    headers: mkHeaders('talent@recruiting-example.test', '198.51.100.5', 'MSG-0418', false),
+    raw:
+      'Hi Anya,\n\nThanks for applying through our platform. I wanted to follow up and see if ' +
+      'you’re still exploring new roles — I have a couple of openings that might be a fit ' +
+      'given your background. Happy to set up a quick call this week if you’re interested.\n\n' +
+      'Best,\nRecruiting Example Talent Team',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0419',
+    from: 'office@northstar-research.test',
+    to: 't.nakamura@northstar-research.test',
+    subject: 'Lunch order confirmed — Thai Basil, 12:30pm',
+    receivedAt: '09:16:10',
+    headers: mkHeaders('office@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0419', true),
+    raw:
+      'Your team lunch order from Thai Basil is confirmed for 12:30pm delivery to the ' +
+      '3rd floor kitchen. Reply to this thread by 11am if anything needs to change.',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0420',
+    from: 'm.doyle@northstar-research.test',
+    to: 'r.chen@northstar-research.test',
+    subject: 'Lunch today?',
+    receivedAt: '09:17:55',
+    headers: mkHeaders('m.doyle@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0420', true),
+    raw: 'Rosa,\n\nHeaded to the place on 5th around 12:30 if you want to join.\n\nMarcus',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0421',
+    from: 'facilities@northstar-research.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'Elevator Maintenance — Building 2, Thursday 6–8am',
+    receivedAt: '09:19:02',
+    headers: mkHeaders('facilities@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0421', true),
+    raw:
+      'One elevator in Building 2 will be offline Thursday 6–8am for scheduled maintenance. ' +
+      'The other two elevators and the stairwell will be available as usual. No action needed.',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0422',
+    from: 'alerts@northstar-research.test',
+    to: 'it-ops@northstar-research.test',
+    subject: 'Nightly backup completed — file-srv-02',
+    receivedAt: '09:22:10',
+    headers: mkHeaders('alerts@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0422', true),
+    raw:
+      'Backup job completed successfully for file-srv-02 at 03:00. Full+incremental, 41GB, ' +
+      '0 errors. This is an automated notification from the backup system.',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0423',
+    from: 'support@cloudtools-example.test',
+    to: 'it-ops@northstar-research.test',
+    subject: 'Ticket #2291 resolved',
+    receivedAt: '09:24:36',
+    headers: mkHeaders('support@cloudtools-example.test', '203.0.113.15', 'MSG-0423', false),
+    raw:
+      'Your support ticket #2291 ("SSO redirect loop for two users") has been marked resolved. ' +
+      'The fix was deployed to your instance this morning. Reply to reopen if the issue recurs.\n\n' +
+      'Cloud Tools Example Support',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0424',
+    from: 'it-ops@northstar-research.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'Scheduled Maintenance Window — Sat 11pm–2am',
+    receivedAt: '09:26:05',
+    headers: mkHeaders('it-ops@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0424', true),
+    raw:
+      'IT will be performing scheduled maintenance Saturday 11pm–2am. VPN and internal wiki ' +
+      'access may be intermittent during this window. No impact expected to email or the AI ' +
+      'assistant platform.',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0425',
+    from: 't.nakamura@northstar-research.test',
+    to: 'l.fischer@northstar-research.test',
+    subject: 'Meeting notes — Procurement sync',
+    receivedAt: '09:30:12',
+    headers: mkHeaders('t.nakamura@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0425', true),
+    raw:
+      'Lena,\n\nNotes from this morning’s procurement sync attached. Main action item is ' +
+      'confirming the Q3 pricing sheet with the equipment vendor before Friday.\n\nTaro',
+    attachments: [{ name: 'procurement-sync-notes.docx', sizeKb: 44 }],
+  },
+  {
+    messageId: 'MSG-0427',
+    from: 'comms@northstar-research.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'Correction: Q3 Town Hall Recording Link',
+    receivedAt: '09:36:29',
+    headers: mkHeaders('comms@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0427', true),
+    raw:
+      'Correcting this morning’s email — the town hall recording link pointed to last ' +
+      'quarter’s video. The right link is now live on the intranet under Company > ' +
+      'All-Hands. Sorry for the mix-up.\n\nComms Team',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0428',
+    from: 'k.osei@northstar-research.test',
+    to: 'p.singh@northstar-research.test',
+    subject: 'Expense report submitted — Sept trip',
+    receivedAt: '09:40:58',
+    headers: mkHeaders('k.osei@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0428', true),
+    raw:
+      'Priya,\n\nSubmitted my expense report for the September client trip — flights, hotel, ' +
+      'and two client dinners. Receipts are attached in the portal. Let me know if you need ' +
+      'anything else for approval.\n\nKwame',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0429',
+    from: 'newsletter@industry-news-example.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'This Week in Enterprise AI',
+    receivedAt: '09:42:15',
+    headers: mkHeaders('newsletter@industry-news-example.test', '2001:db8:aa17:2::40', 'MSG-0429', false),
+    raw:
+      'This week: agentic tool-use adoption climbs among mid-market firms, a roundup of new ' +
+      'evaluation benchmarks, and an op-ed on data governance for AI copilots. Read online or ' +
+      'unsubscribe using the links below.\n\nIndustry News Example — Weekly Digest',
+    attachments: [],
+  },
+  {
+    messageId: 'MSG-0430',
+    from: 'facilities@northstar-research.test',
+    to: 'all-staff@northstar-research.test',
+    subject: 'Parking Garage B Closed This Weekend',
+    receivedAt: '09:44:19',
+    headers: mkHeaders('facilities@northstar-research.test', INTERNAL_RELAY_IP, 'MSG-0430', true),
+    raw:
+      'Parking Garage B will be closed this weekend for resurfacing. Garage A and street ' +
+      'parking on 5th remain available. Normal access resumes Monday morning.',
+    attachments: [],
+  },
+];
+
+// ---------------------------------------------------------------------
 // AI context inspector — trust sources + tool call trace for the request
 // that ARIA processed at 09:16:48.
 // ---------------------------------------------------------------------
@@ -157,14 +438,26 @@ export const AI_CONTEXT = {
 // a Hunt-style query surface — see docs/hunt-dashboard-design.md).
 // `relevant` and `killChainStage` are answer-key fields; never render
 // them directly to the student.
+//
+// Every event carries a `date` (defaults to INCIDENT_DATE) alongside its
+// `ts` (HH:MM:SS) so the Timeline can filter/sort across more than one
+// day once background noise (below) spreads events across a window
+// around the incident.
 // ---------------------------------------------------------------------
+export const INCIDENT_DATE = '2026-08-17';
+
 let _n = 0;
-const evt = (ts, source, event_type, detail, extra = {}, relevant = false, killChainStage = null) => ({
+const evt = (ts, source, event_type, detail, extra = {}, relevant = false, killChainStage = null, date = INCIDENT_DATE) => ({
   id: `EVT-${String(++_n).padStart(3, '0')}`,
-  ts, source, event_type, detail, relevant, killChainStage, ...extra,
+  date, ts, source, event_type, detail, relevant, killChainStage, ...extra,
 });
 
-export const EVENTS = [
+// The 60 authored, evidence-bearing events. IDs EVT-001..EVT-060 are load
+// bearing — EVIDENCE_CATALOG below cites specific ones by string (EVT-011,
+// EVT-018, ...). Do not reorder, insert into, or remove from this block;
+// append new content to NOISE_EVENTS instead, which is generated after
+// this block finishes so it can never renumber anything here.
+const REAL_EVENTS = [
   // ---- background, pre-incident (08:40–09:13) ----
   evt('08:41:03', 'IDENTITY', 'AUTH_SUCCESS', 'j.alvarez logged in via SSO.', { user: 'j.alvarez' }),
   evt('08:42:11', 'ENDPOINT', 'AV_UPDATE', 'Endpoint AV signature update completed on WKS-0812.'),
@@ -241,24 +534,195 @@ export const EVENTS = [
 ];
 
 // ---------------------------------------------------------------------
+// NOISE_EVENTS — generated background volume, ~10 business days bracketing
+// INCIDENT_DATE. Templated rather than hand-authored: this is filler that
+// gives the real 60 events somewhere to hide (spec intent, see TimelineTab
+// comment), not additional graded content, so it doesn't need bespoke
+// prose per row. Deterministic (fixed seed) so the range plays out the
+// same way on every load. IDs continue from REAL_EVENTS (EVT-061+) via
+// the same evt()/_n counter, so nothing here can collide with or shift
+// the EVIDENCE_CATALOG references above.
+//
+// To change the volume or mix, edit COUNTS below — each key is a source
+// category and must sum to however many noise rows you want.
+// ---------------------------------------------------------------------
+function mulberry32(seed) {
+  let a = seed;
+  return function rand() {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rng = mulberry32(0xC0062);
+const pick = (arr) => arr[Math.floor(rng() * arr.length)];
+const two = (n) => String(n).padStart(2, '0');
+function randTime() {
+  const h = 7 + Math.floor(rng() * 12); // 07:00–18:59, business hours
+  const m = Math.floor(rng() * 60);
+  const s = Math.floor(rng() * 60);
+  return `${two(h)}:${two(m)}:${two(s)}`;
+}
+
+const NOISE_DATES = [
+  '2026-08-10', '2026-08-11', '2026-08-12', '2026-08-13', '2026-08-14',
+  INCIDENT_DATE,
+  '2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21',
+];
+// Incident-day noise must stay clear of the real 08:40–09:45 window.
+function randDateTimeAvoidingIncidentWindow() {
+  for (;;) {
+    const date = pick(NOISE_DATES);
+    const ts = randTime();
+    if (date !== INCIDENT_DATE || ts < '08:38:00' || ts > '09:47:00') return { date, ts };
+  }
+}
+
+const USERS = ['j.alvarez', 'k.osei', 'p.singh', 'd.park', 'm.doyle', 't.nakamura', 'l.fischer', 'a.novak', 'r.chen', 's.iversen', 'e.brandt', 'c.mueller'];
+const WKS = ['WKS-0433', 'WKS-0501', 'WKS-0812', 'WKS-0290', 'WKS-0177', 'WKS-0655', 'WKS-0724', 'WKS-0339', 'WKS-0968', 'WKS-0102'];
+const BENIGN_REPOS = ['Procurement', 'Engineering', 'Legal', 'Marketing'];
+const INTERNAL_DESTS = ['kb-internal.northstar-research.test', 'hr-portal.northstar-research.test', 'expense.northstar-research.test', 'ticketing.northstar-research.test', 'wiki.northstar-research.test'];
+const BENIGN_EXT_SENDERS = ['no-reply@partner-logistics.test', 'updates@cloudsync-provider.test', 'notifications@training-portal.test', 'billing@office-supplies.test'];
+const NEWSLETTER_SUBJECTS = ['Weekly All-Staff Digest', 'IT Maintenance Window Notice', 'Facilities Update', 'Q3 Travel Policy Reminder', 'Benefits Enrollment Reminder', 'Cafeteria Menu — Next Week', 'Building Access Badge Reissue', 'Compliance Training Due Date'];
+
+let _msg = 500;
+const nextMsgId = () => `MSG-${String(++_msg).padStart(4, '0')}`;
+
+const NOISE_EVENTS = [];
+
+// ---- EMAIL (44): mostly internal noise, a handful of routine external mail ----
+for (let i = 0; i < 30; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  NOISE_EVENTS.push(evt(ts, 'EMAIL', 'INBOUND', `Internal email: ${pick(NEWSLETTER_SUBJECTS)}.`, { message_id: nextMsgId() }, false, null, date));
+}
+for (let i = 0; i < 8; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  NOISE_EVENTS.push(evt(ts, 'EMAIL', 'OUTBOUND', `${pick(USERS)} replied to an internal thread.`, { message_id: nextMsgId(), user: pick(USERS) }, false, null, date));
+}
+for (let i = 0; i < 6; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const sender = pick(BENIGN_EXT_SENDERS);
+  NOISE_EVENTS.push(evt(ts, 'EMAIL', 'AUTH_CHECK', `SPF/DKIM PASS for ${sender.split('@')[1]} — known correspondent.`, { message_id: nextMsgId(), trust_level: 'EXTERNAL' }, false, null, date));
+}
+
+// ---- AI (24): routine, correctly-scoped ARIA sessions ----
+for (let i = 0; i < 24; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const repo = pick(BENIGN_REPOS);
+  NOISE_EVENTS.push(evt(ts, 'AI', 'REQUEST', `ARIA handled a ${repo.toLowerCase()}-scoped summary request (1 document, ${repo} only).`, { agent: 'ARIA Enterprise Assistant', user: pick(USERS) }, false, null, date));
+}
+
+// ---- TOOL (60): single-repo, in-scope tool calls pairing with the AI noise above ----
+for (let i = 0; i < 60; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const repo = pick(BENIGN_REPOS);
+  const tool = pick(['knowledge.search', 'document.read']);
+  const arg = tool === 'knowledge.search' ? `"${pick(['vendor terms', 'contract renewal', 'onboarding checklist', 'travel policy', 'style guide'])}"` : '()';
+  NOISE_EVENTS.push(evt(ts, 'TOOL', 'AI_TOOL_CALL', `${tool}(${tool === 'knowledge.search' ? arg : ''}) — 1 repository touched.`, { agent: 'ARIA Enterprise Assistant', tool, action: tool.split('.')[1], repository: repo }, false, null, date));
+}
+
+// ---- DATA (24): single-repo access, matching request scope ----
+for (let i = 0; i < 24; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const repo = pick(BENIGN_REPOS);
+  NOISE_EVENTS.push(evt(ts, 'DATA', 'REPO_ACCESS', `${repo} repository accessed by ARIA — matches request scope.`, { agent: 'ARIA Enterprise Assistant', repository: repo }, false, null, date));
+}
+
+// ---- IDENTITY (32): routine auth/badge noise, plus decoy permission-snapshot pairs ----
+for (let i = 0; i < 20; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const user = pick(USERS);
+  const kind = pick(['AUTH_SUCCESS', 'AUTH_SUCCESS', 'AUTH_SUCCESS', 'BADGE_ACCESS']);
+  const detail = kind === 'BADGE_ACCESS'
+    ? `${user} badge access, Building ${pick(['1', '2', '3'])} lobby.`
+    : `${user} logged in via SSO.`;
+  NOISE_EVENTS.push(evt(ts, 'IDENTITY', kind, detail, { user }, false, null, date));
+}
+for (let i = 0; i < 6; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const user = pick(USERS);
+  NOISE_EVENTS.push(evt(ts, 'IDENTITY', 'AUTH_FAILURE', `${user} failed SSO login (bad password) — succeeded on retry.`, { user }, false, null, date));
+}
+// Decoy pairs: same shape as the real EVID-004 evidence (baseline grant +
+// unchanged re-check), for other service accounts. Pure red herring —
+// nothing escalated for these identities either, but a student skimming
+// for "permissions unchanged" pattern-matches will find several.
+const DECOY_SVC_ACCOUNTS = [
+  { user: 'svc-backup-agent', perms: 'Backup.Read, Storage.Read', granted: '2026-06-15' },
+  { user: 'svc-reporting-bot', perms: 'Analytics.Read, Directory.Read', granted: '2026-05-30' },
+  { user: 'svc-crm-sync', perms: 'CRM.Read, CRM.Write, Directory.Read', granted: '2026-07-11' },
+];
+DECOY_SVC_ACCOUNTS.forEach(({ user, perms, granted }) => {
+  const baseline = randDateTimeAvoidingIncidentWindow();
+  NOISE_EVENTS.push(evt(baseline.ts, 'IDENTITY', 'PERMISSION_SNAPSHOT', `${user} assigned permissions: ${perms} (granted ${granted}, unchanged).`, { user }, false, null, baseline.date));
+  const recheck = randDateTimeAvoidingIncidentWindow();
+  NOISE_EVENTS.push(evt(recheck.ts, 'IDENTITY', 'PERMISSION_SNAPSHOT', `${user} permissions re-checked — identical to prior snapshot, no grant events in between.`, { user }, false, null, recheck.date));
+});
+
+// ---- NETWORK (24): routine VPN/API/DNS ----
+for (let i = 0; i < 24; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const kind = pick(['VPN_CONNECT', 'API_CALL', 'DNS_QUERY']);
+  const detail = kind === 'VPN_CONNECT'
+    ? 'VPN session established from known corporate egress range.'
+    : kind === 'API_CALL'
+      ? `Routine internal API call, ${pick(INTERNAL_DESTS).split('.')[0]}.`
+      : `Routine DNS lookup for ${pick(INTERNAL_DESTS)}.`;
+  const extra = kind === 'API_CALL' ? { destination: pick(INTERNAL_DESTS) } : { user: pick(USERS) };
+  NOISE_EVENTS.push(evt(ts, 'NETWORK', kind, detail, extra, false, null, date));
+}
+
+// ---- ENDPOINT (32): routine login/AV/patch noise ----
+for (let i = 0; i < 32; i += 1) {
+  const { date, ts } = randDateTimeAvoidingIncidentWindow();
+  const kind = pick(['LOGIN', 'AV_SCAN', 'AV_UPDATE', 'PATCH_INSTALLED', 'SCREEN_LOCK']);
+  const wks = pick(WKS);
+  const detail = {
+    LOGIN: `Standard workstation login, ${wks}.`,
+    AV_SCAN: `Scheduled AV scan completed, no findings, ${wks}.`,
+    AV_UPDATE: `Endpoint AV signature update completed on ${wks}.`,
+    PATCH_INSTALLED: `Monthly patch cycle completed on ${wks}.`,
+    SCREEN_LOCK: `Workstation locked after idle timeout, ${wks}.`,
+  }[kind];
+  const extra = kind === 'LOGIN' || kind === 'SCREEN_LOCK' ? { user: pick(USERS) } : {};
+  NOISE_EVENTS.push(evt(ts, 'ENDPOINT', kind, detail, extra, false, null, date));
+}
+
+export const EVENTS = [...REAL_EVENTS, ...NOISE_EVENTS];
+
+// ---------------------------------------------------------------------
 // Evidence catalog — the curated cards students collect and file onto
 // the kill-chain rail. Distinct from raw EVENTS: this is the graded
 // evidence-to-stage mapping exercise (spec §15).
 // ---------------------------------------------------------------------
 export const EVIDENCE_CATALOG = [
-  { id: 'EVID-001', label: 'External email preceded the anomaly.', detail: 'MSG-0417 from vendor-example.test arrived at 09:14:02, ~3 minutes before ARIA’s anomalous activity began.', stage: 'initial-access', sourceEventIds: ['EVT-018'] },
-  { id: 'EVID-002', label: 'ARIA ingested attacker-controlled email content.', detail: 'The AI-extracted content view shows ARIA pulled MSG-0417’s full body, including the attachment text, into its working context.', stage: 'initial-access', sourceEventIds: ['EVT-021', 'EVT-022'] },
-  { id: 'EVID-003', label: 'Indirect instructions discovered in the vendor email.', detail: 'A directive addressed to "the assistant" is embedded in the attachment text ARIA was asked to summarize — not typed by a Northstar user.', stage: 'initial-access', sourceEventIds: ['EVT-022'] },
-  { id: 'EVID-004', label: 'svc-aria-prod’s permissions were unchanged across the incident.', detail: 'Finance.Read and ExecutiveDocs.Read were already assigned weeks before the email arrived; no role-assignment event occurred in the incident window.', stage: 'privilege-escalation', sourceEventIds: ['EVT-011', 'EVT-047'] },
-  { id: 'EVID-005', label: 'Off-topic searches followed a procurement-only prompt.', detail: 'knowledge.search() calls for "finance", "executive", "payroll", and "confidential" fired in the same request that started from a procurement summary request.', stage: 'reconnaissance', sourceEventIds: ['EVT-025', 'EVT-027', 'EVT-028'] },
-  { id: 'EVID-006', label: 'Directory lookup returned leadership data ARIA had never queried before.', detail: 'directory.lookup("leadership") is a first-seen query for this identity.', stage: 'reconnaissance', sourceEventIds: ['EVT-029'] },
+  { id: 'EVID-001', label: 'External email preceded the anomaly.', detail: 'MSG-0417 from vendor-example.test arrived at 09:14:02, ~3 minutes before ARIA’s anomalous activity began.', stage: 'initial-access', sourceEventIds: ['EVT-017'] },
+  { id: 'EVID-002', label: 'ARIA ingested attacker-controlled email content.', detail: 'The AI-extracted content view shows ARIA pulled MSG-0417’s full body, including the attachment text, into its working context.', stage: 'initial-access', sourceEventIds: ['EVT-022', 'EVT-023'] },
+  { id: 'EVID-003', label: 'Indirect instructions discovered in the vendor email.', detail: 'A directive addressed to "the assistant" is embedded in the attachment text ARIA was asked to summarize — not typed by a Northstar user.', stage: 'initial-access', sourceEventIds: ['EVT-023'] },
+  { id: 'EVID-004', label: 'svc-aria-prod’s permissions were unchanged across the incident.', detail: 'Finance.Read and ExecutiveDocs.Read were already assigned weeks before the email arrived; no role-assignment event occurred in the incident window.', stage: 'privilege-escalation', sourceEventIds: ['EVT-011', 'EVT-057'] },
+  { id: 'EVID-005', label: 'Off-topic searches followed a procurement-only prompt.', detail: 'knowledge.search() calls for "finance", "executive", "payroll", and "confidential" fired in the same request that started from a procurement summary request.', stage: 'reconnaissance', sourceEventIds: ['EVT-026', 'EVT-028', 'EVT-029', 'EVT-033'] },
+  { id: 'EVID-006', label: 'Directory lookup returned leadership data ARIA had never queried before.', detail: 'directory.lookup("leadership") is a first-seen query for this identity.', stage: 'reconnaissance', sourceEventIds: ['EVT-031'] },
   { id: 'EVID-007', label: 'A condensed copy of the directive was written back into Procurement notes.', detail: 'knowledge.write() created Procurement/Notes/vendor-summary.txt — a location ARIA’s own future retrievals could re-read.', stage: 'persistence', sourceEventIds: ['EVT-046'] },
-  { id: 'EVID-008', label: '147 retrievals inside a single request, not a one-shot read.', detail: 'The agent repeatedly re-consulted the same working set across the request rather than reading once — consistent with content-driven redirection rather than a single injected command.', stage: 'command-and-control', sourceEventIds: ['EVT-034'] },
-  { id: 'EVID-009', label: 'Access crossed four separate data boundaries in one session.', detail: 'Procurement → Finance → Executive Documents → HR Directory, each a boundary Northstar treats as separately authorized.', stage: 'lateral-movement', sourceEventIds: ['EVT-030', 'EVT-031', 'EVT-032', 'EVT-033'] },
-  { id: 'EVID-010', label: 'Finance, Executive, and HR results were aggregated into one draft.', detail: 'context.aggregate() combined the three repositories’ results before mail.compose() ran.', stage: 'actions-on-objective', sourceEventIds: ['EVT-035'] },
-  { id: 'EVID-011', label: 'Outbound message addressed to a domain with no prior correspondence.', detail: 'mail.compose() targeted audit-review@external-example.test — absent from Northstar’s mail history.', stage: 'actions-on-objective', sourceEventIds: ['EVT-036'] },
-  { id: 'EVID-012', label: 'Outbound transmission logged as attempted, not confirmed delivered.', detail: 'The connection to the external mail relay is logged as ATTEMPTED; no delivery-confirmation or read-receipt event exists in the captured window.', stage: 'actions-on-objective', sourceEventIds: ['EVT-037'] },
+  { id: 'EVID-008', label: '147 retrievals inside a single request, not a one-shot read.', detail: 'The agent repeatedly re-consulted the same working set across the request rather than reading once — consistent with content-driven redirection rather than a single injected command.', stage: 'command-and-control', sourceEventIds: ['EVT-038'] },
+  { id: 'EVID-009', label: 'Access crossed four separate data boundaries in one session.', detail: 'Procurement → Finance → Executive Documents → HR Directory, each a boundary Northstar treats as separately authorized.', stage: 'lateral-movement', sourceEventIds: ['EVT-034', 'EVT-035', 'EVT-036', 'EVT-037'] },
+  { id: 'EVID-010', label: 'Finance, Executive, and HR results were aggregated into one draft.', detail: 'context.aggregate() combined the three repositories’ results before mail.compose() ran.', stage: 'actions-on-objective', sourceEventIds: ['EVT-039'] },
+  { id: 'EVID-011', label: 'Outbound message addressed to a domain with no prior correspondence.', detail: 'mail.compose() targeted audit-review@external-example.test — absent from Northstar’s mail history.', stage: 'actions-on-objective', sourceEventIds: ['EVT-040'] },
+  { id: 'EVID-012', label: 'Outbound transmission logged as attempted, not confirmed delivered.', detail: 'The connection to the external mail relay is logged as ATTEMPTED; no delivery-confirmation or read-receipt event exists in the captured window.', stage: 'actions-on-objective', sourceEventIds: ['EVT-041'] },
 ];
+
+// Reverse index: EVT-id -> [EVID-ids] it sources. Lets the Timeline tab
+// recognize when a student adds a log row that is itself the citation
+// backing a catalog card, so "Add Artifact to Incident Report" can also
+// mark that card on the Evidence Board instead of leaving it as an inert
+// citation the grader never looks at.
+export const EVENT_TO_EVIDENCE = EVIDENCE_CATALOG.reduce((map, evidence) => {
+  evidence.sourceEventIds.forEach((evtId) => {
+    if (!map[evtId]) map[evtId] = [];
+    map[evtId].push(evidence.id);
+  });
+  return map;
+}, {});
 
 // ---------------------------------------------------------------------
 // Per-stage judgment questions (spec §7, §9, §11, §12, §13, §14).

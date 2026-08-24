@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EMAIL, STAGE_QUESTIONS } from '../../../content/killChainCase.js';
+import { EMAIL, EMAILS, STAGE_QUESTIONS } from '../../../content/killChainCase.js';
 import { useKillChain } from '../../../state/KillChainContext.jsx';
 
 const VIEWS = [
@@ -69,11 +69,18 @@ function PromptAnalysis() {
   );
 }
 
+const byReceivedAt = (a, b) => (a.receivedAt < b.receivedAt ? -1 : a.receivedAt > b.receivedAt ? 1 : 0);
+const INBOX = [...EMAILS].sort(byReceivedAt);
+
 export default function EmailTab() {
   const { state, dispatch } = useKillChain();
   const [view, setView] = useState('raw');
+  const [selectedId, setSelectedId] = useState(EMAIL.messageId);
   const injectedMarked = Boolean(state.markedEvidence['EVID-003']);
   const claim = state.claims[CLAIM_ID] || null;
+
+  const selected = EMAILS.find((m) => m.messageId === selectedId) || EMAIL;
+  const isFlagged = selected.messageId === EMAIL.messageId;
 
   const markInjection = () => {
     dispatch({ type: 'MARK_EVIDENCE', evidenceId: 'EVID-003' });
@@ -84,11 +91,56 @@ export default function EmailTab() {
     dispatch({ type: 'MARK_EVIDENCE', evidenceId: 'EVID-003' });
   };
 
+  const selectMessage = (messageId) => {
+    setSelectedId(messageId);
+    setView('raw');
+  };
+
   return (
     <div className="kc-tab-pane">
+      <section className="artifact-card">
+        <div className="artifact-label">Inbox &middot; {INBOX.length} messages</div>
+        <div className="kc-table-wrap">
+          <table className="alert-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Subject</th>
+                <th>Source IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {INBOX.map((m) => {
+                const active = m.messageId === selectedId;
+                const flagged = m.messageId === EMAIL.messageId;
+                return (
+                  <tr
+                    key={m.messageId}
+                    className={`alert-row ${active ? 'is-selected' : ''}`}
+                    onClick={() => selectMessage(m.messageId)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td className="ts">{m.receivedAt}</td>
+                    <td className="mono">{m.from}</td>
+                    <td className="mono">{m.to}</td>
+                    <td>
+                      {m.subject}
+                      {flagged && <span className="sev-badge sev-high" style={{ marginLeft: 8 }}>FLAGGED</span>}
+                    </td>
+                    <td className="mono">{m.headers['X-Originating-IP']}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <div className="artifact-grid">
         <section className="artifact-card">
-          <div className="artifact-label">Message Views</div>
+          <div className="artifact-label">Message Views &middot; {selected.messageId}</div>
           <div className="filter-row" style={{ marginBottom: 10 }}>
             {VIEWS.map((item) => (
               <button
@@ -102,29 +154,38 @@ export default function EmailTab() {
           </div>
 
           {view === 'raw' && (
-            <pre className="email-pre">{EMAIL.raw}</pre>
+            <pre className="email-pre">{selected.raw}</pre>
           )}
 
           {view === 'ai' && (
             <>
-              <p className="email-paragraph">{EMAIL.aiExtracted}</p>
-              <div className="action-row">
-                <button className="btn btn-primary" onClick={markInjection}>
-                  MARK AS PROMPT INJECTION
-                </button>
-                <button className="btn" onClick={addEvidenceOnly} disabled={injectedMarked}>
-                  ADD TO EVIDENCE
-                </button>
-                <button className={`btn ${claim === 'benign' ? 'btn-primary' : ''}`}
-                        onClick={() => dispatch({ type: 'SET_CLAIM', claimId: CLAIM_ID, verdict: 'benign' })}>
-                  MARK BENIGN
-                </button>
-                <button className={`btn ${claim === 'sender' ? 'btn-primary' : ''}`}
-                        onClick={() => dispatch({ type: 'SET_CLAIM', claimId: CLAIM_ID, verdict: 'sender' })}>
-                  INVESTIGATE SENDER
-                </button>
-              </div>
-              {injectedMarked && <div className="status-note">Injected passage flagged for follow-up.</div>}
+              {isFlagged ? (
+                <>
+                  <p className="email-paragraph">{selected.aiExtracted}</p>
+                  <div className="action-row">
+                    <button className="btn btn-primary" onClick={markInjection}>
+                      MARK AS PROMPT INJECTION
+                    </button>
+                    <button className="btn" onClick={addEvidenceOnly} disabled={injectedMarked}>
+                      ADD TO EVIDENCE
+                    </button>
+                    <button className={`btn ${claim === 'benign' ? 'btn-primary' : ''}`}
+                            onClick={() => dispatch({ type: 'SET_CLAIM', claimId: CLAIM_ID, verdict: 'benign' })}>
+                      MARK BENIGN
+                    </button>
+                    <button className={`btn ${claim === 'sender' ? 'btn-primary' : ''}`}
+                            onClick={() => dispatch({ type: 'SET_CLAIM', claimId: CLAIM_ID, verdict: 'sender' })}>
+                      INVESTIGATE SENDER
+                    </button>
+                  </div>
+                  {injectedMarked && <div className="status-note">Injected passage flagged for follow-up.</div>}
+                </>
+              ) : (
+                <p className="dim small">
+                  No embedded directive extracted from this message — content stayed within the
+                  sender's stated purpose.
+                </p>
+              )}
             </>
           )}
 
@@ -137,7 +198,7 @@ export default function EmailTab() {
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(EMAIL.headers).map(([key, value]) => (
+                {Object.entries(selected.headers).map(([key, value]) => (
                   <tr key={key} className="alert-row">
                     <td className="mono">{key}</td>
                     <td className="mono">{value}</td>
@@ -149,7 +210,8 @@ export default function EmailTab() {
 
           {view === 'attachments' && (
             <div className="attachment-list">
-              {EMAIL.attachments.map((attachment) => (
+              {selected.attachments.length === 0 && <div className="dim small">No attachments.</div>}
+              {selected.attachments.map((attachment) => (
                 <div key={attachment.name} className="review-line">
                   <span>{attachment.name}</span>
                   <span className="dim small">{attachment.sizeKb} KB</span>
@@ -162,7 +224,7 @@ export default function EmailTab() {
         <section className="artifact-card">
           <div className="artifact-label">Analyst Actions</div>
           <div className="review-line">
-            <span>Message ID</span>
+            <span>Flagged message</span>
             <span className="mono">{EMAIL.messageId}</span>
           </div>
           <div className="review-line">

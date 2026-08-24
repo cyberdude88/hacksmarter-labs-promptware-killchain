@@ -9,6 +9,8 @@ import AiActivityTab from '../components/killchain/tabs/AiActivityTab.jsx';
 import IdentityTab from '../components/killchain/tabs/IdentityTab.jsx';
 import DataAccessTab from '../components/killchain/tabs/DataAccessTab.jsx';
 import NetworkTab from '../components/killchain/tabs/NetworkTab.jsx';
+import EvidenceTab from '../components/killchain/tabs/EvidenceTab.jsx';
+import KillChainTab from '../components/killchain/tabs/KillChainTab.jsx';
 
 // Kill Chain page — Detect & Analyze phase of the incident-response
 // lifecycle. Nearly the entire promptware kill chain lives here: the
@@ -18,7 +20,8 @@ import NetworkTab from '../components/killchain/tabs/NetworkTab.jsx';
 // arXiv:2601.09625), and builds an incident report as they go.
 //
 // Built in phases (see /home/alex/.claude/plans/quizzical-petting-giraffe.md):
-// Phase A shipped the shell; Phase B fills in the evidence-gathering tabs.
+// Phase A shipped the shell; Phase B filled in the evidence-gathering tabs;
+// Phase C adds the evidence board and per-stage notebook.
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
@@ -100,8 +103,8 @@ function Workspace() {
       case 'identity': return <IdentityTab />;
       case 'data-access': return <DataAccessTab />;
       case 'network': return <NetworkTab />;
-      case 'evidence': return <TabStub label="Evidence" />;
-      case 'kill-chain': return <TabStub label="Kill Chain" />;
+      case 'evidence': return <EvidenceTab />;
+      case 'kill-chain': return <KillChainTab />;
       default: return <OverviewTab />;
     }
   };
