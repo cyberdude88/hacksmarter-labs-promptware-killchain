@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useReducer } from 'react';
 import { evaluateRules } from '../lib/ruleEngine.js';
 
 // =====================================================================
-// HackSmarter SOC — global state engine
+// The Promptware Kill Chain — global state engine
 // One reducer drives the entire app. Side effects (timers) live in the
 // provider, which dispatches TICK / STREAM_TICK / REPLAY_TICK actions.
 // =====================================================================
@@ -33,19 +33,23 @@ const initial = {
   attackIndex: 0,
   noiseIndex: 0,
   benignIndex: 0,
+  nextBenignAlertAt: null,
 
-  // Detection engineering.
+  // Authored detection rules (analyst can build ad-hoc Tier-2 rules).
   detectionRules: [],
   detectionDraft: null,
 
   // Investigation page — persists across navigation.
   investigationQuery: '',
 
+  // Top-bar alert search — filters the Alert Queue by IP, rule, or summary.
+  alertSearch: '',
+
   // All pages are accessible from the start. We still track which milestones
   // the analyst has hit (first correct triage, IOC flagged, rule built, replay
   // success) for the end-of-session report — they no longer gate navigation.
   unlocked: { alerts: true, investigation: true, detection: true, replay: true, report: true },
-  milestones: { firstTriage: false, iocFlagged: false, ruleBuilt: false, replayPassed: false },
+  milestones: { correctAssign: false, firstTriage: false, iocFlagged: false, ruleBuilt: false, replayPassed: false },
   currentPage: 'alerts',
   identifiedIocs: [],
 
@@ -70,16 +74,85 @@ const initial = {
 // ---------------------------------------------------------------------
 // helpers
 // ---------------------------------------------------------------------
-const fmtTs = () => new Date().toISOString().substring(11, 19);
+// Timestamps render in the browser's local timezone so the analyst sees
+// times that match their wall clock (not UTC).
+const fmtTs = () =>
+  new Date().toLocaleTimeString('en-GB', { hour12: false });
+const fmtTsBack = (secondsAgo) =>
+  new Date(Date.now() - secondsAgo * 1000).toLocaleTimeString('en-GB', { hour12: false });
 const mkEvtId = () => `EVT-${Date.now().toString(36)}-${Math.floor(Math.random() * 1000)}`;
 const mkAlertId = (i) => `ALRT-${1000 + i}`;
 const cap = (arr, n) => (arr.length > n ? arr.slice(arr.length - n) : arr);
+const randInt = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
 
-// Skip the dead-air buildup before the first interesting event. The scenario's
-// first AUTH_FAIL fires at tOffset 8 and the first alert at tOffset 11, so
-// jumping the clock to 7 means students see the first event within ~1 real
-// second of reset and the first alert within ~2 seconds.
-const SESSION_HEAD_START = 7;
+// Build the initial pre-seeded alert queue from scenario.benignAlertPreSeed.
+// Each entry has an `ageSec` that backdates the alert so the analyst opens
+// the lab to a populated queue (matches a real SOC shift handover).
+function buildPreSeededAlerts(scenario) {
+  const pre = scenario?.benignAlertPreSeed || [];
+  return pre.map((p, i) => {
+    const { ageSec, ...alertFields } = p;
+    return {
+      id: mkAlertId(i),
+      ts: fmtTsBack(ageSec ?? 0),
+      emittedAt: -1 * (ageSec ?? 0),
+      status: 'NEW',
+      ...alertFields,
+    };
+  });
+}
+
+// Same idea for telemetry — the Investigation page opens with hours of
+// baseline logs already present, like a SIEM that's been ingesting all day.
+// Combines hand-authored entries (telemetryPreSeed) with a much larger pool
+// of randomly-generated background events so the analyst has real volume to
+// search through.
+const BULK_PRESEED_COUNT = 500;
+const BULK_PRESEED_MAX_AGE_SEC = 8 * 60 * 60; // 8h back
+const BULK_PRESEED_MIN_AGE_SEC = 70;          // leave a small live-only window
+
+function buildPreSeededTelemetry(scenario) {
+  const pre = scenario?.telemetryPreSeed || [];
+  const pool = scenario?.benignPool || [];
+
+  const authored = pre.map((p) => {
+    const { ageSec, ...fields } = p;
+    return {
+      id: mkEvtId(),
+      ageSec: ageSec ?? 0,
+      ts: fmtTsBack(ageSec ?? 0),
+      tOffset: -1 * (ageSec ?? 0),
+      isAttack: false,
+      ...fields,
+    };
+  });
+
+  const bulk = [];
+  if (pool.length > 0) {
+    for (let i = 0; i < BULK_PRESEED_COUNT; i++) {
+      const ageSec =
+        BULK_PRESEED_MIN_AGE_SEC +
+        Math.floor(Math.random() * (BULK_PRESEED_MAX_AGE_SEC - BULK_PRESEED_MIN_AGE_SEC));
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      bulk.push({
+        id: mkEvtId(),
+        ageSec,
+        ts: fmtTsBack(ageSec),
+        tOffset: -ageSec,
+        isAttack: false,
+        ...pick,
+      });
+    }
+  }
+
+  // Oldest first so the natural scroll order goes past → present.
+  return [...authored, ...bulk].sort((a, b) => b.ageSec - a.ageSec);
+}
+
+// Start the visible timer at 00:00. The immediate STREAM_TICK emits the t+0
+// telemetry event, and the first visible incident alert is scheduled at 00:10.
+const SESSION_HEAD_START = 0;
+const SIMULATION_END_SEC = 60;
 const floorScore = (n) => Math.max(0, n);
 
 // Map a tOffset to its kill-chain phase using the scenario's timeline.
@@ -101,27 +174,53 @@ function findPhase(scenario, tOffset) {
 function reducer(s, a) {
   switch (a.type) {
     case 'INIT':
-      // If we hydrated from storage, keep the prior clock; otherwise start fresh.
-      return s.startedAt
-        ? { ...s, scenario: a.scenario }
-        : { ...s, scenario: a.scenario, startedAt: Date.now(), now: SESSION_HEAD_START };
+      // If we hydrated from storage, keep the prior clock; otherwise start fresh
+      // with a pre-seeded backlog of benign alerts + hours of baseline telemetry.
+      if (s.startedAt) return { ...s, scenario: a.scenario };
+      return {
+        ...s,
+        scenario: a.scenario,
+        startedAt: Date.now(),
+        now: SESSION_HEAD_START,
+        alerts: buildPreSeededAlerts(a.scenario),
+        telemetry: buildPreSeededTelemetry(a.scenario),
+        nextBenignAlertAt: SESSION_HEAD_START + randInt(10, 25),
+      };
 
     case 'RESET':
-      return { ...initial, scenario: s.scenario, startedAt: Date.now(), now: SESSION_HEAD_START };
+      return {
+        ...initial,
+        scenario: s.scenario,
+        startedAt: Date.now(),
+        now: SESSION_HEAD_START,
+        alerts: buildPreSeededAlerts(s.scenario),
+        telemetry: buildPreSeededTelemetry(s.scenario),
+        nextBenignAlertAt: SESSION_HEAD_START + randInt(10, 25),
+      };
 
     // -------- 1Hz clock tick: timer + backlog penalty + risk recalc --------
     case 'TICK': {
       const now = s.now + 1;
-      const untriaged = s.alerts.filter((al) => al.status === 'NEW').length;
-      const assigned = s.alerts.filter((al) => al.status === 'ASSIGNED').length;
-      const resolved = s.alerts.filter((al) => al.status === 'TRIAGED' || al.status === 'ESCALATED').length;
+      // Only real threats (true_positive / escalate) drive the risk meter.
+      // Benign noise alerts are background to the analyst, not organizational
+      // risk — dismissing them shouldn't relieve risk and ignoring them
+      // shouldn't raise it.
+      const realAlerts = s.alerts.filter(
+        (al) => al.expectedVerdict !== 'false_positive'
+      );
+      const untriaged = realAlerts.filter((al) => al.status === 'NEW').length;
+      const assigned = realAlerts.filter((al) => al.status === 'ASSIGNED').length;
+      const resolved = realAlerts.filter(
+        (al) => al.status === 'TRIAGED' || al.status === 'ESCALATED'
+      ).length;
       const backlogPenalty = untriaged > 0 ? -2 : 0;
       const score = floorScore(s.score + backlogPenalty);
       const scoreLog = backlogPenalty
         ? cap([...s.scoreLog, { ts: now, delta: backlogPenalty, reason: `backlog (${untriaged} pending)` }], 60)
         : s.scoreLog;
 
-      const total = s.scenario?.attackChain?.length || 1;
+      const sc = s.scenario;
+      const total = sc?.attackChain?.length || 1;
       const progress = s.attackIndex / total;
       const milestoneRelief =
         (s.milestones.firstTriage ? 10 : 0) +
@@ -129,25 +228,35 @@ function reducer(s, a) {
         (s.milestones.ruleBuilt ? 12 : 0) +
         (s.milestones.replayPassed ? 16 : 0) +
         (s.report?.passed ? 12 : 0);
-      const allAlertsHandled = s.alerts.length > 0 && s.alerts.every(
+      const allAlertsHandled = realAlerts.length > 0 && realAlerts.every(
         (al) => al.status === 'TRIAGED' || al.status === 'ESCALATED'
       );
+      // Time pressure: the longer the attack runs and the longer real alerts
+      // sit untouched, the more risk creeps up. This gives the meter visible
+      // movement between attack events without re-coupling to benign noise.
+      const chainStartT = sc?.attackChain?.[0]?.tOffset || 0;
+      const chainActive = sc && s.attackIndex > 0 && s.attackIndex < (sc.attackChain?.length || 0);
+      const chainElapsed = chainActive ? Math.max(0, s.now - chainStartT) : 0;
+      const chainDrift = Math.min(18, chainElapsed * 0.35);
+      const backlogPressure = Math.min(15, (untriaged + assigned) * (chainElapsed * 0.15));
       const riskLevel = Math.max(
         0,
         Math.min(100, Math.round(
-          progress * 42 +
-          untriaged * 5 +
-          assigned * 2 -
+          progress * 50 +
+          untriaged * 8 +
+          assigned * 3 -
           resolved * 4 -
           s.correctTriages * 3 -
           milestoneRelief -
-          (allAlertsHandled ? 18 : 0)
+          (allAlertsHandled ? 18 : 0) +
+          chainDrift +
+          backlogPressure
         ))
       );
       return { ...s, now, score, scoreLog, riskLevel };
     }
 
-    // -------- Telemetry stream tick (every ~1.5s) --------
+    // -------- Telemetry stream tick (every 2s, real-time) --------
     // Decides whether to emit the next attack-chain step, the next noise alert,
     // or a benign filler event drawn from benignPool.
     case 'STREAM_TICK': {
@@ -199,14 +308,55 @@ function reducer(s, a) {
         return { ...s, alerts: [...s.alerts, alertObj], noiseIndex: s.noiseIndex + 1 };
       }
 
-      // Otherwise emit a benign filler.
+      // Random benign alerts stay inside the first minute so all simulated
+      // activity satisfies the QA timing requirement.
+      const alertPool = sc.benignAlertPool || [];
+      if (
+        alertPool.length > 0 &&
+        s.nextBenignAlertAt != null &&
+        s.now <= SIMULATION_END_SEC &&
+        s.now >= s.nextBenignAlertAt
+      ) {
+        const pick = alertPool[Math.floor(Math.random() * alertPool.length)];
+        const nextBenignAlertAt = s.now + randInt(10, 25);
+        const alertObj = {
+          id: mkAlertId(s.alerts.length),
+          ts,
+          emittedAt: s.now,
+          status: 'NEW',
+          ...pick,
+        };
+        return {
+          ...s,
+          alerts: [...s.alerts, alertObj],
+          nextBenignAlertAt: nextBenignAlertAt <= SIMULATION_END_SEC ? nextBenignAlertAt : null,
+        };
+      }
+
+      // Benign telemetry is emitted on its own timer and also stops after
+      // the first minute.
+      return s;
+    }
+
+    // -------- Ambient benign telemetry (every 1s, real-time) --------
+    // Real SOCs never go quiet — keep the evidence log alive with low-signal
+    // noise even after the attack chain is done.
+    case 'BENIGN_TICK': {
+      const sc = s.scenario;
+      if (!sc) return s;
+      if (s.now > SIMULATION_END_SEC) return s;
       const pool = sc.benignPool || [];
       if (pool.length === 0) return s;
-      const benign = pool[s.benignIndex % pool.length];
-      const evt = { id: mkEvtId(), ts, isAttack: false, ...benign };
+      const benign = pool[Math.floor(Math.random() * pool.length)];
+      const evt = { id: mkEvtId(), ts: fmtTs(), isAttack: false, ...benign };
+      // Cap telemetry array to keep DOM/perf reasonable over long sessions.
+      // Pre-seed adds ~550 entries up front; cap well above that.
+      const telemetry = s.telemetry.length > 2000
+        ? [...s.telemetry.slice(-1999), evt]
+        : [...s.telemetry, evt];
       return {
         ...s,
-        telemetry: [...s.telemetry, evt],
+        telemetry,
         benignIndex: s.benignIndex + 1,
       };
     }
@@ -215,11 +365,16 @@ function reducer(s, a) {
       return { ...s, selectedAlertId: a.id };
 
     // -------- Self-assign an alert (claim ownership of the ticket) --------
+    // Lights the Alerts milestone dot the first time the analyst assigns
+    // themselves a genuine threat alert (not a benign/false-positive one) —
+    // rewards prioritizing the real signal over the noise.
     case 'ASSIGN': {
       const al = s.alerts.find((x) => x.id === a.id);
       if (!al || al.status !== 'NEW') return s;
       const alerts = s.alerts.map((x) => (x.id === a.id ? { ...x, status: 'ASSIGNED', assignedTo: 'me' } : x));
-      return { ...s, alerts };
+      const correct = al.expectedVerdict && al.expectedVerdict !== 'false_positive';
+      const milestones = correct ? { ...s.milestones, correctAssign: true } : s.milestones;
+      return { ...s, alerts, milestones };
     }
 
     // -------- Triage --------
@@ -279,6 +434,8 @@ function reducer(s, a) {
       return { ...s, detectionDraft: a.draft };
     case 'SAVE_INVESTIGATION_QUERY':
       return { ...s, investigationQuery: a.query };
+    case 'SET_ALERT_SEARCH':
+      return { ...s, alertSearch: a.query };
     case 'ACK_CERTIFICATE':
       return { ...s, certificatePending: false };
     case 'REMOVE_RULE':
@@ -376,12 +533,47 @@ function reducer(s, a) {
         .filter((v) => v && known.includes(v));
       const addnlBonus = Math.min(5, addnlValid.length);
 
+      const realAlerts = s.alerts.filter((al) => al.expectedVerdict !== 'false_positive');
+      const timelineComplete = s.attackIndex >= (s.scenario?.attackChain?.length || 0);
+      const realAlertsHandled = realAlerts.length > 0 && realAlerts.every(
+        (al) => al.status === 'TRIAGED' || al.status === 'ESCALATED'
+      );
+      const workflowGrading = [
+        {
+          id: 'workflow_detection',
+          label: 'Detection Builder: rule created',
+          complete: s.detectionRules.length > 0,
+          points: s.detectionRules.length > 0 ? 10 : 0,
+          max: 10,
+          hint: 'Create at least one detection rule that can catch part of the attack chain.',
+        },
+        {
+          id: 'workflow_replay',
+          label: 'Replay Attack: detection validated',
+          complete: s.replayCompleted && s.replayDetections.length > 0,
+          points: s.replayCompleted && s.replayDetections.length > 0 ? 10 : 0,
+          max: 10,
+          hint: 'Run Replay Attack and confirm at least one detection fires.',
+        },
+        {
+          id: 'workflow_triage',
+          label: 'Alerts: full incident triaged',
+          complete: timelineComplete && realAlertsHandled,
+          points: timelineComplete && realAlertsHandled ? 10 : 0,
+          max: 10,
+          hint: 'Let the full one-minute incident play out, then triage or escalate every confirmed-threat alert.',
+        },
+      ];
+      const workflowTotal = workflowGrading.reduce((sum, g) => sum + g.points, 0);
+      const workflowMax = workflowGrading.reduce((sum, g) => sum + g.max, 0);
+
       const total =
-        grading.reduce((sum, g) => sum + g.points, 0) + narrBonus + addnlBonus;
+        grading.reduce((sum, g) => sum + g.points, 0) + narrBonus + addnlBonus + workflowTotal;
       const maxPts =
         cfg.questions.reduce((sum, q) => sum + q.points, 0) +
         (cfg.narrative?.max_bonus ?? 0) +
-        5;
+        5 +
+        workflowMax;
       const pct = Math.round((total / maxPts) * 100);
       const passed = pct >= (cfg.pass_threshold_pct ?? 80);
 
@@ -394,6 +586,9 @@ function reducer(s, a) {
           narrativeMatched: matched,
           narrativeBonus: narrBonus,
           additionalBonus: addnlBonus,
+          workflowGrading,
+          workflowTotal,
+          workflowMax,
           total,
           max: maxPts,
           pct,
@@ -419,7 +614,7 @@ function reducer(s, a) {
 // We intentionally do not persist the scenario object; it's loaded fresh
 // each time so authors can iterate on JSON without stale caches.
 // ---------------------------------------------------------------------
-const STORAGE_KEY = 'hsoc:state:v1';
+const STORAGE_KEY = 'hsoc:state:v4';
 
 function loadInitial() {
   try {
@@ -441,7 +636,7 @@ export function SocProvider({ children }) {
   // Load scenario once on mount.
   useEffect(() => {
     const base = import.meta.env.BASE_URL;
-    fetch(`${base}scenarios/fortigate_ai_attack.json`)
+    fetch(`${base}scenarios/promptware_kill_chain.json`)
       .then((r) => r.json())
       .then((scenario) => dispatch({ type: 'INIT', scenario }));
   }, []);
@@ -463,21 +658,43 @@ export function SocProvider({ children }) {
     dispatch({ type: 'RESET' });
   };
 
-  // Game runs at 2x real-time so students don't sit waiting between
-  // attack-chain phases. The relative pacing (and analyst pressure) is
-  // preserved — just compressed.
-  // Clock advances every 500ms (game-second), stream emits every 750ms.
+  // Pacing: game time advances at real-time speed. Attack-chain events are
+  // checked every 1s so adjacent offsets still fire within the first minute.
   useEffect(() => {
     if (!state.startedAt) return;
-    const id = setInterval(() => dispatch({ type: 'TICK' }), 500);
+    const id = setInterval(() => dispatch({ type: 'TICK' }), 1000);
     return () => clearInterval(id);
   }, [state.startedAt]);
 
   useEffect(() => {
     if (!state.scenario) return;
-    const id = setInterval(() => dispatch({ type: 'STREAM_TICK' }), 750);
+    // Fire one STREAM_TICK immediately so the first attack-chain event
+    // lands on page load — no waiting for the first interval.
+    dispatch({ type: 'STREAM_TICK' });
+    const id = setInterval(() => dispatch({ type: 'STREAM_TICK' }), 1000);
     return () => clearInterval(id);
-  }, [state.scenario]);
+  }, [state.scenario, state.startedAt]);
+
+  // Ambient benign telemetry — varied 5-10s spacing, capped at the first
+  // minute with the rest of the simulation.
+  useEffect(() => {
+    if (!state.scenario || !state.startedAt) return;
+    let timeoutId;
+    function schedule() {
+      const elapsedMs = Date.now() - state.startedAt;
+      const remainingMs = SIMULATION_END_SEC * 1000 - elapsedMs;
+      if (remainingMs <= 0) return;
+      const delay = Math.min(5000 + Math.floor(Math.random() * 5000), remainingMs); // 5-10s
+      timeoutId = setTimeout(() => {
+        if (Date.now() - state.startedAt <= SIMULATION_END_SEC * 1000) {
+          dispatch({ type: 'BENIGN_TICK' });
+        }
+        schedule();
+      }, delay);
+    }
+    schedule();
+    return () => clearTimeout(timeoutId);
+  }, [state.scenario, state.startedAt]);
 
   // Replay tick — 1Hz while a replay is active.
   useEffect(() => {

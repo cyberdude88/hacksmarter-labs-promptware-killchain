@@ -1,19 +1,33 @@
-# HackSmarter SOC
+# The Promptware Kill Chain
 
-A lightweight, frontend-only SOC training environment. Investigate live-style alerts, pivot through telemetry, build detection rules, replay attacks, and submit incident reports — all from static JSON.
+A lightweight, frontend-only SOC training environment, being converted from a
+generic SOC simulator into a range built around **promptware** — the seven-stage
+kill chain (Initial Access → Privilege Escalation → Reconnaissance →
+Persistence → Command & Control → Lateral Movement → Actions on Objective)
+described in Brodt, Feldman, Schneier & Nassi, *"The Promptware Kill Chain"*
+(arXiv:2601.09625, 2026).
 
 Built with **React + Vite**. Deployable to **GitHub Pages** with no backend.
 
-## What it simulates
+## Nav / incident-response lifecycle mapping
 
-The first scenario, **AI-Accelerated Edge Compromise**, models an exposed FortiGate appliance hit by an AI-augmented brute-force tool that:
+| Nav item      | IR lifecycle phase          | Status |
+| ------------- | ---------------------------- | ------ |
+| Alerts        | Detection (trigger)          | live, on placeholder data |
+| Kill Chain    | Detect & Analyze — dropdown over the 7 promptware stages | shell only, no tasks yet |
+| Containment   | Containment & Eradication     | placeholder |
+| Recovery      | Recovery                      | placeholder |
+| Incident Report | Post-Incident Activity      | live, on placeholder data |
 
-1. Probes admin login from a known TOR exit (`185.220.101.42`).
-2. Successfully authenticates as `admin`.
-3. Exports the device configuration.
-4. Mixes in benign workstation noise as distractor.
+## What it currently simulates (placeholder — being replaced)
 
-You triage alerts, write detection rules, replay the attack, and submit a report. Score updates in real time.
+The alert/telemetry data still driving Alerts and Incident Report is the
+original **AI-Accelerated Edge Compromise** scenario: an exposed FortiGate
+appliance hit by an AI-augmented brute-force tool that probes admin login
+from a known TOR exit, authenticates as `admin`, exports the device config,
+and mixes in benign workstation noise as a distractor. This has nothing to
+do with promptware — it's placeholder content until a real prompt-injection
+/ AI-agent-compromise narrative is authored for the new stages above.
 
 ## Layout
 
@@ -46,6 +60,16 @@ Open the URL Vite prints (usually `http://localhost:5173`).
 npm run build      # outputs dist/
 npm run preview    # serves dist/ locally
 ```
+
+## OVA Appliance
+
+The supported appliance path is `appliance/debian/`.
+
+```bash
+appliance/debian/build-ova.sh
+```
+
+That flow builds `dist/`, installs it into a minimal Debian VM with native `nginx`, hardens the guest, and exports `appliance/debian/output/hacksmarter-soc.ova`.
 
 ## Deploy to GitHub Pages
 
@@ -97,7 +121,7 @@ hacksmarterSOC/
 │  │  ├─ logs.json
 │  │  └─ iocs.json
 │  └─ scenarios/
-│     └─ fortigate_ai_attack.json
+│     └─ promptware_kill_chain.json
 ├─ src/
 │  ├─ App.jsx              # composes the SOC layout
 │  ├─ main.jsx

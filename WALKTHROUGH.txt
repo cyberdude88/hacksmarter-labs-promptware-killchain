@@ -1,0 +1,96 @@
+HackSmarter SOC — SOC Analyst Lab Walkthrough
+Scenario: AI-Accelerated Edge Compromise (fortigate_ai_attack)
+Pass threshold: 80%
+================================================================
+
+OVERVIEW
+--------
+You are a SOC analyst for the Hacksmarter SOC. An exposed FortiGate
+appliance is hit by an AI-augmented brute-force tool. It eventually
+lands valid admin creds from a TOR exit IP, reads the config API,
+exfiltrates the full configuration, and creates a persistent admin
+account ("svc_backup").
+
+Your job: triage the alerts as they fire, pivot through the
+evidence log to confirm the details, escalate the confirmed
+malicious activity, and complete the incident report.
+
+
+STEP 1 — TRIAGE THE ALERTS (Alerts page)
+----------------------------------------
+Navigate to http://<TargetIP>/ to enter the Hacksmarter SOC
+
+Seven alerts will fire. Verdict each as follows:
+
+  Repeated failed admin logins (low) ............. true_positive
+  Suricata possible credential brute force (med) . true_positive
+  Successful admin login from TOR exit (high) .... escalate
+  FortiGate config export by admin (critical) .... escalate
+  Persistence: new admin account (critical) ...... escalate
+  Outbound DNS to 1.1.1.1 (info) ................. false_positive
+  Scheduled task created — MDM (low) ............. false_positive
+
+Rule of thumb: anything sourced from 185.220.101.42 is malicious.
+The two 10.20.5.x workstation alerts are benign noise.
+
+
+STEP 2 — INVESTIGATION PAGE
+---------------------------
+Use the event filters to confirm the report answers:
+
+  Filter AUTH_SUCCESS
+    -> host = fgt-edge-01
+    -> user = admin
+
+  Filter API_ENUM
+    -> first /api/v2/cmdb/... path is /api/v2/cmdb/system/admin
+
+  Filter ADMIN_USER_CREATE
+    -> new account = svc_backup
+
+
+STEP 3 — REPORT ANSWERS
+-----------------------
+  Attacker source IP ........... 185.220.101.42
+  Compromised host ............. fgt-edge-01
+  Compromised user ............. admin
+  API path used ................ /api/v2/cmdb/system/admin
+  Persistence account .......... svc_backup
+  Attack classification ........ edge_device_compromise
+  Final severity ............... critical
+  Final verdict ................ confirmed_incident
+
+
+STEP 4 — NARRATIVE (BONUS +5)
+-----------------------------
+Hit these keywords: brute force, TOR, exit, config, exfiltration,
+admin, persistence, svc_backup, 185.220.101.42, fortigate.
+
+Example narrative:
+
+  Brute-force from TOR exit 185.220.101.42 succeeded against the
+  admin account on fgt-edge-01. The attacker enumerated the
+  FortiGate config API, exfiltrated the full configuration, and
+  established persistence by creating admin account svc_backup.
+  Containment: revoke admin credentials, delete svc_backup, block
+  185.220.101.42 at the perimeter, rotate the leaked configuration,
+  and restrict the management plane to an allow-list.
+
+
+KILL CHAIN (for reference)
+--------------------------
+The attack unfolds in this order during the lab. Exact timings depend on
+your session — use the Attack Timeline panel on the Investigation page to
+see what phase you're in.
+
+  Recon          AUTH_FAIL bursts from 185.220.101.42 against fgt-edge-01;
+                 Suricata fires "Possible credential brute force"
+  Initial Access AUTH_SUCCESS for 'admin' from the same TOR-exit IP;
+                 "Successful admin login from foreign ASN" (HIGH)
+  Discovery     API_ENUM hits — /api/v2/cmdb/system/admin first, then
+                 /interface, /firewall/address, /monitor/system/status
+  Exfiltration  CONFIG_EXPORT — full configuration backup downloaded
+                 (FW_LARGE_TRANSFER confirms egress)
+  Persistence   ADMIN_USER_CREATE — new admin account 'svc_backup' added
+  
+  The flag at the successful completion of the lab is HSM{08c9232e8135}

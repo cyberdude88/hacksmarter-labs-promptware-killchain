@@ -1,4 +1,5 @@
 import { SocProvider, useSoc } from './state/SocContext.jsx';
+import { KillChainProvider } from './state/KillChainContext.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import TopBar from './components/TopBar.jsx';
 import AlertsPage from './pages/AlertsPage.jsx';
@@ -11,7 +12,9 @@ import ReportPage from './pages/ReportPage.jsx';
 export default function App() {
   return (
     <SocProvider>
-      <Shell />
+      <KillChainProvider>
+        <Shell />
+      </KillChainProvider>
     </SocProvider>
   );
 }
@@ -30,7 +33,6 @@ function Shell() {
   );
 }
 
-// Page router — keyed off state.currentPage.
 function Workspace() {
   const { state } = useSoc();
   switch (state.currentPage) {

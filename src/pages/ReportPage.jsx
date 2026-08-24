@@ -198,17 +198,65 @@ function Question({ q, value, onChange }) {
   );
 }
 
+function buildReviewNotes(state) {
+  const notes = [];
+  const realAlerts = state.alerts.filter((al) => al.expectedVerdict !== 'false_positive');
+  const untriagedReal = realAlerts.filter(
+    (al) => al.status === 'NEW' || al.status === 'ASSIGNED'
+  );
+  const timelineIncomplete =
+    state.scenario?.attackChain &&
+    state.attackIndex < state.scenario.attackChain.length;
+
+  if (state.detectionRules.length === 0) {
+    notes.push('Detection Rules have not been applied to mitigate this attack in the future.');
+  }
+  if (timelineIncomplete) {
+    notes.push('The attack timeline has not finished. Wait for the full incident sequence, then handle the final alerts.');
+  }
+  if (untriagedReal.length > 0) {
+    notes.push(`${untriagedReal.length} confirmed-threat alert${untriagedReal.length === 1 ? '' : 's'} remain untriaged or only assigned.`);
+  }
+  if (!state.replayCompleted || state.replayDetections.length === 0) {
+    notes.push('Replay has not been run to validate that your detection rules catch the attack chain.');
+  }
+
+  return notes;
+}
+
+function getCompletionFlag(passed) {
+  if (!passed) return '';
+  const shifted = [73, 84, 78, 124, 49, 57, 100, 58, 51, 52, 51, 102, 57, 50, 52, 54, 126];
+  return shifted.map((n) => String.fromCharCode(n - 1)).join('');
+}
+
 function Graded({ onEdit }) {
   const { state, dispatch } = useSoc();
   const r = state.report;
-  const [showCertificate, setShowCertificate] = useState(
-    r.passed && state.certificatePending
+  const reviewNotes = buildReviewNotes(state);
+  const labComplete = r.passed && reviewNotes.length === 0;
+  const flag = getCompletionFlag(labComplete);
+  const [showCompletion, setShowCompletion] = useState(
+    labComplete && state.certificatePending
   );
+  const [showIncomplete, setShowIncomplete] = useState(!labComplete);
+  const [flagCopied, setFlagCopied] = useState(false);
   useEffect(() => {
-    if (showCertificate && state.certificatePending) {
+    if (showCompletion && labComplete && state.certificatePending) {
       dispatch({ type: 'ACK_CERTIFICATE' });
     }
-  }, [showCertificate, state.certificatePending, dispatch]);
+  }, [showCompletion, labComplete, state.certificatePending, dispatch]);
+  const copyFlag = async () => {
+    if (!flag) return;
+    try {
+      await navigator.clipboard.writeText(flag);
+      setFlagCopied(true);
+      window.setTimeout(() => setFlagCopied(false), 1600);
+    } catch {
+      // Clipboard API can be blocked (insecure context / sandboxed iframe);
+      // the flag is still visible on-screen for manual copy.
+    }
+  };
   return (
     <div className="page page-report">
       <div className="page-head">
@@ -225,10 +273,23 @@ function Graded({ onEdit }) {
           <div className="grade-headline">
             {r.passed ? 'LAB PASSED' : 'LAB NOT PASSED'} — {r.total} / {r.max} ({r.pct}%)
           </div>
-          <div className="dim small">pass threshold: {r.threshold}%</div>
+          <div className="dim small">
+            pass threshold: {r.threshold}%
+            {r.passed && !labComplete && <> · workflow incomplete — complete the Tier-2 Review Notes to unlock the flag</>}
+          </div>
         </div>
-        {r.passed && <button className="btn" onClick={() => setShowCertificate(true)}>View Certificate</button>}
+        {labComplete && <button className="btn" onClick={() => setShowCompletion(true)}>View Result</button>}
+        {!labComplete && <button className="btn" onClick={() => setShowIncomplete(true)}>Review Requirements</button>}
       </div>
+
+      {reviewNotes.length > 0 && (
+        <section className="tier2-notes">
+          <div className="panel-title">Tier-2 Review Notes</div>
+          <ul>
+            {reviewNotes.map((note) => <li key={note}>{note}</li>)}
+          </ul>
+        </section>
+      )}
 
       <section className="card">
         <div className="panel-title">Question Breakdown</div>
@@ -268,30 +329,103 @@ function Graded({ onEdit }) {
             </span>
             <span className="grade-pts">+{r.additionalBonus}</span>
           </li>
+
+          {(r.workflowGrading || []).map((g) => (
+            <li key={g.id} className={g.complete ? 'ok' : 'bad'}>
+              <span className="grade-mark">{g.complete ? '✓' : '✗'}</span>
+              <span className="grade-q">
+                <div className="grade-q-label">{g.label}</div>
+                <div className="dim small">
+                  {g.complete ? 'completed' : <><b>Hint:</b> <span className="grade-hint">{g.hint}</span></>}
+                </div>
+              </span>
+              <span className="grade-pts">+{g.points}/{g.max}</span>
+            </li>
+          ))}
         </ul>
       </section>
 
-      {r.passed && showCertificate && (
-        <div className="cert-modal-backdrop" onClick={() => setShowCertificate(false)}>
-          <div className="cert-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="cert-modal-head">
-              <div className="panel-title">Certificate Preview</div>
-              <button className="btn-link" onClick={() => setShowCertificate(false)}>close</button>
+      {!labComplete && showIncomplete && (
+        <div className="completion-backdrop" onClick={() => setShowIncomplete(false)}>
+          <div className="completion-modal card" onClick={(e) => e.stopPropagation()}>
+            <div className="completion-head">
+              <div className="panel-title">Lab Not Completed</div>
+              <button className="btn-link" onClick={() => setShowIncomplete(false)}>close</button>
+            </div>
+            <div className="completion-body">
+              <div className="completion-icon incomplete">!</div>
+              <div className="completion-headline">Flag Locked</div>
+              <div className="completion-sub dim">Complete the analysis workflow before final credit.</div>
+              <div className="incomplete-copy">
+                Completing the steps is part of the score: build a detection rule, run Replay Attack,
+                and triage the confirmed incident alerts. Investigation supports your report answers and
+                optional IOC bonus points. Then resubmit the report to unlock the completion flag.
+              </div>
+              {reviewNotes.length > 0 && (
+                <ul className="incomplete-notes">
+                  {reviewNotes.map((note) => <li key={note}>{note}</li>)}
+                </ul>
+              )}
+            </div>
+            <div className="completion-foot">
+              <button className="btn btn-primary" onClick={() => setShowIncomplete(false)}>Continue</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {labComplete && showCompletion && (
+        <div className="completion-backdrop" onClick={() => setShowCompletion(false)}>
+          <div className="completion-modal card" onClick={(e) => e.stopPropagation()}>
+            <div className="completion-head">
+              <div className="panel-title">Lab Completion</div>
+              <button className="btn-link" onClick={() => setShowCompletion(false)}>close</button>
             </div>
 
-            <section className="certificate pdf-look">
-              <div className="certificate-kicker">Certificate of Completion</div>
-              <div className="certificate-title">Hack Smarter Detection Engineer Lab Certificate</div>
-              <div className="certificate-body">
-                This certifies that <span className="certificate-fill">[PLACEHOLDER]</span> successfully completed the lab requirements.
+            <div className="completion-body">
+              <div className="completion-icon">✓</div>
+              <div className="completion-headline">SOC Analyst Lab Successfully Completed</div>
+              <div className="completion-sub dim">Hack Smarter SOC · SOC Analyst Track</div>
+
+              <div className="completion-score">
+                <div className="completion-pct">{r.pct}<span className="completion-pct-unit">%</span></div>
+                <div className="completion-pct-label dim">passed</div>
               </div>
-              <div className="certificate-lines">
-                <div><span className="certificate-key">Learner</span><span className="certificate-fill">[PLACEHOLDER]</span></div>
-                <div><span className="certificate-key">Completion Date</span><span className="certificate-fill">[PLACEHOLDER]</span></div>
-                <div><span className="certificate-key">Issued By</span><span className="certificate-fill">HACK SMARTER SOC</span></div>
-                <div><span className="certificate-key">Lab Result</span><span className="certificate-fill">{r.pct}% PASS</span></div>
+
+              <div className="completion-stats">
+                <div>
+                  <div className="completion-stat-key">Score</div>
+                  <div className="completion-stat-val mono">{r.total} / {r.max}</div>
+                </div>
+                <div>
+                  <div className="completion-stat-key">Pass Threshold</div>
+                  <div className="completion-stat-val mono">{r.threshold}%</div>
+                </div>
+                <div>
+                  <div className="completion-stat-key">Status</div>
+                  <div className="completion-stat-val accent">PASS</div>
+                </div>
               </div>
-            </section>
+
+              {flag && (
+                <div className="completion-flag">
+                  <div className="completion-flag-label">Submission Flag</div>
+                  <div className="completion-flag-row">
+                    <code className="completion-flag-val">{flag}</code>
+                    <button className="btn" onClick={copyFlag}>
+                      {flagCopied ? 'Copied ✓' : 'Copy'}
+                    </button>
+                  </div>
+                  <div className="dim small">
+                    Submit this flag at <span className="mono">hacksmarter.org</span> to get credit for completing the lab.
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="completion-foot">
+              <button className="btn btn-primary" onClick={() => setShowCompletion(false)}>Continue</button>
+            </div>
           </div>
         </div>
       )}

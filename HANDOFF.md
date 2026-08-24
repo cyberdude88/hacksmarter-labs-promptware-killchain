@@ -51,7 +51,7 @@ Key reducer actions:
 - `INIT` — load scenario (preserves `startedAt` if hydrated from localStorage)
 - `RESET` — wipe to defaults, keep scenario, new `startedAt`
 - `TICK` (1Hz) — timer + backlog penalty (-2/sec while NEW alerts exist) + risk recalc
-- `STREAM_TICK` (1.5s) — emits next attack-chain step (with `phase` derived from `scenario.timeline`) → telemetry + optional alert. Or noise alert. Or benign filler from `benignPool`. Telemetry capped at 200 entries.
+- `STREAM_TICK` (1.5s) — emits next attack-chain step (with `phase` derived from `scenario.timeline`) → telemetry + optional alert. Or noise alert. Or benign filler from `benignPool`. Telemetry capped at 200 entries. **Stream goes quiet once `attackIndex >= attackChain.length`**: noise alerts and attack chain self-terminate, and benign filler is gated so it stops cycling. The lab becomes a static body of evidence — intentional, see UX decisions below.
 - `SELECT_ALERT`
 - `ASSIGN` — NEW → ASSIGNED, sets assignedTo='me'
 - `TRIAGE` — works on NEW or ASSIGNED. +10 correct / -5 wrong against `expectedVerdict`. Auto-assigns. First correct triage flips `milestones.firstTriage`.
@@ -97,6 +97,8 @@ Adding a scenario = drop another JSON in `public/scenarios/`. Scenario selector 
 - **TP/FP/ESC labelled as "Confirm / Dismiss / Escalate"** with explanatory legend on Alerts page (3 cards explaining each + "Assign to me"). Tooltips include the SOC abbreviations.
 - **Ticket assignment**: NEW → ASSIGNED → TRIAGED|ESCALATED. Backlog penalty only counts NEW. Filter pills: All / Unassigned / Mine / Resolved.
 - **Investigation**: query bar with `key=value` syntax + free-text. Auto-pauses when an alert is selected (snapshot mode); `▶ Resume Live` flushes. Pivot pills (src_ip / user / host / type) with counts. Trigger event highlighted with TRIGGER tag.
+- **No secondary live-feed panels.** Earlier the right sidebar had an "Activity Feed" card that scrolled the latest 14 events alongside the Evidence Log — it was removed because it competed for attention while the student was reading the primary stream. Rule: the Evidence Log firehose stays live (intentional pedagogy); secondary tickers that re-show the same telemetry do not earn their keep.
+- **Stream completes, doesn't loop.** Once the attack chain is exhausted (29 events, last at game-time t+70s ≈ 35s wall-clock at 2× speed), the stream halts so the analyst investigates a static body of evidence. The Investigation header swaps from `live · pause to count` to `complete · N events`, and the snapshot banner copy adapts ("Stream is complete — resume just clears the snapshot view"). Time-pressure (backlog penalty, risk level) survives during the active phase, then naturally tapers as the analyst clears the queue.
 - **Phase chips** on attack events derived from `scenario.timeline` — small blue pill rendered in stream lines and trigger-event card.
 - **IOC flagging** is a free-text input now (not a candidates checklist — that was hand-holding). No immediate score; decoys hurt only at report grading time.
 - **Report is graded**: structured questions (text inputs for IP/host/user/path/account, dropdowns for classification/severity/verdict). Pass = % score ≥ `pass_threshold_pct`. Narrative is small keyword bonus only (free-text QA hard). "+ Add IOC" lets analyst list extra indicators with type+value rows.
@@ -112,6 +114,7 @@ Adding a scenario = drop another JSON in `public/scenarios/`. Scenario selector 
 - Single-reducer architecture (replacing with Redux/Zustand would be over-engineering)
 - Telemetry capped at 200 entries (DOM perf vs analyst memory)
 - 1.5s stream cadence (any faster makes the stream unreadable)
+- Stream-quiets-on-completion behavior — do not re-enable benign filler cycling unless asked (see UX decisions for why)
 - localStorage key name (`hsoc:state:v1`) — bump the suffix when shape breaks
 
 ## Dev server
@@ -119,3 +122,9 @@ Was running in the background as bash task `bp6fk41b3`, log at `/tmp/hsoc-dev.lo
 
 ## Last build (vite build)
 Clean as of the styles append. CSS ~18.4KB / JS ~180KB gzipped 56KB.
+
+
+---
+
+# Appliance / AMI build
+Replaced the earlier Flatcar/Ignition + TurnKey + Packer attempts with `appliance/aws/`. Stock Ubuntu 24.04 cloud image + a small install script, tested in QEMU, shipped as either an EC2-snapshotted AMI (Path A) or an OVA → VM Import → AMI (Path B). See `appliance/aws/README.md`.

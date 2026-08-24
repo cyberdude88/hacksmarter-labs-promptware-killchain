@@ -22,7 +22,7 @@ const FILTERS = [
 
 export default function AlertsPage() {
   const { state, dispatch } = useSoc();
-  const [filter, setFilter] = useState('unassigned');
+  const [filter, setFilter] = useState('all');
 
   const matches = (al) => {
     switch (filter) {
@@ -32,7 +32,13 @@ export default function AlertsPage() {
       default:           return true;
     }
   };
-  const filtered = state.alerts.filter(matches);
+  const search = state.alertSearch.trim().toLowerCase();
+  const matchesSearch = (al) =>
+    !search ||
+    al.src_ip.toLowerCase().includes(search) ||
+    al.rule_name.toLowerCase().includes(search) ||
+    al.summary.toLowerCase().includes(search);
+  const filtered = state.alerts.filter((al) => matches(al) && matchesSearch(al));
 
   // Sort: open first (NEW > ASSIGNED), then by severity, then newest.
   const STATUS_ORDER = { NEW: 0, ASSIGNED: 1, ESCALATED: 2, TRIAGED: 3 };
@@ -57,7 +63,7 @@ export default function AlertsPage() {
         <div>
           <h1>Alert Queue</h1>
           <div className="dim">
-            {state.alerts.length} alert{state.alerts.length === 1 ? '' : 's'} · streaming live · 1.5s cadence
+            {state.alerts.length} alert{state.alerts.length === 1 ? '' : 's'} · streaming live · ~4s cadence
           </div>
         </div>
       </div>
@@ -80,7 +86,7 @@ export default function AlertsPage() {
             <div className="legend-gist">"This alert is benign / legitimate activity."</div>
             <div className="dim small">
               Next steps in real life: close the ticket and — if the detection rule is noisy — send it
-              back to detection engineering for tuning.
+              back to the detection team for tuning.
             </div>
           </div>
 
@@ -132,10 +138,11 @@ export default function AlertsPage() {
             {sorted.map((al) => {
               const selected = al.id === state.selectedAlertId;
               const open = al.status === 'NEW' || al.status === 'ASSIGNED';
+              const priority = al.expectedVerdict && al.expectedVerdict !== 'false_positive';
               return (
                 <tr
                   key={al.id}
-                  className={`alert-row sev-${al.severity} ${selected ? 'is-selected' : ''} ${open ? '' : 'is-done'} ${al.status === 'NEW' ? 'is-new' : ''}`}
+                  className={`alert-row sev-${al.severity} ${selected ? 'is-selected' : ''} ${open ? '' : 'is-done'} ${al.status === 'NEW' ? 'is-new' : ''} ${priority ? 'is-priority' : 'is-benign'}`}
                   onClick={() => dispatch({ type: 'SELECT_ALERT', id: al.id })}
                 >
                   <td className="ts">{al.ts}</td>

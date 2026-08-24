@@ -2,11 +2,11 @@ import { useSoc } from '../state/SocContext.jsx';
 
 // Vertical nav. All pages always accessible — milestones are informational.
 const ITEMS = [
-  { key: 'alerts',        label: 'Alerts',            icon: '◉', milestone: null },
-  { key: 'investigation', label: 'Investigation',     icon: '◎', milestone: 'firstTriage' },
-  { key: 'detection',     label: 'Detection Builder', icon: '⌬', milestone: 'ruleBuilt' },
-  { key: 'replay',        label: 'Replay Attack',     icon: '▶', milestone: 'replayPassed' },
-  { key: 'report',        label: 'Incident Report',   icon: '✎', milestone: 'reportReady' },
+  { key: 'alerts',        label: 'Alerts',       icon: '◉', milestone: 'correctAssign' },
+  { key: 'investigation', label: 'Kill Chain',   icon: '⛓', milestone: 'firstTriage' },
+  { key: 'detection',     label: 'Containment',  icon: '◈', milestone: 'ruleBuilt' },
+  { key: 'replay',        label: 'Recovery',     icon: '⟲', milestone: 'replayPassed' },
+  { key: 'report',        label: 'Incident Report', icon: '✎', milestone: 'reportReady' },
 ];
 
 export default function Sidebar() {
@@ -26,7 +26,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="brand">
         <img src={`${import.meta.env.BASE_URL}logo.png`}
-             alt="HackSmarter SOC"
+             alt="Promptware Kill Chain"
              className="brand-logo" />
       </div>
 
