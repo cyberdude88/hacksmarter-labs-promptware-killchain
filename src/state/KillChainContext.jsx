@@ -160,8 +160,43 @@ function reducer(state, action) {
     case 'TOGGLE_REPORT_DRAWER':
       return { ...state, reportDrawerOpen: !state.reportDrawerOpen };
 
-    case 'MARK_EVIDENCE':
-      return { ...state, markedEvidence: { ...state.markedEvidence, [action.evidenceId]: true } };
+    case 'MARK_EVIDENCE': {
+      const evidence = EVIDENCE_CATALOG.find((item) => item.id === action.evidenceId);
+      const markedEvidence = { ...state.markedEvidence, [action.evidenceId]: true };
+      if (!evidence) return { ...state, markedEvidence };
+
+      const existingEntry = state.report.entries.some(
+        (entry) => entry.kind === 'evidence' && entry.refId === action.evidenceId,
+      );
+      const baseEntry = {
+        id: `RPT-${state.report.entries.length + 1}-evidence`,
+        kind: 'evidence',
+        refId: action.evidenceId,
+        label: evidence.label,
+        chosenOptionId: null,
+        filedStage: evidence.stage ?? null,
+        addedAt: Date.now(),
+        graded: false,
+        correct: null,
+      };
+
+      const entries = existingEntry
+        ? state.report.entries.map((entry) => (
+            entry.kind === 'evidence' && entry.refId === action.evidenceId
+              ? {
+                  ...entry,
+                  filedStage: entry.filedStage ?? evidence.stage ?? null,
+                  ...gradeEntry({
+                    ...entry,
+                    filedStage: entry.filedStage ?? evidence.stage ?? null,
+                  }),
+                }
+              : entry
+          ))
+        : [...state.report.entries, baseEntry];
+
+      return { ...state, markedEvidence, report: { ...state.report, entries } };
+    }
 
     case 'SET_CLAIM':
       return { ...state, claims: { ...state.claims, [action.claimId]: action.verdict } };
