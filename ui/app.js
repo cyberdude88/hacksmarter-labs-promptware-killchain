@@ -23,7 +23,7 @@ function matchedRule(alert) {
 
 // ---------- router ----------
 const DEFAULT_ROUTE = '#/xdr/home';
-const LAB_BRAND = 'Hack Smarter Labs';
+const LAB_BRAND = 'HACK SMARTER SOC';
 
 function currentRoute() {
   return (location.hash || DEFAULT_ROUTE).replace(/^#\//, '');   // e.g. "xdr/home"
@@ -52,162 +52,437 @@ function render() {
   document.title = `${LAB_BRAND} — ${portal.name}`;
 
   const shell = document.getElementById('shell');
-  const azurePane = document.getElementById('pane-azure');
+  const cloudPane = document.getElementById('pane-cloud');
   const bladePane = document.getElementById('pane-blade');
-  const cleanPortal = wl === 'governance';
-  const singlePanePortal = wl === 'workspace';
-  shell.classList.remove('no-azure', 'clean-portal');
-  shell.classList.toggle('clean-portal', cleanPortal);
-  shell.classList.toggle('no-azure', singlePanePortal);
-  azurePane.hidden = cleanPortal;
-  bladePane.hidden = cleanPortal;
-
-  if (!cleanPortal) {
-    azurePane.hidden = singlePanePortal;
-    bladePane.hidden = false;
-    if (!singlePanePortal) renderAzurePane(wl);
-    document.getElementById('blade-title').textContent = portal.name;
-    renderSidenav(wl, '#/' + route);
-    applyPaneCollapseState();
-  }
-  renderPortalTabs(wl);
+  shell.classList.remove('no-cloud', 'clean-portal');
+  // Navigation restructure (Sprint 1): #pane-cloud is no longer a permanent
+  // second rail for any workload (it used to show for 6 of 8). Its cross-workload
+  // jump function now lives in the on-demand Home hub drawer instead (see
+  // renderHomeHub() below), driven by the same PORTALS data pane-cloud used
+  // to mirror. `.no-cloud` is the existing 2-column shell layout (see
+  // styles.css) reused unconditionally.
+  shell.classList.add('no-cloud');
+  cloudPane.hidden = true;
+  bladePane.hidden = false;
+  // Sprint 2: the rail is now a single global, bucket-grouped nav (see
+  // renderSidenav()) rather than a per-portal one, so its header no longer
+  // names the current portal — that would misdescribe a list that spans
+  // all of them.
+  document.getElementById('blade-title').textContent = 'Navigation';
+  renderSidenav('#/' + route);
+  applyPaneCollapseState();
   mountView(route);
   scheduleGuideRefresh();
 }
 
-// Top-of-page neutral simulator context strip.
-// XDR and governance workloads use the XDR Security context; SIEM and cloud
-// security workloads use Cloud Console.
+// PORTAL_CONTEXT used to feed the old 3-tab portal switcher, removed in the
+// Sprint 1 navigation restructure (see NAVIGATION_PROGRESS.md). It is kept
+// here, unused by anything in this file, only because helpdesk.js mutates it
+// (`PORTAL_CONTEXT.helpdesk = 'admin'`) at script-load time as a top-level
+// statement — deleting this object would make that assignment throw a
+// ReferenceError when helpdesk.js loads, which would abort the rest of that
+// script and silently drop the entire helpdesk workload (its NAV, its routes,
+// everything below that line). Do not remove without also editing helpdesk.js.
 const PORTAL_CONTEXT = {
   'xdr':        'xdr',
-  'governance': 'xdr',
   'siem':       'cloud',
   'cloud':      'cloud',
   'ai-agent':   'xdr',
   'identity':   'admin',
   'workspace':  'admin',
 };
-const PORTAL_CONTEXT_HOME = {
-  'xdr':   '#/xdr/home',
-  'cloud': '#/cloud/overview',
-  'admin': '#/workspace/home',
-};
-function renderPortalTabs(wl) {
-  const active = PORTAL_CONTEXT[wl];
-  document.querySelectorAll('.portal-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.portal === active);
-  });
-}
-function switchPortalContext(ctx) {
-  const wl = workloadOf(currentRoute());
-  if (PORTAL_CONTEXT[wl] === ctx) return;
-  navigate(PORTAL_CONTEXT_HOME[ctx]);
-}
-window.switchPortalContext = switchPortalContext;
 
-// Which Cloud app to highlight for the active workload.
-const CLOUD_HIGHLIGHT = {
-  'xdr':        'XDR Security',
-  'siem':       'SIEM & SOAR',
-  'cloud':      'Cloud Console',
-  'governance': 'Data Governance',
-  'identity':   'Identity & Access',
-  'workspace':  'Workspace Admin',
+// ---------- Task-based taxonomy + Home hub (navigation restructure, Sprint 1) ----------
+// Canonical bucket list adopted to replace the old portal-tabs/PORTAL_CONTEXT
+// model. See NAVIGATION_PROGRESS.md's "Sprint 1 Implementation Notes" for the
+// full rationale reconciling the spec doc's three different bucket lists.
+const TASK_BUCKETS = [
+  { id:'investigate', label:'Investigate' },
+  { id:'detect',       label:'Detect' },
+  { id:'respond',      label:'Respond' },
+  { id:'protect',      label:'Protect' },
+  { id:'audit',        label:'Audit' },
+  { id:'admin',        label:'Admin' },
+  { id:'assist',       label:'Assist' },
+];
+
+// Every PORTALS id (including the runtime-added `helpdesk`) lands in exactly
+// one primary bucket here. This is a portal-level mapping for the Home hub's
+// one-click landing links; Sprint 2 does the finer route-level regrouping of
+// NAV/left-rail entries across these same buckets (e.g. xdr/action-center and
+// siem/automation belong in Respond even though the xdr and siem portals
+// themselves are anchored in Investigate/Detect below — see the Sprint 1 notes
+// for the full per-route reasoning).
+const PORTAL_BUCKET = {
+  'xdr':        'investigate',
+  'siem':       'detect',
+  'cloud':      'protect',
+  'identity':   'admin',
+  'workspace':  'admin',
+  'helpdesk':   'admin',
+  'ai-agent':   'assist',
 };
-function renderAzurePane(wl) {
-  const target = CLOUD_HIGHLIGHT[wl];
-  const ul = CLOUD_NAV.map(item => {
-    const route = CLOUD_APP_ROUTE[item.label];
-    const cls = (item.label === target) ? ' class="current-app"' : '';
-    const onclick = route ? ` onclick="navigate('${route}')"` : '';
-    // data-tip feeds the hover tooltip that stands in for the label once the pane
-    // is collapsed to an icon rail.
-    return `<li${cls}${onclick} data-tip="${escHtml(item.label)}">
-              <span class="navicon">${item.icon || ''}</span><span class="navlabel">${item.label}</span>
-            </li>`;
+
+// Sprint 4: PORTAL_HOME_ROUTE and PORTAL_ICON (the one-landing-route-per-workload
+// map and the matching icon map, both introduced in Sprint 1 for the original
+// one-tile-per-portal Home hub) were deleted here. Sprint 2's route-level
+// renderHomeHub() rewrite stopped reading either map, and Sprint 3 confirmed
+// they were still unused; reconfirmed by grep immediately before deleting
+// (zero references anywhere outside their own definitions). Nothing else in
+// the app depends on this shape, so there was no replacement needed.
+
+// ---------- Route-level bucket rebuild (navigation restructure, Sprint 2) ----------
+// Sprint 1 mapped whole PORTALS to buckets (PORTAL_BUCKET above) for the Home
+// hub. That's coarser than the left rail needs: `xdr` and `siem` each contain
+// routes that belong in more than one bucket (e.g. xdr/action-center and
+// siem/automation are Respond even though those portals are anchored in
+// Investigate/Detect). ROUTE_BUCKET is an explicit route -> bucket override
+// map layered ONLY for the routes that need to differ from their owning
+// portal's PORTAL_BUCKET default. Every other route (cloud/governance/
+// ai-agent/identity/workspace/helpdesk, all single-bucket portals per the
+// spec doc's own worked example) falls through to PORTAL_BUCKET in
+// buildNavBuckets() below, so this map never has to enumerate a route whose
+// bucket already matches its portal's default. This — rather than replacing
+// NAV itself with a bucket-keyed structure — was the less invasive of the two
+// mechanisms the brief offered: NAV is also read directly by
+// buildSearchIndex() and registerSecondaryNavViews() (views.js), and leaving
+// its shape untouched means neither of those needed to change.
+const ROUTE_BUCKET = {
+  // --- xdr-owned routes (27) ---
+  '#/xdr/home':               'investigate',
+  '#/xdr/exposure':           'protect',
+  '#/xdr/secure-score':       'protect',
+  '#/xdr/vulnerabilities':    'protect',
+  '#/xdr/incidents':          'investigate',
+  '#/xdr/alerts':             'investigate',
+  '#/xdr/cases':              'investigate',
+  '#/xdr/alert-tuning':       'investigate',
+  '#/xdr/hunting':            'detect',
+  '#/xdr/custom-detections':  'detect',
+  '#/xdr/hunting-graph':      'detect',
+  '#/xdr/action-center':      'respond',
+  '#/xdr/air':                'respond',
+  '#/xdr/threat-analytics':   'investigate',
+  '#/xdr/intel-explorer':     'investigate',
+  '#/xdr/devices':            'investigate',
+  '#/xdr/identities':         'investigate',
+  '#/xdr/identity-protection':'investigate',
+  '#/xdr/endpoints':          'protect',
+  '#/xdr/asr-policy':         'protect',
+  '#/xdr/email-collab':       'investigate',
+  '#/xdr/threat-explorer':    'investigate',
+  '#/xdr/cloud-apps':         'investigate',
+  '#/xdr/suppression':        'investigate',
+  // --- siem-owned routes (26) ---
+  '#/siem/home':                    'detect',
+  '#/siem/logs':                    'detect',
+  '#/siem/search':                  'detect',
+  '#/siem/incidents':               'investigate',
+  '#/siem/graph':                   'detect',
+  '#/siem/workbooks':               'detect',
+  '#/siem/hunting':                 'detect',
+  '#/siem/hunting/dns':             'detect',
+  '#/siem/hunting/authentication':  'detect',
+  '#/siem/hunting/network-session': 'detect',
+  '#/siem/anomalies':               'detect',
+  '#/siem/soc-optimization':        'detect',
+  '#/siem/summary-rules':           'detect',
+  '#/siem/data-lake-jobs':          'detect',
+  '#/siem/notebooks':               'detect',
+  '#/siem/entity-behavior':         'detect',
+  '#/siem/threat-intel':            'investigate',
+  '#/siem/mitre':                   'detect',
+  '#/siem/content-hub':             'detect',
+  '#/siem/repositories':            'detect',
+  '#/siem/data-connectors':         'detect',
+  '#/siem/analytics':               'detect',
+  '#/siem/watchlist':               'detect',
+  '#/siem/automation':              'respond',
+};
+
+// Sprint 3 (doc §4, "make page-level navigation local"): routes that are
+// really a tab/mode of a sibling route, not an independent task someone
+// jumps to directly from the shell. Demoted out of the rail/Home-hub
+// *rendering* only — buildNavBuckets() itself still returns all 115 routes
+// (so the distinct-route universe, the command palette's buildSearchIndex(),
+// and registerSecondaryNavViews() are all untouched and these routes stay
+// fully reachable, including by direct deep link); renderSidenav() and
+// renderHomeHub() are the only two call sites that filter this set out, and
+// each of these routes' own VIEWS[...] gains an in-page way to reach its
+// siblings instead (see VIEWS['siem/hunting']'s "ASIM parsers" tab).
+const PAGE_LOCAL_ROUTES = new Set([
+  '#/siem/hunting/dns',
+  '#/siem/hunting/authentication',
+  '#/siem/hunting/network-session',
+]);
+
+// Sprint 3 Admin-bucket call: Admin is the largest bucket (39 routes) and
+// stays a FLAT route list at the buildNavBuckets()/data level — these are
+// genuinely independent tasks (a directory lookup is not a subview of a
+// license report), not subviews of one another, so nothing here qualifies
+// for the doc §4 treatment above. What Admin gets instead is a purely
+// visual sub-grouping inside the rail's rendering (renderSidenav() below),
+// which the brief explicitly allows as long as it doesn't just recreate the
+// old xdr/siem/cloud/etc. per-portal hierarchy under new names. These 3
+// groups are job-oriented, not portal-oriented. Any admin route not listed
+// here still renders (flat, at the end) rather than silently vanishing if
+// this list ever drifts from NAV — see renderAdminSubgroups()'s leftover pass.
+const ADMIN_SUBGROUPS = [
+  { label:'Directory & access', routes:[
+    '#/identity/overview', '#/identity/identity-protection',
+    '#/identity/conditional-access', '#/identity/sign-in-logs',
+  ] },
+  { label:'Tenant & workspace', routes:[
+    '#/workspace/home', '#/workspace/users',
+    '#/workspace/usage', '#/workspace/service-health',
+    '#/workspace/message-center', '#/workspace/setup',
+    '#/workspace/admin-centers',
+  ] },
+  { label:'Support & service desk', routes:[
+    '#/helpdesk/dashboard', '#/helpdesk/tickets', '#/helpdesk/directory',
+    '#/helpdesk/active-directory', '#/helpdesk/windows',
+    '#/helpdesk/event-viewer', '#/helpdesk/powershell',
+    '#/helpdesk/remote-support', '#/helpdesk/endpoint-security',
+    '#/helpdesk/server-manager', '#/helpdesk/dns', '#/helpdesk/dhcp',
+    '#/helpdesk/group-policy', '#/helpdesk/file-server',
+    '#/helpdesk/printers', '#/helpdesk/knowledge-base',
+    '#/helpdesk/environment',
+  ] },
+];
+
+// Builds the global, route-level, bucket-grouped nav structure that both
+// renderSidenav() (left rail) and renderHomeHub() consume. Recomputed on each
+// call (cheap — ~120 array entries) rather than cached once at load, because
+// NAV.helpdesk doesn't exist until helpdesk.js runs (it loads after app.js),
+// so a cache built at app.js load time would silently miss the entire
+// helpdesk workload.
+//
+// Dedup rule: NAV.xdr embeds a "SIEM & SOAR" cross-link section that repeats
+// 16 siem routes (and NAV.siem repeats none of xdr's) under a second, xdr-
+// flavored label — a pre-existing convenience for the old per-portal rail.
+// The bucket rail must show each route exactly once, so only the entry from
+// the route's OWNING namespace (the portal id matching the route's own path
+// segment) is kept; foreign cross-link copies are skipped. A second pass
+// picks up any route that (hypothetically) only ever appears as a foreign
+// copy, so nothing is silently dropped even if that assumption is ever wrong.
+function buildNavBuckets() {
+  const buckets = {};
+  TASK_BUCKETS.forEach(b => { buckets[b.id] = []; });
+  const seen = new Set();
+  const order = PORTALS.map(p => p.id);
+  const addFrom = (requireOwned) => {
+    order.forEach(wl => {
+      (NAV[wl] || []).forEach(item => {
+        if (!item.route || seen.has(item.route)) return;
+        const owning = item.route.split('/')[1];
+        if (requireOwned && owning !== wl) return;
+        if (!requireOwned && owning === wl) return; // already handled in pass 1
+        const bucketId = ROUTE_BUCKET[item.route] || PORTAL_BUCKET[owning] || PORTAL_BUCKET[wl] || 'admin';
+        if (!buckets[bucketId]) return;
+        seen.add(item.route);
+        buckets[bucketId].push({ route:item.route, label:item.label, icon:item.icon });
+      });
+    });
+  };
+  addFrom(true);   // pass 1: owning-namespace entries (canonical label source)
+  addFrom(false);  // pass 2: safety net for any route with no owning-array entry
+  return buckets;
+}
+
+// Single home-hub entry point (replaces the old .portal-tabs bar). Groups all
+// buckets' real ROUTE-level entries (Sprint 2), not one tile per portal
+// (Sprint 1's version, which is why Respond rendered empty — no portal was
+// anchored there at the portal level even though its routes exist). Each
+// bucket is capped at HUB_CAP tiles with a "+N more" tile that jumps to the
+// bucket's first route and opens the sidenav with that bucket expanded,
+// where every remaining entry is one click away — keeps the hub scannable
+// even for Admin (identity + workspace + helpdesk + misc config pages),
+// which has far more routes than any other bucket.
+const HOME_HUB_CAP = 8;
+function renderHomeHub() {
+  const body = document.getElementById('home-hub-body');
+  const activeHash = '#/' + currentRoute();
+  const buckets = buildNavBuckets();
+  body.innerHTML = TASK_BUCKETS.map(bucket => {
+    // Sprint 3: page-local subview routes (PAGE_LOCAL_ROUTES) are discoverable
+    // from inside their parent page instead — filtered out of the hub tiles
+    // the same way renderSidenav() filters them out of the rail, so the two
+    // stay in agreement about what counts as a top-level destination.
+    const items = (buckets[bucket.id] || []).filter(it => !PAGE_LOCAL_ROUTES.has(it.route));
+    if (!items.length) return '';
+    const shown = items.slice(0, HOME_HUB_CAP);
+    const remaining = items.length - shown.length;
+    const tiles = shown.map(item => {
+      const cur = item.route === activeHash ? ' current' : '';
+      return `
+        <div class="switcher-tile${cur}" onclick="navigate('${item.route}'); hidePanels();">
+          <div class="switcher-icon">${item.icon || ''}</div>
+          <span class="switcher-label">${esc(item.label)}</span>
+        </div>`;
+    }).join('');
+    const more = remaining > 0 ? `
+        <div class="switcher-tile" onclick="navigate('${items[0].route}'); hidePanels();">
+          <div class="switcher-icon">+</div>
+          <span class="switcher-label">${remaining} more in ${esc(bucket.label)}</span>
+        </div>` : '';
+    return `
+      <div class="hub-section">
+        <div class="pane-title">${esc(bucket.label)}</div>
+        <div class="switcher-grid">${tiles}${more}</div>
+      </div>`;
   }).join('');
-  document.getElementById('sidenav-azure').innerHTML = ul;
 }
 
-// Subsection collapse state is namespaced by its parent so the same label
-// (e.g. "Hunting") can appear under more than one section.
-function subKey(section, subsection) {
-  return `${section || '_'} / ${subsection}`;
+// renderAzurePane() (the function that used to populate #sidenav-cloud from
+// CLOUD_NAV) was deleted in Sprint 3. It had been uncalled dead code since
+// Sprint 1 hid #pane-cloud permanently, and Sprint 1/2 both explicitly left
+// its fate to Sprint 3 ("repurpose for page-local subnav, or delete"). It
+// wasn't repurposed: this sprint's page-local subnav (the ASIM hunting card
+// grid inside VIEWS['siem/hunting']) follows the codebase's existing
+// `.tabs`/`.tab` in-page pattern instead (see setSentinelHuntingTab()),
+// which fits an in-page tab better than a second nav-list renderer keyed off
+// the unrelated CLOUD_NAV cross-link data. #pane-cloud and
+// #sidenav-cloud themselves are left alone in index.html/styles.css (Sprint
+// 1's call, not reopened here) — they're inert (always `hidden`), just no
+// longer have a renderer that writes into them.
+
+// Bucket collapse state (Sprint 2). Global — keyed only by bucket id, not by
+// workload — because the rail itself is now global: every bucket is always
+// present regardless of which portal's route is active, so "collapsed" has
+// to mean the same thing no matter where you're standing when you toggle it.
+// (The old per-(workload, section) keys this replaced are left in
+// localStorage as harmless orphans; nothing reads hsl.nav.section.* anymore.)
+function navBucketKey(bucketId) {
+  return `hsl.nav.bucket.${bucketId}`;
+}
+function navBucketExpanded(bucketId, defaultExpanded) {
+  const stored = localStorage.getItem(navBucketKey(bucketId));
+  return stored === null ? defaultExpanded : stored !== 'collapsed';
+}
+function setNavBucketExpanded(bucketId, expanded) {
+  localStorage.setItem(navBucketKey(bucketId), expanded ? 'expanded' : 'collapsed');
 }
 
-function navSectionKey(wl, section) {
-  return `hsl.nav.section.${wl}.${section.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+// Renders one <li class="navitem"> row. `nested` adds .navitem-nested (extra
+// left padding, existing CSS) for rows shown under an Admin sub-heading.
+// `bucketId` is stamped as data-bucket so toggleNavBucket() can target this
+// row directly (class toggle on the existing element, not a re-render) —
+// that's what lets the CSS collapse transition actually play.
+function navItemRow(item, activeHash, expanded, nested, bucketId) {
+  const classes = ['navitem'];
+  if (nested) classes.push('navitem-nested');
+  if (item.route === activeHash) classes.push('active');
+  if (!expanded) classes.push('section-hidden');
+  const bucketAttr = bucketId ? ` data-bucket="${escHtml(bucketId)}"` : '';
+  return `<li class="${classes.join(' ')}"${bucketAttr} onclick="navigate('${item.route}')"
+              data-route="${escHtml(item.route)}" data-tip="${escHtml(item.label)}">
+            <span class="navicon">${item.icon || ''}</span><span class="navlabel">${item.label}</span>
+          </li>`;
 }
 
-function navSectionExpanded(wl, section) {
-  return localStorage.getItem(navSectionKey(wl, section)) !== 'collapsed';
+// Sprint 3: purely-visual sub-grouping for the Admin bucket only (see
+// ADMIN_SUBGROUPS above for the reasoning). Reuses the .navsubsection/
+// .navsubsection-toggle CSS that already existed from the pre-Sprint-2 rail
+// (dead since Sprint 2's rewrite dropped the per-portal subsection tier) —
+// rendered here as a static label (no onclick/caret) since these headings
+// aren't independently collapsible, only the parent bucket is. Any admin
+// route not covered by a named subgroup still renders, flat, at the end
+// (defensive: nothing silently disappears if the admin route set changes).
+function renderAdminSubgroups(items, activeHash, expanded, bucketId) {
+  const byRoute = new Map(items.map(it => [it.route, it]));
+  const used = new Set();
+  let html = '';
+  ADMIN_SUBGROUPS.forEach(group => {
+    const groupItems = group.routes.map(r => byRoute.get(r)).filter(Boolean);
+    if (!groupItems.length) return;
+    groupItems.forEach(it => used.add(it.route));
+    const subClasses = ['navsubsection'];
+    if (!expanded) subClasses.push('section-hidden');
+    html += `<li class="${subClasses.join(' ')}" data-bucket="${escHtml(bucketId)}">
+      <span class="navsubsection-toggle" style="cursor:default;">${escHtml(group.label)}</span>
+    </li>`;
+    html += groupItems.map(it => navItemRow(it, activeHash, expanded, true, bucketId)).join('');
+  });
+  const leftover = items.filter(it => !used.has(it.route));
+  html += leftover.map(it => navItemRow(it, activeHash, expanded, false, bucketId)).join('');
+  return html;
 }
 
-function setNavSectionExpanded(wl, section, expanded) {
-  localStorage.setItem(navSectionKey(wl, section), expanded ? 'expanded' : 'collapsed');
-}
-
-function renderSidenav(wl, activeHash) {
-  const items = NAV[wl] || [];
-
-  let currentSection = null;
-  let sectionExpanded = true;
-  let currentSub = null;
-  let subExpanded = true;
-  const ul = items.map(item => {
-    if (item.section) {
-      currentSection = item.section;
-      sectionExpanded = navSectionExpanded(wl, currentSection);
-      // A new top-level section ends any subsection scope from the previous one.
-      currentSub = null;
-      subExpanded = true;
-      const caret = sectionExpanded ? '▾' : '▸';
-      return `<li class="navsection">
-        <button type="button" class="navsection-toggle" aria-expanded="${sectionExpanded}"
-          data-workload="${escHtml(wl)}" data-section="${escHtml(item.section)}"
-          onclick="toggleNavSection(this.dataset.workload, this.dataset.section)">
-          <span class="navcaret">${caret}</span><span>${escHtml(item.section)}</span>
-        </button>
-      </li>`;
-    }
-    if (item.subsection) {
-      currentSub = subKey(currentSection, item.subsection);
-      subExpanded = navSectionExpanded(wl, currentSub);
-      const caret = subExpanded ? '▾' : '▸';
-      const hidden = !sectionExpanded ? ' section-hidden' : '';
-      return `<li class="navsubsection${hidden}">
-        <button type="button" class="navsubsection-toggle" aria-expanded="${subExpanded}"
-          data-workload="${escHtml(wl)}" data-section="${escHtml(currentSub)}"
-          onclick="toggleNavSection(this.dataset.workload, this.dataset.section)">
-          <span class="navcaret">${caret}</span><span>${escHtml(item.subsection)}</span>
-        </button>
-      </li>`;
-    }
-    const classes = ['navitem'];
-    if (item.route === activeHash) classes.push('active');
-    if (currentSub) classes.push('navitem-nested');
-    // Hidden when either its own section or its enclosing subsection is collapsed.
-    if ((currentSection && !sectionExpanded) || (currentSub && !subExpanded)) classes.push('section-hidden');
-    return `<li class="${classes.join(' ')}" onclick="navigate('${item.route}')"
-                data-route="${escHtml(item.route)}" data-tip="${escHtml(item.label)}">
-              <span class="navicon">${item.icon || ''}</span><span class="navlabel">${item.label}</span>
-            </li>`;
+// The global left rail (Sprint 2): one persistent rail, 7 always-present
+// bucket headers in TASK_BUCKETS order, routes flattened directly underneath
+// each (no portal-named subsection tier — that would just reintroduce
+// per-portal grouping as a second hierarchy under a different name). Only the
+// bucket containing the active route auto-expands by default; every other
+// bucket collapses by default, so day-to-day density looks like the old
+// per-portal rail even though the full route set is always technically
+// present. Reuses the existing .navsection/.navsection-toggle/.navcaret/
+// .navitem/.section-hidden CSS — only what counts as a "section" changed
+// (bucket instead of portal-array section). The collapse mechanics got an
+// animation pass post-Sprint-4: rows/subheadings carry a data-bucket stamp
+// so toggleNavBucket() can flip .section-hidden on the existing elements
+// directly (see that function) instead of re-rendering, which is what lets
+// the CSS max-height/opacity transition (and the .navcaret rotate) actually play.
+// Sprint 3 adds two refinements on top, both filtering/grouping only —
+// buildNavBuckets() itself is untouched: PAGE_LOCAL_ROUTES entries are
+// dropped from what's shown (doc §4, moved to page-local subnav instead),
+// and the Admin bucket's remaining items get the ADMIN_SUBGROUPS visual
+// sub-headings (see renderAdminSubgroups() above) since 39 flat entries was
+// hard to scan even collapsed-by-default.
+function renderSidenav(activeHash) {
+  const buckets = buildNavBuckets();
+  const currentBucketId = ROUTE_BUCKET[activeHash] || null;
+  const ul = TASK_BUCKETS.map(bucket => {
+    const items = (buckets[bucket.id] || []).filter(it => !PAGE_LOCAL_ROUTES.has(it.route));
+    if (!items.length) return '';
+    const expanded = navBucketExpanded(bucket.id, bucket.id === currentBucketId);
+    // Caret glyph is always the same '▸' — CSS rotates it 90° off
+    // [aria-expanded="true"] (see styles.css), which is what lets the caret
+    // animate instead of instantly swapping to a different character.
+    const header = `<li class="navsection">
+      <button type="button" class="navsection-toggle" aria-expanded="${expanded}"
+        data-bucket="${escHtml(bucket.id)}"
+        onclick="toggleNavBucket(this.dataset.bucket)">
+        <span class="navcaret">▸</span><span>${escHtml(bucket.label)}</span>
+      </button>
+    </li>`;
+    const rows = bucket.id === 'admin'
+      ? renderAdminSubgroups(items, activeHash, expanded, bucket.id)
+      : items.map(item => navItemRow(item, activeHash, expanded, false, bucket.id)).join('');
+    return header + rows;
   }).join('');
   document.getElementById('sidenav').innerHTML = ul;
 }
 
-function toggleNavSection(wl, section) {
-  const expanded = !navSectionExpanded(wl, section);
-  setNavSectionExpanded(wl, section, expanded);
-  renderSidenav(workloadOf(currentRoute()), '#/' + currentRoute());
+// A manual bucket toggle deliberately does NOT call renderSidenav() (a full
+// innerHTML replace) — that would destroy and recreate the row elements, so
+// the CSS collapse transition would never get a "before" state to animate
+// from. Instead this flips classes/attributes directly on the existing DOM
+// nodes for just this bucket (found via their data-bucket stamp), which lets
+// the max-height/opacity transition on .navitem/.navsubsection and the
+// rotate transition on .navcaret actually play. Route navigation still goes
+// through the normal full renderSidenav() re-render (via render()), which is
+// correct there since a route change also needs to move the "active" row
+// and recompute which bucket auto-expands — no animation expected on that path.
+function toggleNavBucket(bucketId) {
+  const activeHash = '#/' + currentRoute();
+  const currentBucketId = ROUTE_BUCKET[activeHash] || null;
+  const wasExpanded = navBucketExpanded(bucketId, bucketId === currentBucketId);
+  const nowExpanded = !wasExpanded;
+  setNavBucketExpanded(bucketId, nowExpanded);
+
+  const sidenav = document.getElementById('sidenav');
+  const toggleBtn = sidenav.querySelector(`.navsection-toggle[data-bucket="${bucketId}"]`);
+  if (toggleBtn) toggleBtn.setAttribute('aria-expanded', String(nowExpanded));
+  sidenav.querySelectorAll(`.navitem[data-bucket="${bucketId}"], .navsubsection[data-bucket="${bucketId}"]`)
+    .forEach(el => el.classList.toggle('section-hidden', !nowExpanded));
 }
 
 function applyPaneCollapseState() {
-  const azCollapsed = localStorage.getItem('hsl.pane.azure') === 'collapsed';
+  const cloudCollapsed = localStorage.getItem('hsl.pane.cloud') === 'collapsed';
   const blCollapsed = localStorage.getItem('hsl.pane.blade') === 'collapsed';
-  document.getElementById('pane-azure').classList.toggle('collapsed', azCollapsed);
+  document.getElementById('pane-cloud').classList.toggle('collapsed', cloudCollapsed);
   document.getElementById('pane-blade').classList.toggle('collapsed', blCollapsed);
-  document.getElementById('toggle-azure').textContent = azCollapsed ? '»' : '«';
+  document.getElementById('toggle-cloud').textContent = cloudCollapsed ? '»' : '«';
   document.getElementById('toggle-blade').textContent = blCollapsed ? '»' : '«';
 }
 function togglePane(which) {
@@ -216,6 +491,27 @@ function togglePane(which) {
   localStorage.setItem(key, cur === 'collapsed' ? 'expanded' : 'collapsed');
   applyPaneCollapseState();
   hideTooltip();
+}
+
+// ---------- Theme toggle ----------
+function toggleTheme() {
+  const currentTheme = document.body.dataset.theme || 'dark';
+  const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.body.dataset.theme = nextTheme;
+  try { localStorage.setItem(window.THEME_PREFERENCE_KEY || 'hsl.ui.theme', nextTheme); } catch(e) {}
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const theme = document.body.dataset.theme || 'dark';
+  const sunIcon = document.getElementById('theme-icon-sun');
+  const moonIcon = document.getElementById('theme-icon-moon');
+  if (sunIcon && moonIcon) {
+    // Show sun icon when in dark mode (sun is the "next" theme)
+    // Show moon icon when in light mode (moon is the "next" theme)
+    sunIcon.style.display = theme === 'dark' ? '' : 'none';
+    moonIcon.style.display = theme === 'dark' ? 'none' : '';
+  }
 }
 
 // ---------- Hover tooltips for icon-only controls ----------
@@ -480,7 +776,7 @@ function setAttackStoryStep(incidentId, stepIndex = 0) {
       <p>${esc(step.detail)}</p>
       <div class="attack-story-actions-inline">
         <button class="btn btn-secondary btn-sm" onclick="openAlert('${esc(step.alertId)}')">Open alert</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Investigate further</button>
       </div>
       <div class="attack-story-remediation"><strong>Response action:</strong> ${esc(remediation)}</div>
     `;
@@ -546,14 +842,14 @@ function updateAttackStoryEntity(panel, story, nodeId, activeAlertId) {
       <dt>Verdict</dt><dd>${esc(node.verdict || (relatedSteps.length ? 'Suspicious' : 'Unknown'))}</dd>
       <dt>Remediation</dt><dd>${esc(remediation)}</dd>
     </dl>
-    <div class="attack-entity-subtitle">Evidence and response</div>
+    <div class="attack-entity-subtitle">Evidence and remediation</div>
     <div class="attack-entity-actions">
       ${hasDevice
         ? `<button class="btn btn-primary btn-sm" onclick="openDevice('${esc(node.label)}')">Open device page</button>`
         : `<button class="btn btn-secondary btn-sm" onclick="openEntityPivot('${esc(node.type || 'Entity')}', '${esc(node.label || '')}')">Open entity page</button>`}
       <button class="btn btn-primary btn-sm" onclick="viewBlastRadius('${esc(panel.dataset.incidentId)}', '${esc(node.id || '')}')">View blast radius</button>
-      <button class="btn btn-secondary btn-sm" onclick="runSentinelEntityPlaybook('${esc(node.label || panel.dataset.incidentId)}', 'Defender incident side panel')">Run playbook (entity)</button>
-      <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
+      <button class="btn btn-secondary btn-sm" onclick="runSentinelEntityPlaybook('${esc(node.label || panel.dataset.incidentId)}', 'Security incident side panel')">Run playbook (entity)</button>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Investigate further</button>
     </div>
     <ul class="attack-evidence-list">
       ${(evidence.length ? evidence : ['No evidence attached to this entity.']).map(item => `<li>${esc(item)}</li>`).join('')}
@@ -652,13 +948,6 @@ function replayScenario() {
   render();
   toast('Replayed 5 detection events through current suppression rules.');
 }
-
-function toggleSettingState(input) {
-  const row = input.closest('.setting-row');
-  const state = row?.querySelector('em');
-  if (state) state.textContent = input.checked ? 'On' : 'Off';
-}
-window.toggleSettingState = toggleSettingState;
 
 function showNotificationComposer() {
   const composer = document.getElementById('notification-composer');
@@ -843,7 +1132,7 @@ function deleteAnalyticsRule(id) {
   render();
 }
 /* ---- Anomaly rule customization (mimics Analytics → Anomalies tab) ----
-   Real Sentinel: you don't author anomaly rules from blank. You duplicate a
+   Real SIEM: you don't author anomaly rules from blank. You duplicate a
    built-in template to get ONE customizable copy, which runs in Flighting
    alongside the Production original. Promoting the copy to Production flips
    the original to Flighting. Only one copy per rule is allowed. */
@@ -964,7 +1253,7 @@ function renderEntityCatalog() {
 
 function addEntityMapping(type = 'Account') {
   if (analyticsEntityMappings.length >= 10) {
-    toast('Sentinel analytics rules can map up to 10 entities.');
+    toast('Analytics rules can map up to 10 entities.');
     toggleEntityCatalog(false);
     return;
   }
@@ -1023,6 +1312,7 @@ function suggestedEntityColumn(type) {
     IP:'IPAddress',
     URL:'Url',
     'Azure Resource':'ResourceId',
+    'Cloud Resource':'ResourceId',
     'Cloud Application':'ApplicationId',
     'DNS Resolution':'DomainName',
     File:'FileName',
@@ -1111,7 +1401,7 @@ function previewAnalyticsWizardResults() {
   document.getElementById('analytics-wizard-results').classList.remove('hidden');
 }
 
-// ---------- Defender hunting graph ----------
+// ---------- XDR hunting graph ----------
 const HUNTING_GRAPH_STATE_KEY = 'hsl.huntingGraph.state';
 
 function emptyHuntingGraphState() {
@@ -1368,7 +1658,7 @@ function scheduleGuideRefresh() {
   setTimeout(renderGuide, 80);
 }
 
-// ---------- Security Copilot ----------
+// ---------- AI Security Assistant ----------
 function readCopilotStorage(key, fallback) {
   try {
     const raw = localStorage.getItem(key);
@@ -1475,78 +1765,50 @@ function persistCopilotSession(session, transcriptSteps) {
   writeCopilotStorage('hsl.ai-agent.transcripts.custom', transcripts);
 }
 
-function promptbookPluginSelection(book) {
+// Was promptbookPluginSelection() on the old standalone ai-agent/promptbooks
+// surface. Repurposed for the "Run AI-Assisted Playbook" action on
+// siem/automation (Sprint 2, docs/DEMICROSOFTING_PROGRESS.md) — same lookup
+// logic, but the returned labels are authored neutrally at the source now
+// instead of leaning on neutral-terminology.js to patch vendor names at
+// render time.
+function aiAssistedPlaybookPluginSelection(book) {
   const title = `${book.name} ${book.source || ''}`.toLowerCase();
-  if (title.includes('email') || title.includes('governance') || title.includes('dlp')) return ['Purview', 'Defender XDR'];
-  if (title.includes('vulnerability')) return ['Defender XDR', 'Sentinel'];
-  if (title.includes('hunting') || title.includes('threat')) return ['Sentinel', 'Defender Threat Intelligence'];
-  return ['Defender XDR'];
+  if (title.includes('email') || title.includes('governance') || title.includes('dlp')) return ['Data Governance', 'XDR Security'];
+  if (title.includes('vulnerability')) return ['XDR Security', 'SIEM & SOAR'];
+  if (title.includes('hunting') || title.includes('threat')) return ['SIEM & SOAR', 'Threat Intelligence'];
+  return ['XDR Security'];
 }
 
-function runCopilotPromptbook(bookId) {
-  const book = getCopilotPromptbooks().find(pb => pb.id === bookId);
+// Was runCopilotPromptbook(). This is the reused mechanic behind "Run
+// AI-Assisted Playbook" in VIEWS['siem/automation'] — chains an
+// AI_ASSISTED_PLAYBOOKS entry's canned prompts into a session transcript the
+// student can open and inspect (ai-agent/session), rather than a poster
+// button that does nothing.
+function runAiAssistedPlaybook(bookId) {
+  const book = getAiAssistedPlaybooks().find(pb => pb.id === bookId);
   if (!book) return;
   const sessionId = `cs-run-${book.id}-${Date.now().toString(36)}`;
   const steps = [];
   book.prompts.forEach((prompt, index) => {
     const analyst = prompt.replace(/<[^>]+>/g, 'input');
-    const copilot = `Canned answer ${index + 1} for ${book.name}: use the lab fixtures and summarize the requested entity or event before deciding on response actions.`;
-    steps.push({ role:'analyst', text: analyst, plugin:'none', skill:'Promptbook input', pinned:index === 0 });
-    steps.push({ role:'copilot', text: copilot, plugin: promptbookPluginSelection(book)[0], skill:'Promptbook run', pinned:index === 0 });
+    const assistant = `Canned answer ${index + 1} for ${book.name}: use the lab fixtures and summarize the requested entity or event before deciding on response actions.`;
+    steps.push({ role:'analyst', text: analyst, plugin:'none', skill:'Playbook input', pinned:index === 0 });
+    steps.push({ role:'copilot', text: assistant, plugin: aiAssistedPlaybookPluginSelection(book)[0], skill:'AI-assisted playbook run', pinned:index === 0 });
   });
   persistCopilotSession({
     id: sessionId,
-    name: `${book.name} run`,
+    name: `${book.name} (AI-assisted playbook)`,
     owner: 'You',
     workspace: 'Primary',
     lastActivity: new Date().toISOString(),
     promptCount: book.prompts.length,
-    plugins: promptbookPluginSelection(book),
+    plugins: aiAssistedPlaybookPluginSelection(book),
     pinned: true,
     generatedFrom: book.id,
   }, steps);
   sessionStorage.setItem('hsl.ai-agent.session.id', sessionId);
-  toast(`Ran promptbook ${book.name} and created a canned session.`);
+  toast(`Ran AI-Assisted Playbook "${book.name}". Opening the session transcript.`);
   navigate('#/ai-agent/session');
-}
-
-function saveCopilotPromptbook() {
-  const name = document.getElementById('copilot-pb-name')?.value.trim();
-  const description = document.getElementById('copilot-pb-description')?.value.trim();
-  const inputs = (document.getElementById('copilot-pb-inputs')?.value || '')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-  const prompts = (document.getElementById('copilot-pb-prompts')?.value || '')
-    .split('\n')
-    .map(s => s.trim())
-    .filter(Boolean);
-  if (!name || !prompts.length) {
-    toast('Add a name and at least one prompt before saving.');
-    return;
-  }
-  const custom = readCopilotStorage('hsl.ai-agent.promptbooks.custom', []);
-  const book = {
-    id: `pb-custom-${Date.now().toString(36)}`,
-    name,
-    source: 'Custom',
-    description: description || 'User-created promptbook',
-    inputs,
-    prompts,
-  };
-  custom.unshift(book);
-  writeCopilotStorage('hsl.ai-agent.promptbooks.custom', custom);
-  sessionStorage.setItem('hsl.ai-agent.promptbook.tab', 'Custom');
-  sessionStorage.setItem('hsl.ai-agent.promptbook.id', book.id);
-  toast(`Saved promptbook ${name}.`);
-  render();
-}
-
-function selectCopilotPromptbook(id) {
-  const book = getCopilotPromptbooks().find(pb => pb.id === id);
-  sessionStorage.setItem('hsl.ai-agent.promptbook.id', id);
-  if (book?.source) sessionStorage.setItem('hsl.ai-agent.promptbook.tab', book.source);
-  render();
 }
 
 function toggleCopilotPlugin(id) {
@@ -1561,20 +1823,13 @@ function selectCopilotPlugin(id) {
   render();
 }
 
-function updateCopilotSetting(key, value) {
-  const settings = readCopilotStorage('hsl.ai-agent.settings', { ...COPILOT_SETTINGS_DEFAULTS });
-  settings[key] = value;
-  writeCopilotStorage('hsl.ai-agent.settings', settings);
-  render();
-}
-
 function addCopilotKnowledgeSource(kind) {
   const custom = readCopilotStorage('hsl.ai-agent.knowledge.custom', []);
   const stamp = new Date().toISOString();
   custom.unshift({
     id: `kb-custom-${Date.now().toString(36)}`,
     name: kind === 'search' ? 'Grounding search source' : 'Uploaded file bundle',
-    type: kind === 'search' ? 'Azure AI Search index' : 'File upload',
+    type: kind === 'search' ? 'AI search index' : 'File upload',
     items: kind === 'search' ? 128 : 1,
     status: kind === 'search' ? 'Ready' : 'Indexing',
     scope: 'Current lab tenant',
@@ -1582,7 +1837,7 @@ function addCopilotKnowledgeSource(kind) {
     createdAt: stamp,
   });
   writeCopilotStorage('hsl.ai-agent.knowledge.custom', custom);
-  toast(kind === 'search' ? 'Added a mock Azure AI Search source.' : 'Added a mock file upload source.');
+  toast(kind === 'search' ? 'Added a mock AI search source.' : 'Added a mock file upload source.');
   render();
 }
 
@@ -1628,33 +1883,6 @@ function rerunCopilotPrompt(sessionId) {
   render();
 }
 
-// ---------- app switcher ----------
-// Map Cloud app labels to the workloads navigable in this lab.
-const CLOUD_APP_ROUTE = {
-  'XDR Security':      '#/xdr/home',
-  'Cloud Console':     '#/cloud/overview',
-  'Data Governance':   '#/governance/home',
-  'SIEM & SOAR':       '#/siem/home',
-  'Identity & Access': '#/identity/overview',
-  'Workspace Admin':   '#/workspace/home',
-};
-function renderSwitcher() {
-  const grid = document.getElementById('switcher-grid');
-  const wl = workloadOf(currentRoute());
-  const currentLabel = CLOUD_HIGHLIGHT[wl];
-  grid.innerHTML = CLOUD_NAV.map(item => {
-    const route = CLOUD_APP_ROUTE[item.label];
-    const onclick = route ? ` onclick="navigate('${route}'); hidePanels();"` : '';
-    const cur = item.label === currentLabel ? ' current' : '';
-    const dim = route ? '' : ' dim';
-    return `
-      <div class="switcher-tile${cur}${dim}"${onclick}>
-        <div class="switcher-icon">${item.icon}</div>
-        <span class="switcher-label">${esc(item.label)}</span>
-      </div>`;
-  }).join('');
-}
-
 // ---------- toast ----------
 let toastTimer;
 function toast(msg) {
@@ -1676,19 +1904,19 @@ function toast(msg) {
   toastTimer = setTimeout(() => { t.style.opacity = '0'; }, 2400);
 }
 
-// ---------- Sentinel automation lab ----------
+// ---------- SIEM automation lab ----------
 function grantPlaybookPermissions() {
   localStorage.setItem('hsl.siem.playbook1Permission', 'granted');
-  toast('Granted Sentinel access to RG-Playbooks.');
+  toast('Granted automation access to RG-Playbooks.');
   render();
 }
 function resetPlaybookPermissions() {
   localStorage.removeItem('hsl.siem.playbook1Permission');
-  toast('Reset: Playbook1 is grayed out until Sentinel gets resource group access.');
+  toast('Reset: Playbook1 is grayed out until automation gets resource group access.');
   render();
 }
 function explainDisabledPlaybook() {
-  toast('Playbook1 is grayed out because Sentinel lacks Automation Contributor on RG-Playbooks.');
+  toast('Playbook1 is grayed out because automation lacks Contributor access on RG-Playbooks.');
 }
 function selectSentinelPlaybook(name) {
   toast(`${name} selected for the Run playbook action.`);
@@ -1730,7 +1958,7 @@ function createAutomationRule() {
   if (action === 'Run playbook') {
     const playbook = sessionStorage.getItem('hsl.siem.playbook.selected') || (hasPermission ? 'Playbook1' : '(not selected)');
     actions = `Run playbook: ${playbook}`;
-    // A Run playbook rule can't run until Sentinel has permission on the playbook's resource group.
+    // A Run playbook rule can't run until the SIEM has permission on the playbook's resource group.
     status = hasPermission ? 'Enabled' : 'Disabled';
   } else {
     actions = action;
@@ -1755,7 +1983,7 @@ function resetCreatedRules() {
   toast('Cleared all created automation rules.');
   render();
 }
-// ---------- Entra Conditional Access lab ----------
+// ---------- Identity Conditional Access lab ----------
 function selectCaGrant(id) {
   sessionStorage.setItem('hsl.identity.ca.grant', id);
   render();
@@ -1852,7 +2080,7 @@ function deleteCaPolicy(index) {
 }
 function resetCaPolicies() {
   localStorage.removeItem('hsl.identity.ca.policies.created');
-  toast('Cleared created Conditional Access policies.');
+  toast('Cleared created access policies.');
   render();
 }
 window.selectCaGrant = selectCaGrant;
@@ -1884,7 +2112,7 @@ window.explainDisabledPlaybook = explainDisabledPlaybook;
 window.selectSentinelPlaybook = selectSentinelPlaybook;
 window.selectSentinelAutomationPlaybook = selectSentinelAutomationPlaybook;
 
-// ---------- Sentinel incident graph learning state ----------
+// ---------- SIEM incident graph learning state ----------
 const SENTINEL_GRAPH_STATE_KEY = 'hsl.siem.graph.state';
 
 function defaultSentinelGraphState() {
@@ -2128,19 +2356,20 @@ window.openSentinelGraphHunt = openSentinelGraphHunt;
 
 // ---------- wire-up ----------
 document.addEventListener('DOMContentLoaded', () => {
-  renderSwitcher();
+  renderHomeHub();
   render();
   initTooltips();
 
   window.addEventListener('hashchange', render);
 
-  document.getElementById('btn-waffle').addEventListener('click', () => {
-    renderSwitcher();
-    showPanel('panel-switcher');
+  document.getElementById('btn-logo-home').addEventListener('click', () => {
+    renderHomeHub();
+    showPanel('panel-home-hub');
   });
-  document.getElementById('toggle-azure').addEventListener('click', () => togglePane('azure'));
+  document.getElementById('toggle-cloud').addEventListener('click', () => togglePane('cloud'));
   document.getElementById('toggle-blade').addEventListener('click', () => togglePane('blade'));
-  document.getElementById('btn-copilot').addEventListener('click', () => openCopilot());
+  document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
+  updateThemeIcon();
   document.getElementById('btn-guide-next').addEventListener('click', guideNext);
   document.getElementById('btn-guide-prev').addEventListener('click', guidePrev);
   document.getElementById('btn-guide-close').addEventListener('click', closeGuide);
@@ -2195,7 +2424,7 @@ function buildSearchIndex() {
       });
     }
   }
-  // Also surface workload homes so "purview" / "sentinel" jump straight there.
+  // Also surface workload homes so "governance" / "siem" jump straight there.
   for (const p of PORTALS) {
     const first = (NAV[p.id] || []).find(it => it.route);
     if (!first) continue;
@@ -2251,7 +2480,7 @@ function renderSearchDropdown(query) {
   searchMatches = scored.map(s => s.item);
   searchActiveIndex = searchMatches.length ? 0 : -1;
   if (!searchMatches.length) {
-    dd.innerHTML = `<div class="search-dropdown-empty">No matches for "${escHtml(query)}". Try a workload (Sentinel, Purview) or page name (alerts, hunting, DLP).</div>`;
+    dd.innerHTML = `<div class="search-dropdown-empty">No matches for "${escHtml(query)}". Try a workload (analytics, governance) or page name (alerts, hunting, DLP).</div>`;
     dd.hidden = false;
     return;
   }
@@ -2644,14 +2873,14 @@ function openInvestigationPackage(deviceId) {
     status:'Ready',
     collected:new Date().toISOString(),
     reason:'Collect host evidence before remediation.',
-    contents:['Autoruns','Process list','Network summary','Defender sensor diagnostics'],
+    contents:['Autoruns','Process list','Network summary','Endpoint sensor diagnostics'],
     guidance:['Use the package to preserve host-level evidence before rebuild or wipe.'],
   };
   responsePanel(`Investigation package - ${device.name}`, `
     <div class="alert-section-title">Collection flow</div>
     <div class="response-flow">
       <div><strong>1. Request</strong><span>Analyst starts package collection from the device action strip.</span></div>
-      <div><strong>2. Collect</strong><span>MDE sensor gathers triage artifacts from the endpoint.</span></div>
+      <div><strong>2. Collect</strong><span>Endpoint sensor gathers triage artifacts from the endpoint.</span></div>
       <div><strong>3. Review</strong><span>Analyst downloads the package and correlates contents with Timeline and hunting rows.</span></div>
     </div>
     <dl class="kv-list">
@@ -2893,7 +3122,7 @@ function openTvmRemediationFlow(id) {
   sessionStorage.setItem(TVM_PANEL_RECOMMENDATION_KEY, rec.id);
   sessionStorage.setItem(TVM_PANEL_MODE_KEY, 'remediation');
   openTvmPanel(`Request remediation - ${rec.title}`, `
-    <div class="callout info">Create a remediation ticket with a due date and an Intune handoff note. The tracker updates locally and survives refresh.</div>
+    <div class="callout info">Create a remediation ticket with a due date and a device-management handoff note. The tracker updates locally and survives refresh.</div>
     <div class="tvm-form-grid">
       <label class="lbl">Ticket title<input class="ipt" id="tvm-rem-title" value="${esc(rec.title)}"></label>
       <div class="tvm-form-grid two">
@@ -2911,7 +3140,7 @@ function openTvmRemediationFlow(id) {
         <option ${rec.scope === 'Image processing workstations' ? 'selected' : ''}>Image processing workstations</option>
         <option ${rec.scope === 'Finance file server' ? 'selected' : ''}>Finance file server</option>
       </select></label>
-      <label class="lbl">Intune handoff note<textarea class="ipt" id="tvm-rem-handoff" rows="4">${esc(rec.handoff || 'Remediation will be staged through Intune.')}</textarea></label>
+      <label class="lbl">Device management handoff note<textarea class="ipt" id="tvm-rem-handoff" rows="4">${esc(rec.handoff || 'Remediation will be staged through device management.')}</textarea></label>
     </div>
     <div class="sidepanel-footer">
       <button class="btn btn-primary" onclick="saveTvmRemediationRequest()">Save remediation ticket</button>
@@ -3038,7 +3267,7 @@ function syntheticHuntRows(payload, sourceEvents) {
       }),
       row(-8, 'DeviceRegistryEvents', 'RegistryValueSet', {
         RegistryKey: 'HKCU\\Software\\ExampleOrg\\OS\\CurrentVersion\\Run',
-        RegistryValueName: 'OneDrive Update', RegistryValueData: processPath,
+        RegistryValueName: 'CloudDrive Update', RegistryValueData: processPath,
       }),
       row(7, 'DeviceNetworkEvents', 'ConnectionSuccess', {
         InitiatingProcessFileName: processName, RemoteIP: '185.199.111.12',
@@ -3300,14 +3529,14 @@ function openIdentityAlert(identityId, index) {
     </div>
     ${row.classifyNote ? `<p class="muted" style="line-height:1.45; margin-top:8px;"><em>${esc(row.classifyNote)}</em></p>` : ''}
 
-    <div class="alert-section-title">Classification choices (Defender XDR)</div>
+    <div class="alert-section-title">Classification choices</div>
     <table class="grid" style="font-size:12px;">
       <thead><tr><th>Verdict</th><th>When to pick it</th></tr></thead>
       <tbody>
         <tr><td><span class="sev high">True positive</span></td>
             <td>Real malicious activity confirmed.</td></tr>
         <tr><td><span class="sev medium">Benign true positive</span></td>
-            <td>Detection is accurate (the behavior did occur) but the activity is expected — Entra Connect/MSOL_ sync, authorized red-team test, documented break-glass action.</td></tr>
+            <td>Detection is accurate (the behavior did occur) but the activity is expected — Identity sync / MSOL_ sync, authorized red-team test, documented break-glass action.</td></tr>
         <tr><td><span class="sev info">False positive</span></td>
             <td>Detection was wrong — the behavior did NOT actually occur.</td></tr>
       </tbody>
@@ -3315,7 +3544,7 @@ function openIdentityAlert(identityId, index) {
 
     <div class="sidepanel-footer">
       <button class="btn btn-primary" onclick="toast('Marked ${esc(row.classification)} (lab stub).'); hidePanels();">Classify as ${esc(row.classification)}</button>
-      <button class="btn btn-secondary" onclick="toast('Open in Defender (lab stub).')">Open alert page</button>
+      <button class="btn btn-secondary" onclick="toast('Open in XDR Security (lab stub).')">Open alert page</button>
     </div>
   `;
   showPanel('panel-technique');
@@ -3375,7 +3604,7 @@ window.saveTvmExceptionRequest = saveTvmExceptionRequest;
 window.openTvmDeviceTab = openTvmDeviceTab;
 window.huntRelatedEvents = huntRelatedEvents;
 window.navigate          = navigate;
-window.toggleNavSection  = toggleNavSection;
+window.toggleNavBucket   = toggleNavBucket;
 window.openAlert         = openAlert;
 window.openIncident      = openIncident;
 window.openIncidentPage  = openIncidentPage;
@@ -3604,7 +3833,7 @@ function advanceSentinelIngestionLab(id, step) {
     return;
   }
   if (step === 'diagnostic' && !state.policyConfigured) {
-    toast('Choose the Azure Policy or diagnostic settings path first.');
+    toast('Choose the cloud policy or diagnostic settings path first.');
     return;
   }
   if (step === 'role' && !state.appRegistered) {
@@ -3658,7 +3887,7 @@ function advanceSentinelIngestionLab(id, step) {
 }
 function resetSentinelIngestionLab(id) {
   localStorage.removeItem(SENTINEL_INGESTION_STATE_PREFIX + id);
-  toast('Sentinel ingestion lab reset.');
+  toast('SIEM ingestion lab reset.');
   render();
 }
 
@@ -3707,7 +3936,7 @@ function defaultDefenderCloudMulticloudState() {
       ports:['3389', '22'],
       duration:'3 hours',
       requestState:'Approved',
-      requestor:'cloud-admin@hacksmarterlabs.example',
+      requestor:'cloud-admin@hacksmartersoc.example',
       note:'Lab-only request surface; no real network access is opened.',
     },
   };
@@ -3788,7 +4017,7 @@ function requestDefenderCloudJitAccess() {
     ...state.jit,
     enabled: true,
     requestState: 'Approved',
-    requestor: 'cloud-admin@hacksmarterlabs.example',
+    requestor: 'cloud-admin@hacksmartersoc.example',
     approvedAt: new Date().toISOString(),
   };
   localStorage.setItem(DEFENDER_CLOUD_MULTICLOUD_STATE_KEY, JSON.stringify(state));
@@ -3798,7 +4027,7 @@ function requestDefenderCloudJitAccess() {
 
 function resetDefenderCloudMulticloudState() {
   localStorage.removeItem(DEFENDER_CLOUD_MULTICLOUD_STATE_KEY);
-  toast('Defender for Cloud multicloud lab reset.');
+  toast('Cloud security multicloud lab reset.');
   render();
 }
 
@@ -3810,8 +4039,8 @@ const DEFENDER_CLOUD_SETUP_STATE_KEY = 'hsl.cloud.setup';
 
 function defaultDefenderCloudSetupState() {
   return {
-    scope: 'Hack-Smarter-Labs-Production',
-    scopeType: 'Azure subscription',
+    scope: 'Hack-Smarter-SOC-Production',
+    scopeType: 'Cloud subscription',
     saved: true,
     lastSaved: '2026-08-02T18:45:00Z',
     plans: {
@@ -3889,13 +4118,13 @@ function commitDefenderCloudSetupPlans() {
   state.saved = true;
   state.lastSaved = new Date().toISOString();
   saveDefenderCloudSetupState(state);
-  toast('Defender plan changes saved in this local lab.');
+  toast('Cloud security plan changes saved in this local lab.');
   render();
 }
 
 function resetDefenderCloudSetupState() {
   localStorage.removeItem(DEFENDER_CLOUD_SETUP_STATE_KEY);
-  toast('Azure Defender plan setup reset.');
+  toast('Cloud security plan setup reset.');
   render();
 }
 
@@ -4482,72 +4711,6 @@ function setWorkspace(id) {
 window.currentWorkspace = currentWorkspace;
 window.setWorkspace      = setWorkspace;
 
-// ---------- MSSP / MTO state ----------
-function currentMsspTenant() {
-  const id = localStorage.getItem('hsl.siem.mssp.tenant');
-  return MSSP_TENANTS.find(t => t.id === id) || MSSP_TENANTS[0];
-}
-function setMsspTenant(id) {
-  localStorage.setItem('hsl.siem.mssp.tenant', id);
-  render();
-}
-window.currentMsspTenant = currentMsspTenant;
-window.setMsspTenant = setMsspTenant;
-
-// Customer tenant details pane. In the real Workspace Manager / Azure Lighthouse
-// MTO view, selecting a customer tenant opens a details blade showing the
-// delegated workspaces, roles, cross-tenant incidents, and publish scope.
-function openMsspTenant(id) {
-  const t = MSSP_TENANTS.find(x => x.id === id);
-  if (!t) return;
-  const incidents = MTO_INCIDENTS.filter(i => i.tenant === t.name);
-  const openIncidents = incidents.filter(i => i.status !== 'Resolved').length;
-  const isActive = t.id === currentMsspTenant().id;
-  const statusOk = t.status === 'Active';
-  const sevClass = s => ({ High:'high', Medium:'medium', Low:'low', Informational:'info' }[s] || 'info');
-  const incRows = incidents.length
-    ? incidents.map(i => `
-        <tr>
-          <td><strong>${esc(i.title)}</strong><br><span class="muted">${esc(i.id)}</span></td>
-          <td><span class="sev ${sevClass(i.severity)}">${esc(i.severity)}</span></td>
-          <td>${esc(i.status)}</td>
-          <td>${esc(i.assignedTo)}</td>
-        </tr>`).join('')
-    : `<tr><td colspan="4" class="muted">No incidents synced from this tenant.</td></tr>`;
-
-  document.getElementById('tenant-title').textContent = t.name;
-  document.getElementById('tenant-body').innerHTML = `
-    <div class="pill-row" style="margin-bottom:12px;">
-      <span class="tag ${statusOk ? 'green' : 'orange'}"><span class="status-dot ${statusOk ? 'resolved' : 'warn'}"></span>${esc(t.status)} delegation</span>
-      ${isActive ? `<span class="tag green">Active publish target</span>` : ''}
-    </div>
-    <p class="muted" style="line-height:1.5;">Customer tenant onboarded through Azure Lighthouse. Delegated access lets the lab SOC view and act across the tenant's Sentinel workspaces without a directory switch.</p>
-
-    <div class="resource-summary" style="margin-top:12px;">
-      <div><span>Delegated workspaces</span><strong>${t.workspaces.length}</strong><small>${esc(t.workspaces.join(' · '))}</small></div>
-      <div><span>Delegated roles</span><strong>${t.delegatedRoles.length}</strong><small>${esc(t.delegatedRoles.join(' · '))}</small></div>
-      <div><span>Open incidents</span><strong>${openIncidents}</strong><small>${incidents.length} total synced</small></div>
-    </div>
-
-    <div class="alert-section-title" style="margin-top:16px;">Delegated roles (Azure Lighthouse)</div>
-    <ul class="attack-evidence-list">${t.delegatedRoles.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
-
-    <div class="alert-section-title" style="margin-top:16px;">Cross-tenant incidents</div>
-    <table class="grid">
-      <thead><tr><th>Incident</th><th>Severity</th><th>Status</th><th>Owner</th></tr></thead>
-      <tbody>${incRows}</tbody>
-    </table>
-
-    <div class="sidepanel-footer" style="margin-top:16px;">
-      ${isActive
-        ? `<button class="btn btn-secondary" disabled>Active publish target</button>`
-        : `<button class="btn btn-primary" onclick="setMsspTenant('${esc(t.id)}')">Set as active tenant</button>`}
-      <button class="btn btn-secondary" onclick="hidePanels();navigate('#/xdr/mto')">View all tenant incidents</button>
-    </div>`;
-  showPanel('panel-tenant');
-}
-window.openMsspTenant = openMsspTenant;
-
 function loadSentinelLogsQuery(query) {
   sessionStorage.setItem('hsl.siem.logs.query', query);
   navigate('#/siem/logs');
@@ -4750,10 +4913,10 @@ function openEntraUser(upn) {
         `).join('')}</tbody>
       </table>` : ''}
 
-    ${onboarded ? '' : `<div class="muted" style="font-size:12px;">Not onboarded to Defender for Identity — this principal exists in the Entra directory only.</div>`}
+    ${onboarded ? '' : `<div class="muted" style="font-size:12px;">Not onboarded for identity monitoring — this principal exists in the directory only.</div>`}
 
     <div class="sidepanel-footer entra-user-actions">
-      ${onboarded ? `<button class="btn btn-primary" onclick="hidePanels(); openIdentity('${esc(u.xdrIdentity)}')">Defender XDR</button>` : ''}
+      ${onboarded ? `<button class="btn btn-primary" onclick="hidePanels(); openIdentity('${esc(u.xdrIdentity)}')">XDR Security</button>` : ''}
       ${u.incidentId ? `<button class="btn btn-secondary" onclick="hidePanels(); openIncidentPage('${esc(u.incidentId)}')">${esc(u.incidentId)}</button>` : ''}
       <button class="btn btn-secondary" onclick="toast('Lab action: sessions revoked for ${esc(u.upn)}.')">Revoke sessions</button>
       <button class="btn btn-secondary" onclick="toast('Lab action: password reset required for ${esc(u.upn)}.')">Reset password</button>
@@ -4793,7 +4956,7 @@ const SIGNIN_DETAIL_TABS = [
   { key: 'location', label: 'Location' },
   { key: 'device',   label: 'Device info' },
   { key: 'auth',     label: 'Authentication details' },
-  { key: 'ca',       label: 'Conditional Access' },
+  { key: 'ca',       label: 'Access policy' },
 ];
 
 // The fixture keeps one readable string per fact (device, client, mfa, ca) and

@@ -780,7 +780,7 @@ function mockKqlRenderChart(result) {
       const sweep = (value / total) * 360;
       const end = start + sweep;
       const large = sweep > 180 ? 1 : 0;
-      const color = ['#0078d4', '#50e6ff', '#107c10', '#ff8c00', '#d13438', '#8864d2'][index % 6];
+      const color = ['#5aa4ff', '#50e6ff', '#107c10', '#ff8c00', '#d13438', '#8864d2'][index % 6];
       const startRad = start * Math.PI / 180;
       const endRad = end * Math.PI / 180;
       const x1 = cx + r * Math.cos(startRad);
@@ -791,15 +791,15 @@ function mockKqlRenderChart(result) {
       return `<path d="M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${color}" opacity="0.92"></path>`;
     }).join('');
     return `
-      <div class="kql-chart" style="margin:10px 0 14px; padding:10px; border:1px solid var(--border); border-radius:4px; background:#fff;">
+      <div class="kql-chart" style="margin:10px 0 14px; padding:10px; border:1px solid var(--border); border-radius:4px; background:var(--bg-card);">
         <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
           <strong>${esc(cap(kind))} chart</strong>
           <span class="muted">${esc(labelKey)}${numericKey ? ' · ' + esc(numericKey) : ''}</span>
         </div>
         <div style="display:flex; gap:16px; align-items:center;">
-          <svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="${esc(kind)} chart">${slices}<circle cx="90" cy="90" r="36" fill="#fff"></circle></svg>
+          <svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="${esc(kind)} chart">${slices}<circle cx="90" cy="90" r="36" fill="var(--bg-card)"></circle></svg>
           <div style="display:grid; gap:6px; min-width:0;">
-            ${rows.map((row, index) => `<div style="display:flex; gap:8px; align-items:center;"><span class="tag" style="background:${['#0078d4','#50e6ff','#107c10','#ff8c00','#d13438','#8864d2'][index % 6]}; color:#fff;">${esc(row[labelKey] ?? labelKey)}</span><span class="muted">${esc(rows[index][numericKey] ?? values[index] ?? 0)}</span></div>`).join('')}
+            ${rows.map((row, index) => `<div style="display:flex; gap:8px; align-items:center;"><span class="tag" style="background:${['#5aa4ff','#50e6ff','#107c10','#ff8c00','#d13438','#8864d2'][index % 6]}; color:#fff;">${esc(row[labelKey] ?? labelKey)}</span><span class="muted">${esc(rows[index][numericKey] ?? values[index] ?? 0)}</span></div>`).join('')}
           </div>
         </div>
       </div>`;
@@ -816,13 +816,13 @@ function mockKqlRenderChart(result) {
     const label = String(row[labelKey] ?? labelKey).slice(0, 24);
     return `
       <g>
-        <rect x="${x}" y="${y}" width="${Math.max(18, barWidth - 28)}" height="${barHeight}" rx="2" fill="${kind === 'timechart' ? '#0078d4' : '#5c2d91'}"></rect>
-        <text x="${x + Math.max(9, (barWidth - 28) / 2)}" y="148" text-anchor="middle" font-size="11" fill="#605e5c">${esc(label)}</text>
-        <text x="${x + Math.max(9, (barWidth - 28) / 2)}" y="${Math.max(24, y - 6)}" text-anchor="middle" font-size="11" fill="#201f1e">${esc(value)}</text>
+        <rect x="${x}" y="${y}" width="${Math.max(18, barWidth - 28)}" height="${barHeight}" rx="2" fill="${kind === 'timechart' ? '#5aa4ff' : '#8b7cf6'}"></rect>
+        <text x="${x + Math.max(9, (barWidth - 28) / 2)}" y="148" text-anchor="middle" font-size="11" fill="var(--fg-muted)">${esc(label)}</text>
+        <text x="${x + Math.max(9, (barWidth - 28) / 2)}" y="${Math.max(24, y - 6)}" text-anchor="middle" font-size="11" fill="var(--fg)">${esc(value)}</text>
       </g>`;
   }).join('');
   return `
-    <div class="kql-chart" style="margin:10px 0 14px; padding:10px; border:1px solid var(--border); border-radius:4px; background:#fff;">
+    <div class="kql-chart" style="margin:10px 0 14px; padding:10px; border:1px solid var(--border); border-radius:4px; background:var(--bg-card);">
       <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
         <strong>${esc(cap(kind))} chart</strong>
         <span class="muted">${esc(labelKey)}${numericKey ? ' · ' + esc(numericKey) : ''}</span>
@@ -863,7 +863,7 @@ function huntResolveIdentity(value) {
   const raw = String(value ?? '').trim();
   if (!raw || typeof IDENTITIES === 'undefined') return null;
   const v = raw.toLowerCase();
-  // HACKSMARTERLABS\jdoe and jdoe@hacksmarterlabs.example both resolve to the jdoe identity.
+  // HACKSMARTERSOC\jdoe and jdoe@hacksmartersoc.example both resolve to the jdoe identity.
   const bare = (v.includes('\\') ? v.split('\\').pop() : v).split('@')[0];
   return IDENTITIES.find(i =>
     [i.id, i.upn, i.samName, i.displayName, i.sid].filter(Boolean).some(x => {
@@ -1268,7 +1268,8 @@ function renderDiscoveredDevicesCard() {
   const max = types[0][1];
 
   // Anything first seen in the trailing week counts as "recently discovered".
-  const weekAgo = new Date('2026-06-28T15:00:00Z').getTime() - 7 * 864e5;
+  // (2026-06-28T15:00:00Z is the lab's fictional "now" — see LAB_ANCHOR in data.js.)
+  const weekAgo = Date.parse('2026-06-28T15:00:00Z') + LAB_TIME_OFFSET_MS - 7 * 864e5;
   const recent = DISCOVERED_DEVICES.filter(d => new Date(d.firstSeen).getTime() >= weekAgo);
 
   return `
@@ -1286,16 +1287,18 @@ function renderDiscoveredDevicesCard() {
             <div class="kpi"><span class="kpi-label">Network devices</span><span class="kpi-value">${network.length}</span></div>
             <div class="kpi"><span class="kpi-label">High value devices</span><span class="kpi-value">${highValue.length}</span></div>
           </div>
-          <div class="alert-section-title">Distribution by device type
-            <span class="muted" style="font-weight:400">· ${types.length} classifications · scroll for the long tail</span>
-          </div>
-          <div class="discovery-bars">
-          ${types.map(([type, n]) => `
-            <div class="discovery-bar-row">
-              <div class="discovery-bar-label"><span>${esc(type)}</span><span class="muted">${n}/${DISCOVERED_DEVICES.length}</span></div>
-              <div class="bar"><i style="width:${Math.max(2, Math.round(n / max * 100))}%"></i></div>
-            </div>`).join('')}
-          </div>
+          <details class="dfc-additional-recs discovery-type-breakdown">
+            <summary>Distribution by device type
+              <span class="muted" style="font-weight:400">· ${types.length} classifications · full breakdown lives in Inventory</span>
+            </summary>
+            <div class="discovery-bars">
+            ${types.map(([type, n]) => `
+              <div class="discovery-bar-row">
+                <div class="discovery-bar-label"><span>${esc(type)}</span><span class="muted">${n}/${DISCOVERED_DEVICES.length}</span></div>
+                <div class="bar"><i style="width:${Math.max(2, Math.round(n / max * 100))}%"></i></div>
+              </div>`).join('')}
+            </div>
+          </details>
           <button class="btn btn-secondary" style="margin-top:12px" onclick="setInventoryTab('iot');navigate('#/xdr/devices')">View all IoT devices</button>
         </div>
       </div>
@@ -1303,7 +1306,6 @@ function renderDiscoveredDevicesCard() {
       <div class="card">
         <div class="card-toolbar">
           <strong>Devices discovered in the last 7 days</strong>
-          <a class="chip-link" href="#/xdr/device-discovery">Discovery settings →</a>
         </div>
         <div class="card-body">
           <h2 style="margin:0 0 12px">Recently discovered devices in your organization: ${recent.length}</h2>
@@ -1345,30 +1347,29 @@ VIEWS['xdr/home'] = () => {
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary">↻ Refresh</button>
-        <button class="btn btn-primary" onclick="openCopilot()">✨ Ask Security Copilot</button>
       </div>
     </div>
 
-    <div class="kpi-strip">
-      <div class="kpi">
-        <span class="kpi-label">Active incidents</span>
-        <span class="kpi-value">${incOpen}</span>
+    <div class="home-hero">
+      <div class="home-hero-primary">
+        <span class="home-hero-label">Active incidents</span>
+        <span class="home-hero-value">${incOpen}</span>
         <span class="kpi-delta bad">▲ 2 vs. yesterday</span>
+        <a class="chip-link" href="#/xdr/incidents">Open case queue →</a>
       </div>
-      <div class="kpi">
-        <span class="kpi-label">New alerts (24h)</span>
-        <span class="kpi-value">${newAlerts}</span>
-        <span class="kpi-delta">▼ 4 vs. yesterday</span>
-      </div>
-      <div class="kpi">
-        <span class="kpi-label">Secure score</span>
-        <span class="kpi-value">65%</span>
-        <span class="kpi-delta">▲ 1.2 pts this week</span>
-      </div>
-      <div class="kpi">
-        <span class="kpi-label">Devices at risk</span>
-        <span class="kpi-value">3</span>
-        <span class="kpi-delta bad">▲ 1 new</span>
+      <div class="home-hero-secondary">
+        <div class="home-stat">
+          <span class="home-stat-value">${newAlerts}</span>
+          <span class="home-stat-label">New alerts · 24h</span>
+        </div>
+        <div class="home-stat">
+          <span class="home-stat-value">65%</span>
+          <span class="home-stat-label">Exposure score</span>
+        </div>
+        <div class="home-stat">
+          <span class="home-stat-value">3</span>
+          <span class="home-stat-label">Devices at risk</span>
+        </div>
       </div>
     </div>
 
@@ -1390,80 +1391,81 @@ VIEWS['xdr/home'] = () => {
       </div>
     </div>
 
-    <div class="two-col">
-      <div class="card">
-        <div class="card-toolbar">
-          <strong>Active incidents</strong>
-          <a class="chip-link" href="#/xdr/incidents">View all →</a>
-        </div>
-        <table class="grid">
-          <thead><tr><th>Severity</th><th>Title</th><th>Alerts</th><th>Status</th></tr></thead>
-          <tbody>
-            ${INCIDENTS.slice(0,4).map(i => `
-              <tr onclick="openIncident('${i.id}')">
-                <td><span class="sev ${i.severity}">${cap(i.severity)}</span></td>
-                <td><strong>${esc(i.title)}</strong><br><span class="muted">${esc(i.tactics.join(' · '))}</span></td>
-                <td>${i.alertCount}</td>
-                <td>${esc(i.status)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+    <div class="home-layout">
+      <div class="home-main">
+        <section class="home-block">
+          <div class="home-block-header">
+            <h2>Active incidents</h2>
+            <a class="chip-link" href="#/xdr/incidents">View all →</a>
+          </div>
+          <table class="grid">
+            <thead><tr><th>Severity</th><th>Title</th><th>Alerts</th><th>Status</th></tr></thead>
+            <tbody>
+              ${INCIDENTS.slice(0,4).map(i => `
+                <tr onclick="openIncident('${i.id}')">
+                  <td><span class="sev ${i.severity}">${cap(i.severity)}</span></td>
+                  <td><strong>${esc(i.title)}</strong><br><span class="muted">${esc(i.tactics.join(' · '))}</span></td>
+                  <td>${i.alertCount}</td>
+                  <td>${esc(i.status)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </section>
+
+        <section class="home-block">
+          <div class="home-block-header">
+            <h2>Active threat campaigns</h2>
+            <a class="chip-link" href="#/xdr/threat-analytics">All threat analytics →</a>
+          </div>
+          ${THREAT_REPORTS.filter(t => t.status === 'Active campaign').slice(0,3).map(t => `
+            <div class="home-threat-row">
+              <div><span class="sev ${t.severity}">${cap(t.severity)}</span> <strong>${esc(t.name)}</strong></div>
+              <div class="muted" style="font-size:12px;">${esc(t.type)} · ${t.impactedAssets} impacted asset(s)</div>
+            </div>
+          `).join('')}
+        </section>
       </div>
 
-      <div class="card">
-        <div class="card-toolbar">
-          <strong>Latest alerts</strong>
+      <aside class="home-side">
+        <div class="home-side-block">
+          <div class="home-side-title">Latest alerts</div>
+          ${recentAlerts.map(a => `
+            <div class="home-alert-row" onclick="openAlert('${a.id}')">
+              <span class="sev ${a.severity}"></span>
+              <div>
+                <strong>${esc(a.title)}</strong>
+                <span class="muted">${esc(a.asset)} · ${fmtTime(a.firstActivity)}</span>
+              </div>
+            </div>
+          `).join('')}
           <a class="chip-link" href="#/xdr/alerts">View all →</a>
         </div>
-        <table class="grid">
-          <thead><tr><th>Severity</th><th>Title</th><th>Asset</th></tr></thead>
-          <tbody>
-            ${recentAlerts.map(a => `
-              <tr onclick="openAlert('${a.id}')">
-                <td><span class="sev ${a.severity}">${cap(a.severity)}</span></td>
-                <td><strong>${esc(a.title)}</strong><br><span class="muted">${fmtTime(a.firstActivity)}</span></td>
-                <td>${esc(a.asset)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="three-col" style="margin-top:16px;">
-      <div class="card card-body">
-        <div class="alert-section-title">Secure score</div>
-        <div class="donut" style="--pct:65"><div class="donut-inner"><b>65%</b><span>247 / 380 pts</span></div></div>
-        <div class="muted">3 high-impact actions available.</div>
-        <a class="chip-link" href="#/xdr/secure-score">Improve score →</a>
-      </div>
-      <div class="card card-body">
-        <div class="alert-section-title">Active threat campaigns</div>
-        ${THREAT_REPORTS.filter(t => t.status === 'Active campaign').slice(0,3).map(t => `
-          <div style="margin-bottom:10px;">
-            <div><span class="sev ${t.severity}">${cap(t.severity)}</span> <strong>${esc(t.name)}</strong></div>
-            <div class="muted" style="font-size:12px;">${esc(t.type)} · ${t.impactedAssets} impacted asset(s)</div>
-          </div>
-        `).join('')}
-        <a class="chip-link" href="#/xdr/threat-analytics">All threat analytics →</a>
-      </div>
-      <div class="card card-body">
-        <div class="alert-section-title">Suggested next steps</div>
-        <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7;">
-          <li><a href="#/xdr/incidents">Triage 5 active incidents</a></li>
-          <li><a href="#/xdr/hunting">Hunt for staging in C:\\Users\\Public</a></li>
-          <li><a href="#/xdr/suppression">Review noisy detections</a></li>
-          <li><a href="#/siem/analytics">Tune Sentinel analytics rules</a></li>
-        </ul>
-      </div>
+        <div class="home-side-block">
+          <div class="home-side-title">Exposure score</div>
+          <div class="donut" style="--pct:65"><div class="donut-inner"><b>65%</b><span>247 / 380 pts</span></div></div>
+          <div class="muted">3 high-impact actions available.</div>
+          <a class="chip-link" href="#/xdr/secure-score">Improve score →</a>
+        </div>
+
+        <div class="home-side-block">
+          <div class="home-side-title">Suggested next steps</div>
+          <ul class="home-next-steps">
+            <li><a href="#/xdr/incidents">Triage 5 active incidents</a></li>
+            <li><a href="#/xdr/hunting">Hunt for staging in C:\\Users\\Public</a></li>
+            <li><a href="#/xdr/suppression">Review noisy detections</a></li>
+            <li><a href="#/siem/analytics">Tune analytics rules</a></li>
+          </ul>
+        </div>
+      </aside>
     </div>
   `;
 };
 
 VIEWS['xdr/incidents'] = () => `
   <div class="page-header">
-    <div><div class="breadcrumb">Investigation & response › Incidents &amp; alerts › <strong>Incidents</strong></div><h1>Incidents</h1></div>
+    <div><div class="breadcrumb">Investigation & response › Incidents &amp; alerts › <strong>Case queue</strong></div><h1>Case queue</h1></div>
   </div>
   <div class="filterbar">
     <span class="chip">Severity: <strong>Any</strong> ▾</span>
@@ -1500,10 +1502,10 @@ VIEWS['xdr/incidents'] = () => `
 `;
 
 const INCIDENT_PAGE_TABS = [
-  { key:'attack-story',  label:'Attack story' },
+  { key:'attack-story',  label:'Attack narrative' },
   { key:'alerts',        label:'Alerts' },
   { key:'assets',        label:'Assets' },
-  { key:'evidence',      label:'Evidence and Response' },
+  { key:'evidence',      label:'Evidence and remediation' },
   { key:'summary',       label:'Summary' },
   { key:'activities',    label:'Activities' },
   { key:'similar',       label:'Similar incidents' },
@@ -1575,9 +1577,9 @@ VIEWS['xdr/incident'] = () => {
           </div>
         ` : ''}
         <div class="callout info" style="margin-top:18px;">
-          The attack story stitches alerts into a chronological narrative across the kill chain.
+          The attack narrative stitches alerts into a chronological sequence across the kill chain.
           Use the <strong>Alerts</strong> tab for the raw row-by-row view, <strong>Assets</strong> for affected
-          devices/identities/files, and <strong>Evidence and Response</strong> for entity verdicts.
+          devices/identities/files, and <strong>Evidence and remediation</strong> for entity verdicts.
         </div>`;
       break;
     case 'alerts':
@@ -1604,7 +1606,7 @@ VIEWS['xdr/incident'] = () => {
       break;
     case 'evidence':
       body = `
-        <p class="muted" style="margin-bottom:12px;">Defender XDR auto-analyzes events and entities and assigns each one a verdict (Malicious, Suspicious, Clean) plus a remediation status. Pending actions can be approved or rejected per row.</p>
+        <p class="muted" style="margin-bottom:12px;">Each event and entity is auto-analyzed and assigned a verdict (Malicious, Suspicious, Clean) plus a remediation status. Pending actions can be approved or rejected per row.</p>
         ${renderIncidentEvidence(inc)}`;
       break;
     case 'summary':
@@ -1628,7 +1630,7 @@ VIEWS['xdr/incident'] = () => {
         <div class="breadcrumb">
           <a href="#/xdr/incidents">Investigation &amp; response</a> ›
           <a href="#/xdr/incidents">Incidents &amp; alerts</a> ›
-          <a href="#/xdr/incidents">Incidents</a> ›
+          <a href="#/xdr/incidents">Case queue</a> ›
           <strong>${esc(inc.id)}</strong>
         </div>
         <h1>${esc(inc.title)}</h1>
@@ -1641,10 +1643,10 @@ VIEWS['xdr/incident'] = () => {
     </div>
 
     <div class="incident-command-bar">
-      <button class="btn btn-secondary btn-sm" onclick="toast('Incident classified (lab stub).')">Classify</button>
+      <button class="btn btn-secondary btn-sm" onclick="toast('Verdict set (lab stub).')">Set verdict</button>
       <button class="btn btn-secondary btn-sm" onclick="toast('Comment added (lab stub).')">Add comment</button>
       <button class="btn btn-secondary btn-sm" onclick="toast('Tags opened (lab stub).')">Manage tags</button>
-      <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Investigate further</button>
     </div>
 
     <div class="incident-page-tabs tabs">
@@ -1699,7 +1701,7 @@ VIEWS['xdr/alerts'] = () => {
   }).join('');
   return `
     <div class="page-header">
-      <div><div class="breadcrumb">Investigation & response › <strong>Alerts</strong></div><h1>Alerts</h1></div>
+      <div><div class="breadcrumb">Investigation & response › <strong>Signals</strong></div><h1>Signals</h1></div>
       <div class="page-actions">
         <button class="btn btn-secondary" onclick="replayScenario()">↻ Replay scenario events</button>
         <button class="btn btn-primary" onclick="openRulePanel()">+ Create suppression rule</button>
@@ -2310,10 +2312,10 @@ VIEWS['xdr/threat-analytics'] = () => `
 `;
 
 VIEWS['xdr/secure-score'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Exposure management › <strong>Secure score</strong></div><h1>Secure Score</h1></div></div>
+  <div class="page-header"><div><div class="breadcrumb">Exposure management › <strong>Exposure score</strong></div><h1>Exposure Score</h1></div></div>
   <div class="two-col">
     <div class="card card-body" style="text-align:center;">
-      <div class="alert-section-title">Your secure score</div>
+      <div class="alert-section-title">Your exposure score</div>
       <div class="donut" style="--pct:65; margin:8px auto;"><div class="donut-inner"><b>65%</b><span>247 / 380 pts</span></div></div>
       <div class="muted">Last updated ${fmtTime(new Date().toISOString())}</div>
     </div>
@@ -2351,7 +2353,7 @@ VIEWS['xdr/cloud-apps'] = () => {
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary" onclick="openIncident('${esc(inv.incidentId)}')">Open incident preview</button>
-        <button class="btn btn-primary" onclick="openIncidentPage('${esc(inv.incidentId)}')">Open in Defender XDR</button>
+        <button class="btn btn-primary" onclick="openIncidentPage('${esc(inv.incidentId)}')">Open in XDR Security</button>
       </div>
     </div>
     <div class="kpi-strip">
@@ -2396,156 +2398,6 @@ VIEWS['xdr/cloud-apps'] = () => {
   `;
 };
 
-VIEWS['xdr/settings'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">System › <strong>Settings</strong></div>
-      <h1>Defender XDR settings</h1>
-      <div class="page-subtitle">MDE tenant controls for advanced features, device grouping, permissions, and automation levels.</div>
-    </div>
-    <div class="page-actions">
-      <button class="btn btn-secondary" onclick="toast('Settings export prepared in the lab.')">Export</button>
-      <a class="btn btn-secondary" href="#/xdr/mto">Multi-tenant management</a>
-      <button class="btn btn-primary" onclick="toast('Settings saved in lab memory only.')">Save changes</button>
-    </div>
-  </div>
-  <div class="settings-grid">
-    <section class="card card-body">
-      <div class="alert-section-title">Advanced features</div>
-      <div class="settings-list">
-        ${MDE_SETTINGS.advancedFeatures.map(f => `
-          <label class="setting-row">
-            <input type="checkbox" ${f.enabled ? 'checked' : ''} onchange="toggleSettingState(this)">
-            <span><strong>${esc(f.name)}</strong><small>${esc(f.note)}</small></span>
-            <em>${f.enabled ? 'On' : 'Off'}</em>
-          </label>
-        `).join('')}
-      </div>
-    </section>
-    <section class="card card-body">
-      <div class="alert-section-title">Rules settings</div>
-      <table class="grid compact-grid">
-        <thead><tr><th>Area</th><th>Current setting</th><th>Owner</th></tr></thead>
-        <tbody>${MDE_SETTINGS.rulesSettings.map(r => `
-          <tr><td><strong>${esc(r.area)}</strong></td><td>${esc(r.setting)}</td><td>${esc(r.owner)}</td></tr>
-        `).join('')}</tbody>
-      </table>
-    </section>
-  </div>
-  <div class="two-col" style="margin-top:16px;">
-    <section class="card">
-      <div class="card-toolbar"><strong>Device groups and automation levels</strong><span class="muted">Rank controls policy precedence</span></div>
-      <table class="grid">
-        <thead><tr><th>Rank</th><th>Device group</th><th>Devices</th><th>Automation level</th><th>Allowed role</th></tr></thead>
-        <tbody>${MDE_SETTINGS.deviceGroups.map(g => `
-          <tr><td>${g.rank}</td><td><strong>${esc(g.name)}</strong></td><td>${g.devices}</td><td>${esc(g.automation)}</td><td>${esc(g.role)}</td></tr>
-        `).join('')}</tbody>
-      </table>
-    </section>
-    <section class="card">
-      <div class="card-toolbar"><strong>Permissions and roles</strong><a class="chip-link" href="#/xdr/action-center">Review pending actions →</a></div>
-      <table class="grid">
-        <thead><tr><th>Role</th><th>Members</th><th>Rights</th></tr></thead>
-        <tbody>${MDE_SETTINGS.roles.map(r => `
-          <tr><td><strong>${esc(r.role)}</strong></td><td>${esc(r.members)}</td><td>${esc(r.rights)}</td></tr>
-        `).join('')}</tbody>
-      </table>
-    </section>
-  </div>
-  <section class="card" style="margin-top:16px;">
-    <div class="card-toolbar"><strong>Custom data collection</strong><span class="muted">Lab-only study cards</span></div>
-    <div class="tile-grid">
-      ${MDE_SETTINGS.customCollection.map(c => `
-        <div class="tile">
-          <div class="tile-title">${esc(c.name)}</div>
-          <div class="tile-sub">${esc(c.scope)}</div>
-          <div><span class="entity-chip">${esc(c.table)}</span><span class="tag ${c.status === 'Collecting' ? 'green' : 'orange'}">${esc(c.status)}</span></div>
-        </div>
-      `).join('')}
-    </div>
-  </section>
-`;
-
-VIEWS['xdr/mto'] = () => {
-  const tenant = currentMsspTenant();
-  const tenantIncidents = MTO_INCIDENTS.filter(i => i.tenant === tenant.name);
-  const openIncidents = MTO_INCIDENTS.filter(i => i.status !== 'Resolved');
-  return `
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb">System › <strong>Multi-tenant management</strong></div>
-        <h1>Defender multi-tenant management</h1>
-        <div class="page-subtitle">Consolidated incident queue for a managed-security-provider style lab tenant. Use it to reason about delegated access versus customer-tenant administration.</div>
-      </div>
-      <div class="page-actions">
-        <a class="btn btn-secondary" href="#/xdr/settings">Back to settings</a>
-        <button class="btn btn-primary" onclick="toast('MTO queue updated in local lab state only.')">Refresh queue</button>
-      </div>
-    </div>
-    <div class="callout info" style="margin-bottom:16px;">
-      Multi-tenant management is for delegated triage, hunting, and response across customer tenants. It does <strong>not</strong> replace customer-tenant ownership for directory, licensing, or admin-only changes.
-    </div>
-    <div class="kpi-strip">
-      <div class="kpi"><span class="kpi-label">Customer tenants</span><span class="kpi-value">${MSSP_TENANTS.length}</span></div>
-      <div class="kpi"><span class="kpi-label">Open incidents</span><span class="kpi-value">${openIncidents.length}</span></div>
-      <div class="kpi"><span class="kpi-label">Selected tenant</span><span class="kpi-value">${esc(tenant.name)}</span></div>
-      <div class="kpi"><span class="kpi-label">Delegated roles</span><span class="kpi-value">${tenant.delegatedRoles.length}</span></div>
-    </div>
-    <div class="two-col">
-      <section class="card card-body">
-        <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-          <strong>Tenant switcher</strong>
-          <span class="muted">Choose the customer you are triaging</span>
-        </div>
-        <label class="wizard-label">Active customer
-          <select class="text-input" onchange="setMsspTenant(this.value)">
-            ${MSSP_TENANTS.map(t => `<option value="${t.id}" ${t.id === tenant.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}
-          </select>
-        </label>
-        <div class="tile-grid" style="margin-top:12px;">
-          ${MSSP_TENANTS.map(t => `
-            <button class="tile ${t.id === tenant.id ? 'selected-row' : ''}" type="button" onclick="setMsspTenant('${esc(t.id)}')">
-              <div class="tile-title">${esc(t.name)}</div>
-              <div class="tile-sub">${esc(t.status)} · ${t.workspaces.length} workspace${t.workspaces.length === 1 ? '' : 's'}</div>
-              <div style="margin-top:8px;">${t.delegatedRoles.map(role => `<span class="tag">${esc(role)}</span>`).join(' ')}</div>
-            </button>
-          `).join('')}
-        </div>
-      </section>
-      <section class="card card-body">
-        <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-          <strong>Scope notes</strong>
-          <span class="muted">What MTO covers and what it does not</span>
-        </div>
-        <div class="flowline vertical-flow">
-          <div class="flow-step"><strong>MTO can</strong><span>View and triage incidents, pivot entities, run response actions, and coordinate across delegated customer workspaces.</span></div>
-          <div class="flow-step"><strong>Need B2B or tenant admin</strong><span>Change directory objects, tenant settings, subscription ownership, or customer-owned configuration outside the delegated scope.</span></div>
-          <div class="flow-step"><strong>Single-tenant only</strong><span>Lab tasks that touch licensing, ownership, or customer governance stay in the customer tenant even when the queue is centralized.</span></div>
-        </div>
-      </section>
-    </div>
-    <section class="card" style="margin-top:16px;">
-      <div class="card-toolbar">
-        <strong>Consolidated incident queue</strong>
-        <span class="muted">${tenantIncidents.length} incidents for ${esc(tenant.name)}</span>
-      </div>
-      <table class="grid">
-        <thead><tr><th>Tenant</th><th>Severity</th><th>Incident</th><th>Status</th><th>Assigned to</th></tr></thead>
-        <tbody>
-          ${MTO_INCIDENTS.map(incident => `
-            <tr class="${incident.tenant === tenant.name ? 'active-row' : ''}">
-              <td><strong>${esc(incident.tenant)}</strong></td>
-              <td><span class="sev ${incident.severity === 'High' ? 'high' : incident.severity === 'Medium' ? 'medium' : 'low'}">${esc(incident.severity)}</span></td>
-              <td>${esc(incident.title)}</td>
-              <td>${esc(incident.status)}</td>
-              <td>${esc(incident.assignedTo)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </section>
-  `;
-};
 
 VIEWS['xdr/asr-policy'] = () => `
   <div class="page-header">
@@ -2582,43 +2434,6 @@ VIEWS['xdr/asr-policy'] = () => `
   </div>
   <div class="callout info" style="margin-top:16px;">
     <strong>SC-200 decision point:</strong> use Audit to measure breakage, Warn when user override is acceptable, and Block for high-confidence protections after exclusions are justified.
-  </div>
-`;
-
-VIEWS['xdr/notifications'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">System › <strong>Email notifications</strong></div>
-      <h1>Email notification rules</h1>
-      <div class="page-subtitle">Static create flow for incident, action center, and threat analytics notifications.</div>
-    </div>
-    <div class="page-actions"><button class="btn btn-primary" onclick="showNotificationComposer()">+ Create notification rule</button></div>
-  </div>
-  <div class="two-col">
-    <section class="card">
-      <div class="card-toolbar"><strong>${NOTIFICATION_RULES.length}</strong> notification rules</div>
-      <table class="grid">
-        <thead><tr><th>Status</th><th>Name</th><th>Trigger</th><th>Recipients</th><th>Filter</th></tr></thead>
-        <tbody>${NOTIFICATION_RULES.map(r => `
-          <tr><td><span class="status-dot resolved"></span>${esc(r.status)}</td><td><strong>${esc(r.name)}</strong></td><td>${esc(r.trigger)}</td><td>${esc(r.recipients)}</td><td>${esc(r.filter)}</td></tr>
-        `).join('')}</tbody>
-      </table>
-    </section>
-    <section class="card card-body notification-composer" id="notification-composer">
-      <div class="alert-section-title">Create notification rule</div>
-      <label class="wizard-label">Rule name<input class="text-input" id="notif-name" value="Medium incidents assigned to L1"></label>
-      <label class="wizard-label">Notify on
-        <select class="text-input" id="notif-trigger">
-          <option>Incident created or updated</option>
-          <option>Action center item pending</option>
-          <option>Threat analytics report impacts assets</option>
-        </select>
-      </label>
-      <label class="wizard-label">Recipients<input class="text-input" value="l1-soc@hacksmarterlabs.example"></label>
-      <label class="wizard-label">Filter<input class="text-input" value="Severity is Medium and assignedTo is L1-Triage"></label>
-      <button class="btn btn-primary" onclick="createNotificationRule()">Create lab rule</button>
-      <div class="callout hidden" id="notification-result"></div>
-    </section>
   </div>
 `;
 
@@ -2819,7 +2634,6 @@ VIEWS['xdr/devices'] = () => {
       <div class="page-subtitle">Onboarded devices and the unmanaged assets your sensors discovered on monitored networks. Select a device to investigate, or triage what can still be onboarded.</div>
     </div>
     <div class="page-actions">
-      <a class="btn btn-secondary" href="#/xdr/device-discovery">📡 Discovery settings</a>
       <button class="btn btn-primary" onclick="toast('Fictional lab action: an onboarding package would be generated for the selected devices.')">Onboard devices</button>
     </div>
   </div>
@@ -3018,7 +2832,6 @@ VIEWS['xdr/discovered-device'] = () => {
           <button class="btn btn-primary" onclick="toast('Fictional lab action: an onboarding package would be downloaded for ${esc(d.name)}.')">Download onboarding package</button>` : ''}
         <div class="alert-section-title">Other actions</div>
         <button class="btn btn-secondary" onclick="toast('Fictional lab action: ${esc(d.name)} would be excluded from active probing.')">Exclude from standard discovery</button>
-        <a class="btn btn-secondary" href="#/xdr/device-discovery">Discovery settings</a>
       </section>`,
   }[tab]();
 
@@ -3051,132 +2864,12 @@ VIEWS['xdr/discovered-device'] = () => {
 `;
 };
 
-// ---------- Defender for Endpoint › System > Settings > Device discovery ----------
-VIEWS['xdr/device-discovery'] = () => {
-  const s = DEVICE_DISCOVERY_SETTINGS;
-  return `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">System › Settings › <strong>Device discovery</strong></div>
-      <h1>Device discovery</h1>
-      <div class="page-subtitle">Control how onboarded devices find unmanaged assets: scan mode, which networks are watched, what is excluded from active probing, and authenticated scans for network gear.</div>
-    </div>
-    <div class="page-actions">
-      <a class="btn btn-secondary" href="#/xdr/devices">Open device inventory</a>
-    </div>
-  </div>
-
-  <section class="card card-body">
-    <div class="alert-section-title">Discovery mode</div>
-    <div class="tile-grid">
-      ${s.modes.map(m => `
-        <button class="tile ${m.key === s.mode ? 'active' : ''}" onclick="setDiscoveryMode('${m.key}')">
-          <strong>${esc(m.label)} ${m.key === s.mode ? '✓' : ''}</strong>
-          <span>${esc(m.summary)}</span>
-        </button>`).join('')}
-    </div>
-    ${s.modes.filter(m => m.key === s.mode).map(m => `
-      <div class="callout ${m.key === 'Standard' ? 'good' : 'warn'}">
-        <strong>${esc(m.label)} is selected.</strong> ${esc(m.detail)}<br>
-        <span class="muted">${esc(m.scanner)}</span>
-      </div>`).join('')}
-    <div class="callout info">
-      Basic mode trades visibility for silence: it never sends a probe, so it suits sensitive or legacy segments, but it classifies far fewer devices. Standard is recommended for a coherent inventory — it only probes unmanaged devices, never onboarded ones.
-    </div>
-  </section>
-
-  <section class="card">
-    <div class="card-toolbar">
-      <strong>Monitored networks</strong>
-      <span class="muted">Corporate networks are correlated automatically; non-corporate ones are ignored</span>
-    </div>
-    <table class="grid">
-      <thead><tr><th>Network</th><th>Default gateway</th><th>DHCP server</th><th>Devices</th><th>State</th><th>Why</th></tr></thead>
-      <tbody>
-        ${s.monitoredNetworks.map(n => `
-          <tr>
-            <td><strong>${esc(n.name)}</strong></td>
-            <td>${esc(n.gateway)}</td>
-            <td>${esc(n.dhcp)}</td>
-            <td>${n.devices || '—'}</td>
-            <td><span class="tag ${n.state === 'Monitored' ? 'green' : ''}">${esc(n.state)}</span></td>
-            <td class="muted">${esc(n.reason)}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
-  </section>
-
-  <div class="two-col">
-    <section class="card">
-      <div class="card-toolbar">
-        <strong>Exclusions</strong>
-        <button class="btn btn-secondary btn-sm" onclick="toast('Fictional lab action: an exclusion would be added to standard discovery.')">Add exclusion</button>
-      </div>
-      <table class="grid">
-        <thead><tr><th>Target</th><th>Type</th><th>Reason</th></tr></thead>
-        <tbody>
-          ${s.exclusions.map(x => `
-            <tr>
-              <td><strong>${esc(x.target)}</strong></td>
-              <td>${esc(x.kind)}</td>
-              <td class="muted">${esc(x.reason)}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-      <div class="card-body">
-        <div class="callout warn">Exclusions stop <strong>active</strong> probing only. An excluded device that talks to an onboarded sensor is still discovered passively and still appears in the inventory.</div>
-      </div>
-    </section>
-
-    <section class="card card-body">
-      <div class="alert-section-title">Enterprise IoT</div>
-      <div class="callout ${s.enterpriseIoT.enabled ? 'good' : 'info'}">
-        ${s.enterpriseIoT.enabled ? '✓ Enabled' : 'Not enabled'} — ${esc(s.enterpriseIoT.note)}
-      </div>
-      <div class="alert-section-title">Vulnerability assessment</div>
-      <p class="muted">Discovered endpoints are assessed automatically and produce recommendations under Exposure management. IoT assets are assessed once an Enterprise IoT license is in place.</p>
-      <div class="tile-grid">
-        <a class="tile" href="#/xdr/exposure"><strong>Recommendations</strong><span>Remediate what discovery found — for example, SSH weaknesses on unmanaged servers.</span></a>
-        <a class="tile" href="#/xdr/hunting"><strong>Advanced hunting</strong><span>Query discovered devices and their activity alongside onboarded telemetry.</span></a>
-      </div>
-    </section>
-  </div>
-
-  <section class="card">
-    <div class="card-toolbar">
-      <strong>Authenticated network scans</strong>
-      <button class="btn btn-secondary btn-sm" onclick="toast('Fictional lab action: a new authenticated scan would be scheduled.')">Add scan</button>
-    </div>
-    <div class="card-body">
-      <p class="muted">Network gear can't run a sensor, so designated onboarded devices scan it remotely over SNMP read-only and feed the results into vulnerability management.</p>
-    </div>
-    <table class="grid">
-      <thead><tr><th>Scan</th><th>Scanning device</th><th>Targets</th><th>Protocol</th><th>Interval</th><th>Last run</th><th>Found</th><th>State</th></tr></thead>
-      <tbody>
-        ${s.authenticatedScans.map(a => `
-          <tr>
-            <td><strong>${esc(a.name)}</strong></td>
-            <td>${esc(a.scanner)}</td>
-            <td>${esc(a.targets)}</td>
-            <td>${esc(a.protocol)}</td>
-            <td>${esc(a.interval)}</td>
-            <td>${fmtTime(a.lastRun)}</td>
-            <td>${a.found}</td>
-            <td><span class="tag ${a.state === 'Active' ? 'green' : 'orange'}">${esc(a.state)}</span></td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
-  </section>
-`;
-};
-
 // ---------- Defender for Endpoint › Device detail (Overview / Timeline / …) ----------
 const DEVICE_TABS = [
   { key:'overview',        label:'Overview' },
   { key:'incidents',       label:'Incidents and alerts' },
   { key:'timeline',        label:'Timeline' },
   { key:'recommendations', label:'Security recommendations' },
-  { key:'effective',       label:'Effective settings' },
   { key:'inventories',     label:'Inventories' },
   { key:'vulnerabilities', label:'Discovered vulnerabilities' },
   { key:'missingkbs',      label:'Missing KBs' },
@@ -3348,25 +3041,6 @@ VIEWS['xdr/device'] = () => {
       </table>`;
   }
 
-  function effectiveBody() {
-    return `
-      <div class="dev-cmdbar">
-        <button class="btn btn-secondary btn-sm">Refresh</button>
-        <button class="btn btn-secondary btn-sm">Export</button>
-      </div>
-      <div class="callout info">Effective settings resolve tenant security baseline, antivirus policy, endpoint detection policy, and local policy into the value currently applied to this device.</div>
-      <table class="grid">
-        <thead><tr><th>Setting</th><th>Category</th><th>Source</th><th>Effective value</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td>Real-time protection</td><td>Antivirus</td><td>Antivirus policy</td><td>Enabled</td><td><span class="dev-state">Applied</span></td></tr>
-          <tr><td>Cloud-delivered protection</td><td>Antivirus</td><td>Endpoint security baseline</td><td>Enabled</td><td><span class="dev-state">Applied</span></td></tr>
-          <tr><td>EDR in block mode</td><td>Endpoint detection</td><td>MDE advanced features</td><td>Enabled</td><td><span class="dev-state">Applied</span></td></tr>
-          <tr><td>Automatic investigation level</td><td>AIR</td><td>Finance workstations group</td><td>Full - remediate threats</td><td><span class="dev-state">Applied</span></td></tr>
-          <tr><td>Scheduled full scan</td><td>Antivirus</td><td>Local policy</td><td>Not configured</td><td><span class="dev-state err">Needs attention</span></td></tr>
-        </tbody>
-      </table>`;
-  }
-
   function inventoriesBody() {
     return `
       <div class="two-col">
@@ -3388,7 +3062,7 @@ VIEWS['xdr/device'] = () => {
       </div>
       <div class="callout info">This tab shows the installed software and discovered vulnerabilities for <strong>${esc(d.name)}</strong>. Use the full TVM dashboard to compare exposure across the tenant.</div>
       <div class="dev-assessment-list">
-        <div><span>Exposure score</span><strong>${esc(tvm.exposureScore)}</strong></div>
+        <div><span>Vulnerability exposure score</span><strong>${esc(tvm.exposureScore)}</strong></div>
         <div><span>Installed software</span><strong>${esc(tvm.software.length)}</strong></div>
         <div><span>Discovered vulnerabilities</span><strong>${esc(tvm.vulnerabilities.length)}</strong></div>
       </div>
@@ -3484,7 +3158,7 @@ VIEWS['xdr/device'] = () => {
 
   const bodies = {
     overview: overviewBody, incidents: incidentsBody, timeline: timelineBody,
-    recommendations: recommendationsBody, effective: effectiveBody, inventories: inventoriesBody,
+    recommendations: recommendationsBody, inventories: inventoriesBody,
     vulnerabilities: vulnerabilitiesBody, missingkbs: missingKbsBody,
     baselines: baselinesBody, policies: policiesBody, sentinel: sentinelBody,
   };
@@ -3529,7 +3203,7 @@ VIEWS['xdr/device'] = () => {
         <button class="dev-action" onclick="openDeviceLiveResponse('${esc(d.id)}')">Initiate Live Response Session</button>
         <button class="dev-action" onclick="toast('Automated investigation initiated for ${esc(d.name)} (lab stub).')">Initiate automated investigation</button>
         <button class="dev-action" onclick="toast('Threat expert consultation request drafted (lab stub).')">Consult a threat expert</button>
-        <button class="dev-action" onclick="toast('Action center opened for this device (lab stub).')">Action center</button>
+        <button class="dev-action" onclick="toast('Response queue opened for this device (lab stub).')">Response queue</button>
         <button class="dev-action" onclick="toast('Criticality menu opened (lab stub).')">Set criticality</button>
         <button class="dev-action" onclick="toast('More actions opened (lab stub).')">⋯</button>
       </div>
@@ -3602,13 +3276,13 @@ VIEWS['xdr/identities'] = () => `
 VIEWS['xdr/identity-protection'] = () => `
   <div class="page-header">
     <div>
-      <div class="breadcrumb">Assets › Identities › <strong>Identity protection</strong></div>
+      <div class="breadcrumb">Assets › Identities › <strong>Identity risk</strong></div>
       <h1>Compromised identity investigation</h1>
       <div class="page-subtitle">Review risky sign-ins and risk detections, then confirm compromise or dismiss risk with documented context.</div>
     </div>
     <div class="page-actions">
       <button class="btn btn-secondary" onclick="toast('Risk policy settings opened in the lab.')">Risk policy</button>
-      <button class="btn btn-primary" onclick="openIdentity('sam.lee@hacksmarterlabs.example')">Open Sam Lee identity</button>
+      <button class="btn btn-primary" onclick="openIdentity('sam.lee@hacksmartersoc.example')">Open Sam Lee identity</button>
     </div>
   </div>
   <div class="identity-risk-layout">
@@ -3698,11 +3372,11 @@ const IDENTITY_ALERT_TEMPLATES = [
 ];
 
 function identityAlertRows(identity, realAlerts, timeline) {
-  const defaultIncident = identity.id === 'fin-svc@hacksmarterlabs.example' ? 'INC-1050'
-    : identity.id === 'jane.doe@hacksmarterlabs.example' ? 'INC-1042'
-    : identity.id === 'maria.ross@hacksmarterlabs.example' ? 'INC-1051'
-    : identity.id === 'sam.lee@hacksmarterlabs.example' ? 'INC-1053'
-    : identity.id === 'svc-backup@hacksmarterlabs.example' || identity.id === 'MSOL_AzureSync@hacksmarterlabs.example' ? 'INC-1019'
+  const defaultIncident = identity.id === 'fin-svc@hacksmartersoc.example' ? 'INC-1050'
+    : identity.id === 'jane.doe@hacksmartersoc.example' ? 'INC-1042'
+    : identity.id === 'maria.ross@hacksmartersoc.example' ? 'INC-1051'
+    : identity.id === 'sam.lee@hacksmartersoc.example' ? 'INC-1053'
+    : identity.id === 'svc-backup@hacksmartersoc.example' || identity.id === 'MSOL_AzureSync@hacksmartersoc.example' ? 'INC-1019'
     : 'INC-1038';
   const timelineAlerts = timeline.filter(r => r.kind === 'alert').map((r, index) => ({
     id: r.alertId || `IDTIM-${index + 1}`,
@@ -3742,7 +3416,7 @@ function identityAssetRows(identity) {
   const ips = ['10.20.7.42','10.20.4.55','185.199.111.12','91.219.236.54','76.21.55.4','168.63.129.16'];
   const files = ['scanner.exe','locker.exe','vssadmin.exe','invoice.html','consent-grant.json','RECOVER-FILES.txt'];
   const groups = ['Domain Admins','Backup Operators','Finance Share Owners','Privileged Role Admins','Remote Management Users'];
-  const mailboxes = [identity.upn, 'shared-finance@hacksmarterlabs.example', 'cfo@hacksmarterlabs.example'];
+  const mailboxes = [identity.upn, 'shared-finance@hacksmartersoc.example', 'cfo@hacksmartersoc.example'];
   const make = (type, values, source, riskBase) => values.map((name, index) => ({
     type,
     name,
@@ -3778,7 +3452,7 @@ VIEWS['xdr/identity'] = () => {
   const riskClass = i.riskLevel==='High' ? 'high'
                   : i.riskLevel==='Medium' ? 'medium' : 'info';
   const riskColor = i.riskLevel==='High' ? '#d13438'
-                  : i.riskLevel==='Medium' ? '#f7630c' : '#0078d4';
+                  : i.riskLevel==='Medium' ? '#f7630c' : 'var(--sev-info)';
 
   // ---- Overview ----
   function overviewBody() {
@@ -4109,8 +3783,8 @@ VIEWS['siem/home'] = () => `
 VIEWS['siem/incidents'] = () => `
   <div class="page-header">
     <div>
-      <div class="breadcrumb">Sentinel › Threat management › <strong>Incidents</strong></div>
-      <h1>Sentinel incidents</h1>
+      <div class="breadcrumb">Sentinel › Threat management › <strong>Case queue</strong></div>
+      <h1>Case queue</h1>
       <div class="page-subtitle">Sentinel queue with Defender XDR unified-response context, ownership, evidence, and cross-product pivots.</div>
     </div>
     <div class="page-actions">
@@ -4119,7 +3793,7 @@ VIEWS['siem/incidents'] = () => `
     </div>
   </div>
   <div class="callout info">
-    <strong>Unified response lens:</strong> Sentinel incidents can be investigated from Defender XDR when Hack Smarter Labs security signals are connected.
+    <strong>Unified response lens:</strong> Sentinel incidents can be investigated from Defender XDR when Hack Smarter SOC security signals are connected.
     Keep Sentinel analytics, automation, bookmarks, and Graph context visible while using Defender XDR for the unified incident story and response actions.
   </div>
   <div class="card" style="margin-top:16px;">
@@ -4136,11 +3810,11 @@ VIEWS['siem/incidents'] = () => `
             <td>${uniqueSources.map(s=>`<span class="tag">${esc(s)}</span>`).join('') || '<span class="tag">Sentinel</span>'}</td>
             <td>${i.tactics.map(t=>`<span class="mitre">${esc(t)}</span>`).join('')}</td>
             <td>
-              <div class="mini-step">Defender incident page preserves attack story, evidence, and response actions.</div>
+              <div class="mini-step">Incident page preserves the attack narrative, evidence, and remediation actions.</div>
               ${i.id === SENTINEL_GRAPH.incidentId ? '<div class="mini-step">Sentinel Graph fixture available for entity relationship analysis.</div>' : ''}
             </td>
             <td>
-              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openIncidentPage('${esc(i.id)}')">Open in Defender XDR</button>
+              <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openIncidentPage('${esc(i.id)}')">Open in XDR Security</button>
               ${i.id === SENTINEL_GRAPH.incidentId ? `<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); navigate('#/siem/graph')">Graph</button>` : ''}
             </td>
           </tr>`;
@@ -4374,20 +4048,20 @@ VIEWS['siem/graph'] = () => {
   return {
     html:`
       <div class="sg-page-header">
-        <div class="breadcrumb">Sentinel › Incidents › ${esc(inc.id)} › <strong>Incident graph</strong></div>
+        <div class="breadcrumb">Sentinel › Case queue › ${esc(inc.id)} › <strong>Incident graph</strong></div>
         <div class="sg-incident-title-row">
           <div><h1>${esc(inc.id)}: ${esc(inc.title)}</h1><div class="sg-incident-meta"><span class="sev high">High</span><span class="status-dot active"></span>Active<span>👤 ${esc(inc.assignedTo)}</span><span>◈ Unclassified</span><span>Updated 08:34 UTC</span><span class="tag red">OAuth abuse</span><span class="tag orange">Critical data</span></div></div>
           <div class="page-actions"><button class="btn btn-secondary" onclick="openIncident('${esc(inc.id)}')">Incident preview</button><button class="btn btn-primary" onclick="openIncidentPage('${esc(inc.id)}')">Open full incident</button></div>
         </div>
       </div>
-      <div class="sg-data-banner"><span>✓</span><div><strong>Sentinel data lake and graph connected</strong><small>Relationship context is derived from fictional Defender, Entra, 365, and threat-intelligence fixtures.</small></div><button class="btn btn-ghost btn-sm" onclick="toast('Graph provisioning is healthy in this local lab.')">View status</button></div>
-      <div class="sg-tabs"><button class="active">Attack story</button><button onclick="openIncidentPage('${esc(inc.id)}')">Alerts (${incAlerts.length})</button><button onclick="openIncidentPage('${esc(inc.id)}')">Evidence and response (${INCIDENT_EVIDENCE[inc.id]?.length || 0})</button><button onclick="openIncidentPage('${esc(inc.id)}')">Entities (${SENTINEL_GRAPH.nodes.length})</button><button onclick="openIncidentPage('${esc(inc.id)}')">Summary</button></div>
+      <div class="sg-data-banner"><span>✓</span><div><strong>SIEM data lake and graph connected</strong><small>Relationship context is derived from security, identity, workspace, and threat-intelligence fixtures.</small></div><button class="btn btn-ghost btn-sm" onclick="toast('Graph provisioning is healthy in this local lab.')">View status</button></div>
+      <div class="sg-tabs"><button class="active">Attack narrative</button><button onclick="openIncidentPage('${esc(inc.id)}')">Alerts (${incAlerts.length})</button><button onclick="openIncidentPage('${esc(inc.id)}')">Evidence and remediation (${INCIDENT_EVIDENCE[inc.id]?.length || 0})</button><button onclick="openIncidentPage('${esc(inc.id)}')">Entities (${SENTINEL_GRAPH.nodes.length})</button><button onclick="openIncidentPage('${esc(inc.id)}')">Summary</button></div>
       ${renderSentinelGraphLearning(state)}
       <section class="sg-experience card">
         <aside class="sg-alert-rail">
           <div class="sg-rail-head"><strong>Detection &amp; categories</strong><button class="iconbtn" title="Collapse detection pane" onclick="this.closest('.sg-alert-rail').classList.toggle('collapsed')">‹</button></div>
           <div class="sg-rail-stats"><div><strong>${incAlerts.length}</strong><span>Active alerts</span></div><div><strong>${inc.tactics.length}</strong><span>Categories</span></div><div><strong>08:11</strong><span>First activity</span></div><div><strong>08:24</strong><span>Last activity</span></div></div>
-          <div class="sg-rail-section">Alert story</div>
+          <div class="sg-rail-section">Alert narrative</div>
           <div class="sg-alert-list">
             ${story.steps.map((step,index) => {
               const alert = incAlerts.find(item => item.id === step.alertId);
@@ -4950,7 +4624,7 @@ VIEWS['siem/threat-intel'] = () => `
         <strong>Manual import CSV</strong>
         <button class="btn btn-ghost btn-sm" onclick="copyToClipboard('ti-import-csv')">Copy</button>
       </div>
-      <textarea id="ti-import-csv" class="kql" readonly>${esc(TI_IMPORT_CSV)}</textarea>
+      <textarea id="ti-import-csv" class="kql" readonly>${esc(shiftLabDateText(TI_IMPORT_CSV))}</textarea>
     </div>
   </div>
 
@@ -5015,7 +4689,7 @@ VIEWS['siem/mitre'] = () => {
         <div class="page-subtitle">Coverage reflects active analytics rules and their selected tactics or techniques.</div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
-        <span class="legend-swatch" style="background:#0078d4;"></span><span class="muted" style="font-size:12px;">Technique covered</span>
+        <span class="legend-swatch" style="background:var(--workload);"></span><span class="muted" style="font-size:12px;">Technique covered</span>
         <span class="legend-swatch" style="background:#7fb5e6; margin-left:10px;"></span><span class="muted" style="font-size:12px;">Tactic only</span>
         <span class="legend-swatch" style="background:#1f2937; margin-left:10px;"></span><span class="muted" style="font-size:12px;">No coverage</span>
       </div>
@@ -5336,6 +5010,20 @@ VIEWS['siem/logs'] = () => {
   };
 };
 
+// Card-grid data for the "ASIM parsers" tab below (Sprint 3, doc §4). Labels
+// match what these routes used to show as their own rail entries in
+// NAV.siem, and descriptions are pulled from each route's own VIEWS[...]
+// (renderMockAsimLab config `subtitle`) so the card grid doesn't drift from
+// what the destination page actually says.
+const ASIM_HUNTING_PARSERS = [
+  { route:'#/siem/hunting/dns', icon:'🌐', label:'ASIM DNS (Preview)',
+    desc:'Query the unifying _Im_Dns parser across normalized DNS sources, then pivot on clients, domains, response codes, and returned addresses.' },
+  { route:'#/siem/hunting/authentication', icon:'🔐', label:'ASIM Authentication (Preview)',
+    desc:'Normalize Windows logons and Entra sign-ins into one parser-style view so you can filter by source IP, target user, and result without switching tables.' },
+  { route:'#/siem/hunting/network-session', icon:'🛰', label:'ASIM Network Session (Preview)',
+    desc:'Review firewall and proxy sessions in a normalized shape so blocked outbound traffic, risky destinations, and source-host blast radius stay easy to compare.' },
+];
+
 VIEWS['siem/hunting'] = () => {
   const jobComplete = localStorage.getItem('hsl.siem.networklogs.searchJob') === 'complete';
   const activeTab = currentSentinelHuntingTab();
@@ -5506,6 +5194,28 @@ VIEWS['siem/hunting'] = () => {
     </div>
   `;
 
+  // Sprint 3 (doc §4): the 3 ASIM parser labs used to be their own top-level
+  // rail entries under Sentinel. They're really 3 guided modes of this same
+  // "Search & explore" surface (same lab shape as the tabs above — canned
+  // rows, a KQL editor, a study card), so they're demoted to a card grid in
+  // a tab here instead (routes/views themselves are unchanged and still
+  // directly deep-linkable — see PAGE_LOCAL_ROUTES in app.js).
+  const renderAsimTab = `
+    <div class="callout info" style="margin-bottom:14px;">
+      ASIM (a unifying parser layer) normalizes different source products into one
+      consistent schema, so the same query shape works no matter which vendor logged
+      the event. Each card below is its own guided lab for one ASIM domain.
+    </div>
+    <div class="tile-grid">
+      ${ASIM_HUNTING_PARSERS.map(p => `
+        <div class="tile" style="cursor:pointer;" onclick="navigate('${p.route}')">
+          <div class="tile-title">${p.icon} ${esc(p.label)}</div>
+          <div class="tile-sub">${esc(p.desc)}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
   const renderLivestreamTab = `
     <div class="kpi-strip hunting-status-cards">
       <div class="kpi"><span class="kpi-label">Status</span><span class="kpi-value">${esc(livestream.status)}</span><span class="kpi-delta">${livestream.elevated ? 'Alert stub created' : 'Live query feed'}</span></div>
@@ -5566,7 +5276,7 @@ VIEWS['siem/hunting'] = () => {
   <div class="page-header hunting-page-header">
     <div>
       <div class="breadcrumb">Sentinel › <strong>Search</strong></div>
-      <h1>Hunting workspace</h1>
+      <h1>Search & explore</h1>
       <div class="page-subtitle">Work through retained search results, bookmarks, and a live query feed from the same hunting surface.</div>
     </div>
     <div class="page-actions">
@@ -5579,8 +5289,9 @@ VIEWS['siem/hunting'] = () => {
     <button class="tab ${activeTab === 'search' ? 'active' : ''}" onclick="setSentinelHuntingTab('search')">Search results</button>
     <button class="tab ${activeTab === 'bookmarks' ? 'active' : ''}" onclick="setSentinelHuntingTab('bookmarks')">Bookmarks (${bookmarks.length})</button>
     <button class="tab ${activeTab === 'livestream' ? 'active' : ''}" onclick="setSentinelHuntingTab('livestream')">Livestream</button>
+    <button class="tab ${activeTab === 'asim' ? 'active' : ''}" onclick="setSentinelHuntingTab('asim')">ASIM parsers</button>
   </div>
-  ${activeTab === 'bookmarks' ? renderBookmarksTab : activeTab === 'livestream' ? renderLivestreamTab : renderSearchTab}
+  ${activeTab === 'bookmarks' ? renderBookmarksTab : activeTab === 'livestream' ? renderLivestreamTab : activeTab === 'asim' ? renderAsimTab : renderSearchTab}
   `;
 };
 
@@ -5859,25 +5570,24 @@ VIEWS['siem/automation'] = () => {
       <div>
         <div class="breadcrumb">Configuration › <strong>Automation</strong></div>
         <h1>Automation</h1>
-        <div class="page-subtitle">Create automation rules and run incident-trigger playbooks from Sentinel.</div>
-      </div>
-      <div class="page-actions">
-        <button class="btn btn-primary" onclick="toast('Create automation rule blade is open in the lab page below.')">+ Create</button>
+        <div class="page-subtitle">Automation rules are a plain sentence: <strong>WHEN</strong> something happens, <strong>IF</strong> it matches a filter, <strong>THEN</strong> respond automatically.</div>
       </div>
     </div>
-    <div class="tabs"><span class="tab active">Automation rules</span><span class="tab">Playbooks</span><span class="tab">Active playbooks</span></div>
 
-    <div class="callout ${hasPermission ? 'success' : 'warn'}">
-      <strong>SC-200 checkpoint:</strong> ${hasPermission
-        ? 'Sentinel now has access to RG-Playbooks, so Playbook1 is available in the Run playbook action.'
-        : 'Playbook1 is grayed out because Sentinel does not have permission to the playbook resource group.'}
+    <div class="card card-body" style="margin-bottom:16px;">
+      <div class="alert-section-title">How a rule works</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div class="callout info" style="flex:1 1 220px; margin:0;"><strong>WHEN</strong> — the trigger<br>An incident or alert gets created or updated.</div>
+        <div class="callout info" style="flex:1 1 220px; margin:0;"><strong>IF</strong> — the condition (optional)<br>It matches a filter, e.g. severity is High or it came from a specific detection rule.</div>
+        <div class="callout info" style="flex:1 1 220px; margin:0;"><strong>THEN</strong> — the action<br>Respond automatically: run a playbook, change status, assign an owner, add a tag.</div>
+      </div>
     </div>
 
     <div class="automation-layout">
       <section class="card">
         <div class="card-toolbar"><strong>Automation rules</strong><span class="muted">Sentinel workspace: ${esc(lab.workspace)}</span></div>
         <table class="grid">
-          <thead><tr><th>Order</th><th>Name</th><th>Trigger</th><th>Actions</th><th>Status</th></tr></thead>
+          <thead><tr><th>Order</th><th>Name</th><th>When</th><th>Then</th><th>Status</th></tr></thead>
           <tbody>
             <tr><td>1</td><td>Auto-assign phishing incidents to L1</td><td>When incident is created</td><td>Assign owner: L1-Triage</td><td><span class="status-dot resolved"></span>Enabled</td></tr>
             <tr><td>2</td><td>Tag identity attacks</td><td>When incident is updated</td><td>Add tag: identity-attack</td><td><span class="status-dot resolved"></span>Enabled</td></tr>
@@ -5896,26 +5606,22 @@ VIEWS['siem/automation'] = () => {
 
       <section class="card automation-blade">
         <div class="blade-mini-header">
-          <div>
-            <div class="breadcrumb">Create automation rule</div>
-            <h2>${esc(lab.ruleDraft.name)}</h2>
-          </div>
-          <button class="iconbtn" onclick="toast('Blade closed (lab stub).')">×</button>
+          <div><h2>Build a rule</h2></div>
         </div>
         <div class="wizard-section form-grid two">
-          <label class="lbl">Automation rule name<input id="newRuleName" class="ipt" value="${esc(lab.ruleDraft.name)}"></label>
-          <label class="lbl">Trigger<select class="ipt" onchange="selectAutomationTrigger(this.value)">
+          <label class="lbl">Name<input id="newRuleName" class="ipt" value="${esc(lab.ruleDraft.name)}"></label>
+          <label class="lbl">WHEN (trigger)<select class="ipt" onchange="selectAutomationTrigger(this.value)">
             ${['When incident is created', 'When incident is updated', 'When alert is created']
               .map(t => `<option ${t === selectedTrigger ? 'selected' : ''}>${esc(t)}</option>`).join('')}
           </select></label>
-          <label class="lbl">Action<select id="newRuleAction" class="ipt">
+          <label class="lbl">THEN (action)<select id="newRuleAction" class="ipt">
             <option selected>Run playbook</option>
             ${INCIDENT_ACTIONS.map(a => `<option ${isAlertTrigger ? 'disabled' : ''}>${esc(a)}${isAlertTrigger ? ' — incident trigger only' : ''}</option>`).join('')}
           </select></label>
         </div>
 
         <div class="wizard-section">
-          <div class="dropdown-label">Condition (If <em>property → operator → value</em>)</div>
+          <div class="dropdown-label">IF (optional filter): <em>property → operator → value</em></div>
           <div class="condition-row" style="display:flex; gap:8px; flex-wrap:wrap; align-items:end;">
             <label class="lbl" style="flex:1 1 180px;">Property
               <select id="newRuleCondProp" class="ipt" onchange="selectConditionProperty(this.value)" ${isAlertTrigger ? 'disabled' : ''}>
@@ -5933,91 +5639,48 @@ VIEWS['siem/automation'] = () => {
                 : `<input id="newRuleCondValue" class="ipt" placeholder="${isAlertTrigger ? 'Analytics rule name' : 'Type a value'}">`}
             </label>
           </div>
-          <div class="muted" style="margin-top:6px;">
-            ${isAlertTrigger
-              ? 'Alert-trigger rules support only the <strong>Analytic rule name</strong> condition (Contains / Does not contain).'
-              : 'Property and operator are drop-downs; the value is a drop-down for closed lists (Severity, Status, Incident provider) and a text box otherwise.'}
-          </div>
+          <div class="muted" style="margin-top:6px;">Leave the filter broad to catch everything, or narrow it so the rule only fires on the cases you actually want automated.</div>
         </div>
 
         ${isAlertTrigger ? `
         <div class="callout warn" style="margin-top:12px;">
-          <strong>Alert-trigger rule:</strong> when the trigger is <em>When alert is created</em>, the only available action is
-          <strong>Run playbook</strong>. Change status, Change severity, Assign owner, Add tags, and Add task are incident-level
-          actions and are greyed out here because alerts have no incident status, owner, or tags to manage.
-          <span class="muted">See your licensed product documentation for automation rule actions.</span>
+          <strong>Alerts don't have incident data.</strong> When the trigger is an alert, only <strong>Run playbook</strong> is available — an alert has no status, owner, or tags to change yet, because no incident has been created.
         </div>` : `
         <div class="callout info" style="margin-top:12px;">
-          <strong>Incident-trigger rule:</strong> incident triggers add Change status, Change severity, Assign owner, Add tags, and Add task
-          on top of Run playbook. Switch the Trigger to <em>When alert is created</em> to see those actions grey out.
+          <strong>Incidents carry more state.</strong> Once an incident exists, a rule can also change its status or severity, assign an owner, or add a tag — not just run a playbook.
         </div>`}
 
         <div class="run-playbook-action">
-          <div class="action-header">
-            <strong>Run playbook</strong>
-            <button class="chip-link" onclick="grantPlaybookPermissions()">Manage playbook permissions</button>
-          </div>
+          <div class="action-header"><strong>Run playbook</strong></div>
           <div class="playbook-dropdown">
-            <div class="dropdown-label">Playbook drop-down list</div>
+            <div class="dropdown-label">Choose which playbook to run</div>
             ${selectedPlaybookRow}
             <button class="playbook-select-row" onclick="toast('PB-RevokeOAuthConsent selected for comparison.')">
-              <span><strong>PB-RevokeOAuthConsent</strong><small>Sentinel incident trigger · RG-SOC</small></span>
+              <span><strong>PB-RevokeOAuthConsent</strong><small>Runs on incidents</small></span>
               <span class="status-pill ok">Selectable</span>
             </button>
             <button class="playbook-select-row ${selectedPlaybookName === 'PB-ContainEntity' ? 'selected' : ''}" onclick="selectSentinelAutomationPlaybook('PB-ContainEntity')">
-              <span><strong>PB-ContainEntity</strong><small>Entity trigger · ${esc(lab.resourceGroup.replace('RG-Playbooks', 'RG-Entity-Playbooks'))}</small></span>
+              <span><strong>PB-ContainEntity</strong><small>Runs on a specific entity</small></span>
               <span class="status-pill ok">Selectable</span>
             </button>
           </div>
           <div class="permission-state ${permissionClass}">
             <span>${playbookState}</span>
-            <strong>${hasPermission ? 'Sentinel has Automation Contributor on RG-Playbooks.' : 'Sentinel is missing Automation Contributor on RG-Playbooks.'}</strong>
+            <strong>${hasPermission ? 'Playbook1 can run — permission granted.' : 'Playbook1 is greyed out — it needs permission before it can run.'}</strong>
+            <button class="chip-link" onclick="${hasPermission ? 'resetPlaybookPermissions()' : 'grantPlaybookPermissions()'}">${hasPermission ? 'Revoke' : 'Grant permission'}</button>
           </div>
         </div>
 
         <div class="blade-actions" style="display:flex; gap:8px; margin-top:16px;">
-          <button class="btn btn-primary" onclick="createAutomationRule()">Apply (create rule)</button>
+          <button class="btn btn-primary" onclick="createAutomationRule()">Create rule</button>
           ${createdRules.length ? `<button class="btn btn-secondary" onclick="resetCreatedRules()">Clear created rules (${createdRules.length})</button>` : ''}
         </div>
       </section>
     </div>
 
-    <div class="two-col" style="margin-top:16px;">
-      <section class="card">
-        <div class="card-toolbar"><strong>Manage playbook permissions</strong><span class="muted">${esc(lab.resourceGroup)}</span></div>
-        <div class="permission-panel">
-          <div class="permission-target">
-            <span class="resource-icon">RG</span>
-            <div><strong>${esc(lab.resourceGroup)}</strong><small>Resource group containing ${esc(lab.playbookName)}</small></div>
-          </div>
-          <table class="grid compact">
-            <thead><tr><th>Principal</th><th>Role</th><th>Effect</th></tr></thead>
-            <tbody>
-              ${lab.permissions.map(p => {
-                const active = p.principal === lab.serviceAccount && hasPermission;
-                return `<tr class="${active ? 'active-row' : ''}">
-                  <td>${esc(p.principal)}</td>
-                  <td>${esc(p.role)}</td>
-                  <td>${esc(p.effect)}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-          <button class="btn btn-primary" onclick="grantPlaybookPermissions()">Grant Sentinel access</button>
-          <button class="btn btn-secondary" onclick="resetPlaybookPermissions()">Reset lab permission</button>
-        </div>
-      </section>
-
-      <section class="card card-body">
-        <div class="alert-section-title">Why the exam answer is this action</div>
-        <ol class="learn-steps">
-          ${lab.notes.map(n => `<li>${esc(n)}</li>`).join('')}
-        </ol>
-        <div class="resource-summary">
-          <div><span>Wrong fix</span><strong>Logic App Contributor for your user</strong><small>Lets you edit the app, but the automation rule still cannot run it.</small></div>
-          <div><span>Correct fix</span><strong>Manage playbook permissions</strong><small>Grants the Sentinel service account ${esc(lab.role)} on ${esc(lab.resourceGroup)}.</small></div>
-        </div>
-      </section>
+    <div class="card card-body" style="margin-top:16px;">
+      <div class="alert-section-title">Why a playbook can be greyed out</div>
+      <div class="muted">A playbook is an automated script. ${esc(lab.notes[0])} Granting yourself edit access to the playbook isn't enough — the automation engine itself needs permission to run it, separate from your own access.</div>
     </div>
 
     <div class="card card-body" style="margin-top:16px;">
@@ -6069,21 +5732,51 @@ VIEWS['siem/automation'] = () => {
         </div>
       `).join('')}
     </div>
+
+    <div class="card card-body" style="margin-top:16px;">
+      <div class="card-toolbar">
+        <strong>AI-Assisted Playbooks</strong>
+        <span class="muted">${AI_ASSISTED_PLAYBOOKS.length} scenarios · merged in from the AI Security Agent workload</span>
+      </div>
+      <div class="callout info">
+        These used to live on a standalone "promptbooks" page under the AI Security Agent workload. They're playbooks
+        in the same sense as the ones above — a fixed, repeatable sequence of steps — except each step is a prompt to
+        the assistant instead of a connector action. Running one chains its prompts into a canned session transcript
+        you can open, read, and rerun a step from, in the AI Security Agent's session view.
+      </div>
+    </div>
+    <div class="three-col" style="margin-top:16px;">
+      ${AI_ASSISTED_PLAYBOOKS.map(book => `
+        <div class="card card-body">
+          <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
+            <strong>${esc(book.name)}</strong>
+            <span class="tag">${esc(book.source)}</span>
+          </div>
+          <div class="muted">${esc(book.description)}</div>
+          ${book.inputs.length ? `<div class="muted">Inputs: <strong>${esc(book.inputs.join(', '))}</strong></div>` : ''}
+          <div class="alert-section-title">Sequenced prompts</div>
+          <ol style="margin:0; padding-left:18px; font-size:12px; line-height:1.7;">
+            ${book.prompts.map(p => `<li>${esc(p)}</li>`).join('')}
+          </ol>
+          <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="runAiAssistedPlaybook('${esc(book.id)}')">Run AI-Assisted Playbook</button>
+        </div>
+      `).join('')}
+    </div>
   `;
 };
 
 // ---------- Agent 10 dead-route cleanup surfaces ----------
 const ACTION_CENTER_ITEMS = [
-  { source:'AIR', status:'Pending approval', incident:'INC-1042', action:'Remove OAuth consent for DocViewer Pro', target:'jane.doe@hacksmarterlabs.example', age:'12 min' },
+  { source:'AIR', status:'Pending approval', incident:'INC-1042', action:'Remove OAuth consent for DocViewer Pro', target:'jane.doe@hacksmartersoc.example', age:'12 min' },
   { source:'AIR', status:'Completed', incident:'INC-1050', action:'Isolate device', target:'FIN-FS-02', age:'38 min' },
   { source:'MDE', status:'Pending approval', incident:'INC-1050', action:'Quarantine locker.exe', target:'7a64529e93fa01e8cedfc02114f397d4bbbb42715349f24763d3b7765ffed466', age:'41 min' },
   { source:'MDO', status:'Completed', incident:'INC-1042', action:'Soft-delete phishing message', target:'MSG-7781', age:'55 min' },
 ];
 
 const MDO_INVESTIGATION_ROWS = [
-  { sev:'high', title:'User clicked phishing URL and granted OAuth consent', user:'jane.doe@hacksmarterlabs.example', evidence:'URL click + app consent', incident:'INC-1042', action:'Revoke sessions, remove consent, purge message' },
-  { sev:'medium', title:'Mailbox rule created after suspicious sign-in', user:'maria.chen@hacksmarterlabs.example', evidence:'Inbox rule forwards finance mail', incident:'INC-1051', action:'Disable rule, reset password, review audit' },
-  { sev:'low', title:'Attachment detonated but blocked', user:'pavel.novak@hacksmarterlabs.example', evidence:'Sandbox verdict matched malware family', incident:'INC-1031', action:'Confirm delivery blocked and tune alert noise' },
+  { sev:'high', title:'User clicked phishing URL and granted OAuth consent', user:'jane.doe@hacksmartersoc.example', evidence:'URL click + app consent', incident:'INC-1042', action:'Revoke sessions, remove consent, purge message' },
+  { sev:'medium', title:'Mailbox rule created after suspicious sign-in', user:'maria.chen@hacksmartersoc.example', evidence:'Inbox rule forwards finance mail', incident:'INC-1051', action:'Disable rule, reset password, review audit' },
+  { sev:'low', title:'Attachment detonated but blocked', user:'pavel.novak@hacksmartersoc.example', evidence:'Sandbox verdict matched malware family', incident:'INC-1031', action:'Confirm delivery blocked and tune alert noise' },
 ];
 
 const SENTINEL_WATCHLIST_ROWS = [
@@ -6096,18 +5789,18 @@ const CLOUD_ATTACK_PATHS = [
   {
     id:'dfc-path-01', name:'Internet VM to storage exfiltration', severity:'high', status:'Pending', assetType:'Virtual machine',
     firstSeen:'2026-07-12T09:20:00Z', lastSeen:'2026-08-02T07:42:00Z', affectedResources:4,
-    start:'vm-prod-web-01', entryPoint:'Public SSH endpoint', target:'sthacksmarterlabslogs', chokePoints:['mi-web-prod'],
-    path:['Open SSH management port','Managed identity has Storage Blob Data Contributor','sthacksmarterlabslogs permits public network access'],
+    start:'vm-prod-web-01', entryPoint:'Public SSH endpoint', target:'sthacksmartersoclogs', chokePoints:['mi-web-prod'],
+    path:['Open SSH management port','Managed identity has Storage Blob Data Contributor','sthacksmartersoclogs permits public network access'],
     result:'Potential data exfiltration path', scenario:'Internet-exposed compute can use a workload identity to reach a data store.',
     nodes:[
       { id:'vm-web', role:'entry', type:'Virtual machine', label:'vm-prod-web-01', subtitle:'Public IP · SSH 22 open', insight:'The management port is reachable from the internet and the VM has unresolved high-severity vulnerabilities.', riskFactors:['Internet exposed','High-severity vulnerabilities'], techniques:['T1190 Exploit Public-Facing Application'], recommendationIds:['ap-rec-ssh','ap-rec-vuln'] },
       { id:'mi-web', role:'choke', type:'Managed identity', label:'mi-web-prod', subtitle:'Storage Blob Data Contributor', insight:'This identity is the single convergence point between the exposed VM and the storage target.', riskFactors:['Broad data-plane role','Reachable from exposed compute'], techniques:['T1078 Valid Accounts'], recommendationIds:['ap-rec-role'] },
-      { id:'storage-logs', role:'target', type:'Storage account', label:'sthacksmarterlabslogs', subtitle:'Sensitive operational exports', insight:'The account contains sensitive exports and still accepts public network traffic.', riskFactors:['Sensitive data','Public network access'], techniques:['T1530 Data from Cloud Storage'], recommendationIds:['ap-rec-storage'] },
+      { id:'storage-logs', role:'target', type:'Storage account', label:'sthacksmartersoclogs', subtitle:'Sensitive operational exports', insight:'The account contains sensitive exports and still accepts public network traffic.', riskFactors:['Sensitive data','Public network access'], techniques:['T1530 Data from Cloud Storage'], recommendationIds:['ap-rec-storage'] },
     ],
     recommendations:[
       { id:'ap-rec-ssh', kind:'mitigating', title:'Close internet-exposed management ports on vm-prod-web-01', resource:'vm-prod-web-01', status:'Not started' },
       { id:'ap-rec-role', kind:'mitigating', title:'Remove the broad storage data role from mi-web-prod', resource:'mi-web-prod', status:'Not started' },
-      { id:'ap-rec-storage', kind:'mitigating', title:'Disable public network access on sthacksmarterlabslogs', resource:'sthacksmarterlabslogs', status:'Not started' },
+      { id:'ap-rec-storage', kind:'mitigating', title:'Disable public network access on sthacksmartersoclogs', resource:'sthacksmartersoclogs', status:'Not started' },
       { id:'ap-rec-vuln', kind:'additional', title:'Resolve high-severity vulnerabilities on vm-prod-web-01', resource:'vm-prod-web-01', status:'Not started' },
     ],
   },
@@ -6150,15 +5843,9 @@ const CLOUD_ATTACK_PATHS = [
 ];
 
 const SECONDARY_SURFACES = {
-  'xdr/reports': { crumb:'Defender › Other', title:'Reports', note:'Secondary reporting surface for lab review. The exam-relevant detail is in Threat analytics, Secure score, and incident queues.', links:[['Open Threat analytics','#/xdr/threat-analytics'], ['Open Secure score','#/xdr/secure-score']] },
-  'xdr/learning-hub': { crumb:'Defender › Other', title:'Learning hub', note:'Supporting study surface with pointers into the local hands-on flows.', links:[['Start Guided scenarios','#/xdr/home'], ['Open Advanced hunting','#/xdr/hunting']] },
-  'xdr/trials': { crumb:'Defender › Other', title:'Trials', note:'Chrome-only lab surface. Licensing and trials are outside this local simulator; practice workload behavior instead.', links:[['Open Settings','#/xdr/settings'], ['Open Endpoints','#/xdr/endpoints']] },
-  'siem/news': { crumb:'Sentinel › General', title:'News and guides', note:'Supporting content surface. Current syllabus practice is covered by connectors, analytics, incidents, hunting, and graph views.', links:[['Open Data connectors','#/siem/data-connectors'], ['Open Sentinel Graph','#/siem/graph']] },
-  'siem/repositories': { crumb:'Sentinel › Content management', title:'Repositories', note:'Supporting content lifecycle surface. Use Workspace manager to distribute rules and DCR-backed content across workspaces.', links:[['Open Workspace manager','#/siem/workspace-manager'], ['Open Content hub','#/siem/content-hub']] },
-  'siem/community': { crumb:'Sentinel › Content management', title:'Community', note:'Supporting community surface. The lab keeps all content local and original.', links:[['Open Hunting','#/siem/hunting'], ['Open Analytics','#/siem/analytics']] },
-  'cloud/community': { crumb:'Defender for Cloud › General', title:'Community', note:'Supporting study surface for cloud security guidance. Use alerts, inventory, and attack paths for hands-on practice.', links:[['Open Security alerts','#/cloud/alerts'], ['Open Attack paths','#/cloud/attack-paths']] },
+  'siem/repositories': { crumb:'Sentinel › Content management', title:'Repositories', note:'Supporting content lifecycle surface. Use Content hub to distribute rules and DCR-backed content across workspaces.', links:[['Open Content hub','#/siem/content-hub'], ['Open Data connectors','#/siem/data-connectors']] },
   'cloud/workbooks': { crumb:'Defender for Cloud › General', title:'Workbooks', note:'Secondary dashboard surface for posture and workload protection summaries.', links:[['Open Recommendations','#/cloud/recommendations'], ['Open Inventory','#/cloud/inventory']] },
-  'cloud/diagnose': { crumb:'Defender for Cloud › General', title:'Diagnose and solve problems', note:'Secondary support surface. The lab models investigation decisions in alerts, inventory, and attack paths.', links:[['Open Security alerts','#/cloud/alerts'], ['Open Environment settings','#/cloud/environment']] },
+  'cloud/diagnose': { crumb:'Defender for Cloud › General', title:'Diagnose and solve problems', note:'Secondary support surface. The lab models investigation decisions in alerts, inventory, and attack paths.', links:[['Open Security alerts','#/cloud/alerts'], ['Open Attack path analysis','#/cloud/attack-paths']] },
 };
 
 function renderSecondarySurface(config) {
@@ -6179,13 +5866,7 @@ function renderSecondarySurface(config) {
     </div>`;
 }
 
-VIEWS['xdr/reports'] = () => renderSecondarySurface(SECONDARY_SURFACES['xdr/reports']);
-VIEWS['xdr/learning-hub'] = () => renderSecondarySurface(SECONDARY_SURFACES['xdr/learning-hub']);
-VIEWS['xdr/trials'] = () => renderSecondarySurface(SECONDARY_SURFACES['xdr/trials']);
-VIEWS['siem/news'] = () => renderSecondarySurface(SECONDARY_SURFACES['siem/news']);
 VIEWS['siem/repositories'] = () => renderSecondarySurface(SECONDARY_SURFACES['siem/repositories']);
-VIEWS['siem/community'] = () => renderSecondarySurface(SECONDARY_SURFACES['siem/community']);
-VIEWS['cloud/community'] = () => renderSecondarySurface(SECONDARY_SURFACES['cloud/community']);
 VIEWS['cloud/workbooks'] = () => renderSecondarySurface(SECONDARY_SURFACES['cloud/workbooks']);
 VIEWS['cloud/diagnose'] = () => renderSecondarySurface(SECONDARY_SURFACES['cloud/diagnose']);
 
@@ -6204,7 +5885,7 @@ function defenderCloudMulticloudState() {
             { item:'/var/log/auth.log', change:'Burst of failed logons', source:'AWS workload' },
           ],
         },
-        jit: { enabled:true, vm:'i-0b8d41f7c9a2e6f35', ports:['3389','22'], duration:'3 hours', requestState:'Approved', requestor:'cloud-admin@hacksmarterlabs.example', note:'Lab-only request surface; no real network access is opened.' },
+        jit: { enabled:true, vm:'i-0b8d41f7c9a2e6f35', ports:['3389','22'], duration:'3 hours', requestState:'Approved', requestor:'cloud-admin@hacksmartersoc.example', note:'Lab-only request surface; no real network access is opened.' },
       };
 }
 
@@ -6511,7 +6192,7 @@ function renderDefenderCloudAttackPathDetail(path, ui) {
 
 VIEWS['xdr/action-center'] = () => `
   <div class="page-header">
-    <div><div class="breadcrumb">Investigation &amp; response › <strong>Action center</strong></div><h1>Action center</h1><div class="page-subtitle">Review completed and pending response actions from AIR, MDE, and MDO.</div></div>
+    <div><div class="breadcrumb">Investigation &amp; response › <strong>Response queue</strong></div><h1>Response queue</h1><div class="page-subtitle">Review completed and pending response actions from AIR, MDE, and MDO.</div></div>
     <div class="page-actions"><a class="btn btn-secondary" href="#/xdr/air">Open AIR center</a></div>
   </div>
   <div class="kpi-strip">
@@ -6589,21 +6270,19 @@ VIEWS['xdr/email-collab'] = () => `
     <div class="tile-grid">
       <a class="tile" href="#/xdr/threat-explorer"><strong>Threat Explorer</strong><span>Filter phish and malware waves, inspect headers, and queue remediation.</span></a>
       <a class="tile" href="#/xdr/cloud-apps"><strong>Cloud Apps OAuth</strong><span>Continue the phishing-to-consent chain and review risky app activity.</span></a>
-      <a class="tile" href="#/governance/audit"><strong>Purview Audit</strong><span>Search consent, login, and Copilot interactions across the timeline.</span></a>
     </div>
   </div>`;
 
 VIEWS['xdr/endpoints'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Endpoints › <strong>Endpoint security ops</strong></div><h1>Endpoint security operations</h1><div class="page-subtitle">Shortcut surface for MDE device settings, ASR policy, live response, and device inventory.</div></div></div>
+  <div class="page-header"><div><div class="breadcrumb">Endpoints › <strong>Endpoint security ops</strong></div><h1>Endpoint security operations</h1><div class="page-subtitle">Shortcut surface for device inventory, ASR policy, live response, and custom detections.</div></div></div>
   <div class="tile-grid">
     <a class="tile" href="#/xdr/devices"><strong>Device inventory</strong><span>Open device overview, timeline, live response, and package collection.</span></a>
-    <a class="tile" href="#/xdr/settings"><strong>MDE settings</strong><span>Advanced features, device groups, roles, and automation levels.</span></a>
     <a class="tile" href="#/xdr/asr-policy"><strong>ASR policies</strong><span>Audit/block states, exclusions, and expected impact.</span></a>
     <a class="tile" href="#/xdr/custom-detections"><strong>Custom detections</strong><span>Promote Advanced hunting queries to endpoint actions.</span></a>
   </div>`;
 
 VIEWS['xdr/exposure'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Exposure management › <strong>Overview</strong></div><h1>Exposure management</h1><div class="page-subtitle">Prioritize exposed assets by incident linkage, cloud attack paths, and secure score recommendations.</div></div></div>
+  <div class="page-header"><div><div class="breadcrumb">Exposure management › <strong>Overview</strong></div><h1>Exposure management</h1><div class="page-subtitle">Prioritize exposed assets by incident linkage, cloud attack paths, and exposure score recommendations.</div></div></div>
   <div class="kpi-strip">
     <div class="kpi"><span class="kpi-label">Critical assets</span><span class="kpi-value">7</span></div>
     <div class="kpi"><span class="kpi-label">Open paths</span><span class="kpi-value">${CLOUD_ATTACK_PATHS.length}</span></div>
@@ -6698,14 +6377,14 @@ VIEWS['siem/search'] = () => {
 };
 
 VIEWS['siem/entity-behavior'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Threat management › <strong>Entity behavior</strong></div><h1>Entity behavior</h1><div class="page-subtitle">UEBA-style risk context for users, hosts, and IPs that feed incidents, anomalies, and hunting pivots.</div></div><div class="page-actions"><a class="btn btn-secondary" href="#/siem/settings">UEBA settings</a></div></div>
+  <div class="page-header"><div><div class="breadcrumb">Threat management › <strong>Entity behavior</strong></div><h1>Entity behavior</h1><div class="page-subtitle">UEBA-style risk context for users, hosts, and IPs that feed incidents, anomalies, and hunting pivots.</div></div></div>
   <div class="two-col">
     <section class="card">
       <div class="card-toolbar"><strong>Behavioral entities</strong><span class="muted">Fictional UEBA scores</span></div>
       <table class="grid">
         <thead><tr><th>Entity</th><th>Type</th><th>Score</th><th>Top anomaly</th><th>Pivot</th><th>Action</th></tr></thead>
         <tbody>
-          <tr><td>jane.doe@hacksmarterlabs.example</td><td>Account</td><td><span class="sev high">92</span></td><td>OAuth grant after phishing click</td><td><a class="chip-link" href="#/siem/graph">Graph</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('jane.doe@hacksmarterlabs.example', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
+          <tr><td>jane.doe@hacksmartersoc.example</td><td>Account</td><td><span class="sev high">92</span></td><td>OAuth grant after phishing click</td><td><a class="chip-link" href="#/siem/graph">Graph</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('jane.doe@hacksmartersoc.example', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
           <tr><td>FIN-FS-02</td><td>Host</td><td><span class="sev high">88</span></td><td>Rare encryption process and service stop</td><td><a class="chip-link" href="#/xdr/device">Device</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('FIN-FS-02', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
           <tr><td>10.5.12.44</td><td>IP</td><td><span class="sev medium">67</span></td><td>Repeated IOC destination contact</td><td><a class="chip-link" href="#/siem/hunting/dns">DNS hunt</a></td><td><button class="btn btn-primary btn-sm" onclick="runSentinelEntityPlaybook('10.5.12.44', 'Sentinel entity behavior')">Run playbook (entity)</button></td></tr>
         </tbody>
@@ -6726,127 +6405,15 @@ SigninLogs
 | where UserPrincipalName in (VIPs)
 | where RiskLevel == "High"</pre></div>`;
 
-VIEWS['siem/settings'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Configuration › <strong>Settings</strong></div><h1>Sentinel settings</h1><div class="page-subtitle">Workspace-level controls for UEBA, retention decisions, and content lifecycle.</div></div></div>
-  <div class="two-col">
-    <section class="card card-body"><div class="alert-section-title">UEBA enablement</div>
-      <div class="setting-row"><div><strong>Entity behavior analytics</strong><span>Builds behavioral context for accounts, hosts, and IPs.</span></div><label class="toggle"><input type="checkbox" checked><span></span></label></div>
-      <div class="setting-row"><div><strong>Directory data sync</strong><span>Enriches accounts with department, manager, and role context.</span></div><label class="toggle"><input type="checkbox" checked><span></span></label></div>
-      <div class="setting-row"><div><strong>Anomaly enrichment</strong><span>Feeds customizable anomaly rules and hunting pivots.</span></div><label class="toggle"><input type="checkbox" checked><span></span></label></div>
-      <a class="chip-link" href="#/siem/entity-behavior">Open Entity behavior →</a>
-    </section>
-    <section class="card card-body"><div class="alert-section-title">Workspace operations</div><ul><li>Use Workspace manager to publish analytics, workbooks, and automation to member workspaces.</li><li>Use Data connectors for DCR-backed Windows, CEF, Azure Activity, and custom ingestion labs.</li><li>Use Analytics and Anomalies for detection engineering coverage.</li></ul><a class="chip-link" href="#/siem/workspace-manager">Open Workspace manager →</a></section>
-  </div>`;
 
-VIEWS['siem/workspace-manager'] = () => {
-  const content = [
-    { type:'Analytics rules', selected:5, total:SENTINEL_RULES.length, link:'#/siem/analytics', detail:'Scheduled, NRT, TI, and ML behavior analytics examples' },
-    { type:'Hunting queries', selected:4, total:SAVED_QUERIES.length, link:'#/xdr/hunting', detail:'Reusable Advanced hunting and Sentinel search patterns' },
-    { type:'Workbooks', selected:3, total:5, link:'#/siem/workbooks', detail:'SOC overview, UEBA, and ingestion health panels' },
-    { type:'Automation', selected:2, total:3, link:'#/siem/automation', detail:'Playbooks and automation rules tied to incident response' },
-    { type:'DCR-backed connectors', selected:4, total:SENTINEL_INGESTION_LABS.length + 1, link:'#/siem/data-connectors', detail:'Syslog, Windows Security Events, CEF, Azure Activity, custom logs' },
-  ];
-  const workspace = currentWorkspace();
-  const tenant = currentMsspTenant();
-  const workspaceQuery = `workspace("${workspace.name}").SecurityEvent
-| where EventID == 4625
-| project TimeGenerated, Computer, EventID, Account, IpAddress`;
-  return `
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb">Configuration › <strong>Workspace manager</strong></div>
-        <h1>Workspace manager</h1>
-        <div class="page-subtitle">Central landing surface for packaging, publishing, and tracking Sentinel content across member workspaces and customer tenants.</div>
-      </div>
-      <div class="page-actions"><a class="btn btn-secondary" href="#/siem/analytics">Analytics</a><a class="btn btn-primary" href="#/siem/data-connectors">DCR workflows</a></div>
-    </div>
-    <div class="kpi-strip">
-      <div class="kpi"><span class="kpi-label">Member workspaces</span><span class="kpi-value">${SENTINEL_WORKSPACES.length}</span></div>
-      <div class="kpi"><span class="kpi-label">Customer tenants</span><span class="kpi-value">${MSSP_TENANTS.length}</span></div>
-      <div class="kpi"><span class="kpi-label">Content types</span><span class="kpi-value">${content.length}</span></div>
-      <div class="kpi"><span class="kpi-label">Last publish</span><span class="kpi-value">07:40</span><span class="kpi-delta">2026-07-06</span></div>
-    </div>
-    <div class="callout info" style="margin-bottom:16px;">
-      Azure Lighthouse lets the lab SOC see and act across customer workspaces with delegated access. Use B2B when the work needs customer-tenant administration, directory changes, or ownership that Lighthouse does not delegate.
-    </div>
-    <div class="two-col">
-      <section class="card">
-        <div class="card-toolbar"><strong>Member workspaces</strong><span class="muted">Publish target status</span></div>
-        <table class="grid">
-          <thead><tr><th>Workspace</th><th>Region</th><th>Tier</th><th>Rules</th><th>Publish status</th><th>Last publish</th></tr></thead>
-          <tbody>${SENTINEL_WORKSPACES.map((w, i) => `<tr><td><strong>${esc(w.name)}</strong></td><td>${esc(w.region)}</td><td>${esc(w.tier)}</td><td>${w.ruleIdx.length}</td><td><span class="tag ${i === 2 ? 'orange' : 'green'}">${i === 2 ? 'Pending changes' : 'In sync'}</span></td><td>${i === 2 ? '2026-07-05 16:10' : '2026-07-06 07:40'}</td></tr>`).join('')}
-          </tbody>
-        </table>
-        <div class="callout info" style="margin-top:12px;">Selected workspace: <strong>${esc(workspace.name)}</strong> · use it as the publishing target for analytics, hunting, workbooks, and automation packages.</div>
-      </section>
-      <section class="card card-body">
-        <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-          <strong>Customer tenants</strong>
-          <span class="muted">Cross-tenant switcher</span>
-        </div>
-        <label class="wizard-label">Tenant
-          <select class="text-input" onchange="setMsspTenant(this.value)">
-            ${MSSP_TENANTS.map(t => `<option value="${t.id}" ${t.id === tenant.id ? 'selected' : ''}>${esc(t.name)} · ${esc(t.status)}</option>`).join('')}
-          </select>
-        </label>
-        <div class="resource-summary" style="margin-top:12px;">
-          <div><span>Selected tenant</span><strong>${esc(tenant.name)}</strong><small>${esc(tenant.status)} delegation</small></div>
-          <div><span>Workspaces</span><strong>${tenant.workspaces.length}</strong><small>${esc(tenant.workspaces.join(' · '))}</small></div>
-          <div><span>Delegated roles</span><strong>${tenant.delegatedRoles.length}</strong><small>${esc(tenant.delegatedRoles.join(' · '))}</small></div>
-        </div>
-        <div class="muted" style="margin-top:12px; font-size:12px;">Select a tenant to open its delegated workspaces, roles, and cross-tenant incidents.</div>
-        <table class="grid" style="margin-top:6px;">
-          <thead><tr><th>Tenant</th><th>Workspaces</th><th>Delegated roles</th><th>Status</th></tr></thead>
-          <tbody>${MSSP_TENANTS.map(t => `
-            <tr class="clickable-row ${t.id === tenant.id ? 'active-row' : ''}" onclick="openMsspTenant('${esc(t.id)}')">
-              <td><strong>${esc(t.name)}</strong></td>
-              <td>${t.workspaces.map(ws => `<span class="tag">${esc(ws)}</span>`).join(' ')}</td>
-              <td>${t.delegatedRoles.map(role => `<span class="entity-chip">${esc(role)}</span>`).join(' ')}</td>
-              <td><span class="status-dot ${t.status === 'Active' ? 'resolved' : 'warn'}"></span>${esc(t.status)}</td>
-            </tr>
-          `).join('')}</tbody>
-        </table>
-      </section>
-    </div>
-    <div class="two-col" style="margin-top:16px;">
-      <section class="card">
-        <div class="card-toolbar"><strong>Content selection</strong><span class="muted">Package for publish</span></div>
-        <table class="grid">
-          <thead><tr><th>Content</th><th>Selected</th><th>Scope</th><th>Open</th></tr></thead>
-          <tbody>${content.map(c => `<tr><td><strong>${esc(c.type)}</strong><br><span class="muted">${esc(c.detail)}</span></td><td>${c.selected} / ${c.total}</td><td><span class="tag green">Included</span></td><td><a class="chip-link" href="${c.link}">Open →</a></td></tr>`).join('')}</tbody>
-        </table>
-      </section>
-      <section class="card card-body">
-        <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-          <strong>Cross-workspace query</strong>
-          <span class="muted">workspace() example</span>
-        </div>
-        <div class="callout info">This query is a study aid for cross-workspace hunting. It stays local, but it mirrors the way Sentinel references a workspace-qualified table.</div>
-        <textarea class="kql" readonly>${esc(workspaceQuery)}</textarea>
-        <div class="sidepanel-footer" style="padding-top:12px;">
-          <button class="btn btn-secondary" onclick='loadSentinelLogsQuery(${JSON.stringify(workspaceQuery)})'>Send to Logs</button>
-          <a class="btn btn-primary" href="#/siem/logs">Open Logs</a>
-        </div>
-      </section>
-    </div>
-    <div class="card card-body" style="margin-top:16px;">
-      <div class="alert-section-title">Publish workflow</div>
-      <div class="flowline">
-        <div class="flow-step"><strong>Select content</strong><span>Choose analytics rules, hunting queries, workbooks, automation, and connector-backed DCR labs.</span></div>
-        <div class="flow-step"><strong>Validate dependencies</strong><span>Confirm required tables, connectors, watchlists, and UEBA settings exist in each member workspace.</span></div>
-        <div class="flow-step"><strong>Publish</strong><span>Distribute the package and record last-publish status per workspace.</span></div>
-        <div class="flow-step"><strong>Monitor drift</strong><span>Flag workspaces with changed rules, disabled connectors, or stale automation.</span></div>
-      </div>
-    </div>`;
-};
 
 // ====================================================================
-// DEFENDER FOR CLOUD
+// CLOUD SECURITY POSTURE
 // ====================================================================
 VIEWS['cloud/overview'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Overview</strong></div><h1>Defender for Cloud</h1></div></div>
   <div class="kpi-strip">
-    <div class="kpi"><span class="kpi-label">Secure score</span><span class="kpi-value">65%</span></div>
+    <div class="kpi"><span class="kpi-label">Exposure score</span><span class="kpi-value">65%</span></div>
     <div class="kpi"><span class="kpi-label">Active recommendations</span><span class="kpi-value">${DEFENDER_CLOUD_RECS.length}</span></div>
     <div class="kpi"><span class="kpi-label">Unhealthy resources</span><span class="kpi-value">46</span></div>
     <div class="kpi"><span class="kpi-label">Workload protection plans</span><span class="kpi-value">7/12</span></div>
@@ -6954,24 +6521,9 @@ function renderCloudRecommendationDetail(rec, tab) {
       <div class="alert-section-title">Related initiatives and standards</div>
       ${(rec.initiatives || []).map(name => `<div class="detail-row"><span>${esc(name)}</span><strong>Mapped</strong></div>`).join('') || '<div class="muted">No related initiatives.</div>'}
       <div class="callout info" style="margin-top:14px;">A recommendation can contribute evidence to more than one initiative. Remediating the resource finding can therefore improve multiple compliance views.</div>
-      <button class="btn btn-secondary btn-sm" onclick="hidePanels(); navigate('#/cloud/regulatory');">Open regulatory compliance</button>
     `}
   `;
 }
-
-VIEWS['cloud/regulatory'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Regulatory compliance</strong></div><h1>Regulatory compliance</h1></div></div>
-  ${COMPLIANCE_FRAMEWORKS.map(f => `
-    <div class="card card-body">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <strong>${esc(f.name)}</strong>
-        <span class="muted">${f.passing} passing · ${f.failing} failing</span>
-      </div>
-      <div class="bar ${f.percent < 60 ? 'warn' : ''}"><i style="width:${f.percent}%"></i></div>
-      <div style="font-size:12px; color:var(--fg-muted); margin-top:4px;">${f.percent}% compliant</div>
-    </div>
-  `).join('')}
-`;
 
 const DEFENDER_CLOUD_SEVERITY_ORDER = ['high', 'medium', 'low', 'informational'];
 const DEFENDER_CLOUD_STATUSES = ['Active', 'Dismissed', 'Resolved'];
@@ -7161,7 +6713,6 @@ function renderCloudAlertDetail(alert, tab) {
       <div class="pill-row">
         <button class="btn btn-secondary btn-sm" onclick="toast('Marked useful — feedback tunes detection quality.')">Useful</button>
         <button class="btn btn-secondary btn-sm" onclick="toast('Marked not useful — pick a reason and add a comment in the portal.')">Not useful</button>
-        <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/settings'); hidePanels();">Configure email notification settings</button>
       </div>
     `}`;
 }
@@ -7213,7 +6764,7 @@ function renderCloudIncidentDetail(incident) {
       <dt>Correlated on</dt><dd>${esc(incident.sharedEntity)}</dd>
       <dt>Member alerts</dt><dd>${members.length}</dd>
     </dl>
-    <div class="alert-section-title">Attack story</div>
+    <div class="alert-section-title">Attack narrative</div>
     <p class="muted" style="line-height:1.5;">${esc(incident.story)}</p>
     ${renderCloudIncidentAttackPath(incident)}
     <div class="alert-section-title">Alerts in this incident</div>
@@ -7441,136 +6992,6 @@ const DEFENDER_CLOUD_AZURE_PLANS = [
   { id:'ai', name:'AI', kind:'Workload protection', note:'Protects supported AI workloads; availability depends on resource type and region.' },
 ];
 
-VIEWS['cloud/setup'] = () => {
-  const state = currentDefenderCloudSetupState();
-  const enabledPlans = Object.values(state.plans).filter(p => p.enabled).length;
-  const server = state.plans.servers;
-  const containers = state.plans.containers;
-  const storage = state.plans.storage;
-  const protectionStatus = (enabled, detail) => enabled
-    ? `<span class="tag green">Protected</span><small>${detail}</small>`
-    : '<span class="tag red">Not protected</span><small>Enable the matching plan, save, then verify deployment.</small>';
-  return `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">Defender for Cloud › Management › Environment settings › <strong>Defender plans</strong></div>
-      <h1>Defender plans</h1>
-      <div class="page-subtitle">Configure Azure workload-protection coverage, required components, and the path from telemetry to investigation.</div>
-    </div>
-    <div class="page-actions">
-      <button class="btn btn-secondary" onclick="resetDefenderCloudSetupState()">Reset lab</button>
-      <button class="btn btn-secondary" onclick="enableAllDefenderCloudSetupPlans()">Enable all</button>
-      <button class="btn btn-primary dc-save-plans" onclick="commitDefenderCloudSetupPlans()" ${state.saved ? 'disabled' : ''}>Save changes</button>
-    </div>
-  </div>
-
-  <div class="callout info dc-exam-focus">
-    <strong>SC-200 focus:</strong> the current outline tests investigation and remediation of Defender for Cloud workload-protection alerts and incidents. Setup is supporting knowledge: know which plan produces the signal, verify coverage, then pivot to the alert and its affected resource.
-  </div>
-
-  <div class="kpi-strip dc-setup-kpis">
-    <div class="kpi"><span class="kpi-label">Scope</span><span class="kpi-value dc-kpi-text">${esc(state.scope)}</span><span class="muted">${esc(state.scopeType)}</span></div>
-    <div class="kpi"><span class="kpi-label">Foundational CSPM</span><span class="kpi-value dc-kpi-text">Included</span><span class="muted">Basic posture is available when Defender for Cloud is enabled</span></div>
-    <div class="kpi"><span class="kpi-label">Paid plans selected</span><span class="kpi-value">${enabledPlans}</span><span class="muted">of ${DEFENDER_CLOUD_AZURE_PLANS.length} represented plans</span></div>
-    <div class="kpi"><span class="kpi-label">Configuration</span><span class="kpi-value dc-kpi-text">${state.saved ? 'Saved' : 'Unsaved'}</span><span class="muted">${state.saved ? `Last saved ${fmtTime(state.lastSaved)}` : 'Save before validating coverage'}</span></div>
-  </div>
-
-  <div class="dc-setup-layout">
-    <div>
-      <section class="card">
-        <div class="card-toolbar"><strong>${esc(state.scope)} · Defender plans</strong><span class="muted">Plan availability and pricing vary by scope and resource type</span></div>
-        <div class="dc-plan-list">
-          ${DEFENDER_CLOUD_AZURE_PLANS.map(plan => {
-            const value = state.plans[plan.id];
-            const suffix = plan.id === 'servers' && value.enabled ? ` · ${esc(value.tier)}` : '';
-            return `<label class="dc-plan-row">
-              <input type="checkbox" ${value.enabled ? 'checked' : ''} onchange="setDefenderCloudSetupPlan('${plan.id}', this.checked)">
-              <span><strong>${esc(plan.name)}${suffix}</strong><small>${esc(plan.note)}</small></span>
-              <span class="dc-plan-kind">${esc(plan.kind)}</span>
-              <em>${value.enabled ? 'On' : 'Off'}</em>
-            </label>`;
-          }).join('')}
-        </div>
-        <div class="card-body dc-plan-footnote">
-          Foundational CSPM is not one of these paid toggles. Enabling every paid plan can create charges; select plans according to the protected workloads and required detections.
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-toolbar"><strong>Plan settings that affect signal coverage</strong><span class="muted">Configure after selecting the plan</span></div>
-        <div class="dc-feature-grid">
-          <div class="dc-feature-group ${server.enabled ? '' : 'disabled'}">
-            <div class="dc-feature-head"><div><strong>Servers</strong><small>Plan 2 features are not available in Plan 1.</small></div>
-              <select class="ipt input-sm" onchange="setDefenderCloudServersTier(this.value)" ${server.enabled ? '' : 'disabled'}><option ${server.tier === 'Plan 1' ? 'selected' : ''}>Plan 1</option><option ${server.tier === 'Plan 2' ? 'selected' : ''}>Plan 2</option></select>
-            </div>
-            <label><input type="checkbox" ${server.endpointProtection ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('servers','endpointProtection',this.checked)" ${server.enabled ? '' : 'disabled'}> Endpoint protection auto-provisioning</label>
-            <label><input type="checkbox" ${server.agentlessScanning ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('servers','agentlessScanning',this.checked)" ${server.enabled && server.tier === 'Plan 2' ? '' : 'disabled'}> Agentless machine scanning</label>
-            <label><input type="checkbox" ${server.fim ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('servers','fim',this.checked)" ${server.enabled && server.tier === 'Plan 2' ? '' : 'disabled'}> File integrity monitoring configured</label>
-          </div>
-          <div class="dc-feature-group ${containers.enabled ? '' : 'disabled'}">
-            <div class="dc-feature-head"><div><strong>Containers</strong><small>Access requirements differ across AKS, EKS, and GKE.</small></div></div>
-            <label><input type="checkbox" ${containers.defenderSensor ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('containers','defenderSensor',this.checked)" ${containers.enabled ? '' : 'disabled'}> Defender sensor</label>
-            <label><input type="checkbox" ${containers.registryAccess ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('containers','registryAccess',this.checked)" ${containers.enabled ? '' : 'disabled'}> Registry access for image assessment</label>
-          </div>
-          <div class="dc-feature-group ${storage.enabled ? '' : 'disabled'}">
-            <div class="dc-feature-head"><div><strong>Storage</strong><small>Malware scanning is billed separately from the base plan.</small></div></div>
-            <label><input type="checkbox" ${storage.malwareScanning ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('storage','malwareScanning',this.checked)" ${storage.enabled ? '' : 'disabled'}> On-upload malware scanning add-on</label>
-            <label><input type="checkbox" ${storage.sensitiveData ? 'checked' : ''} onchange="setDefenderCloudSetupFeature('storage','sensitiveData',this.checked)" ${storage.enabled ? '' : 'disabled'}> Sensitive-data threat detection</label>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-toolbar"><strong>Coverage validation</strong><span class="muted">Saving a plan starts component deployment; verify the result</span></div>
-        <div class="dc-coverage-list">
-          <div><span><strong>vm-app-01</strong><small>Azure virtual machine</small></span>${protectionStatus(server.enabled && state.saved, server.tier === 'Plan 2' ? 'Servers Plan 2 · MDE and agentless scanning selected' : 'Servers Plan 1 · endpoint protection selected')}</div>
-          <div><span><strong>aks-prod</strong><small>Azure Kubernetes Service</small></span>${protectionStatus(containers.enabled && state.saved, 'Containers · sensor and registry coverage selected')}</div>
-          <div><span><strong>stprodeuw</strong><small>Azure Storage account</small></span>${protectionStatus(storage.enabled && state.saved, `Storage · malware scanning ${storage.malwareScanning ? 'on' : 'off'} · sensitivity context ${storage.sensitiveData ? 'on' : 'off'}`)}</div>
-          <div><span><strong>sql-orders-prod</strong><small>Azure SQL database</small></span>${protectionStatus(state.plans.databases.enabled && state.saved, 'Databases · confirm the Azure SQL subplan is selected')}</div>
-        </div>
-        <div class="card-body dc-coverage-actions"><span class="muted">Use the Coverage workbook for plan/resource gaps; then confirm the asset appears in inventory and produces recommendations or alerts.</span><a class="btn btn-secondary btn-sm" href="#/cloud/inventory">Open inventory</a></div>
-      </section>
-    </div>
-
-    <aside>
-      <section class="card card-body">
-        <div class="alert-section-title">Enablement path</div>
-        <ol class="dc-step-list">
-          <li><strong>Open Environment settings</strong><span>Select the Azure subscription or supported workspace to protect.</span></li>
-          <li><strong>Select plans</strong><span>Choose only the workload plans the environment needs; use plan settings for extensions and add-ons.</span></li>
-          <li><strong>Save and deploy</strong><span>Required monitoring components are provisioned to supported resources. Deployment can take time.</span></li>
-          <li><strong>Verify coverage</strong><span>Check the Coverage workbook, inventory, recommendations, and component health—not just the toggle.</span></li>
-          <li><strong>Investigate the signal</strong><span>Defender for Cloud alerts also flow automatically into the Defender portal for correlated SOC investigation.</span></li>
-        </ol>
-      </section>
-
-      <section class="card card-body">
-        <div class="alert-section-title">Permissions to remember</div>
-        <dl class="dc-fact-list">
-          <dt>View resource information</dt><dd>Owner, Contributor, or Reader at the subscription or resource-group scope.</dd>
-          <dt>Change security policy</dt><dd>Security Admin, Owner, or Contributor at the relevant subscription scope.</dd>
-          <dt>Least privilege</dt><dd>Grant the role at the narrowest scope that still covers the analyst or administrator's job.</dd>
-        </dl>
-      </section>
-
-      <section class="card card-body">
-        <div class="alert-section-title">Hybrid and multicloud are separate</div>
-        <p class="muted">On-premises servers use Azure Arc. AWS accounts and GCP projects use native connectors with federated access; their connector flow also establishes the access needed for selected CSPM and workload-protection capabilities.</p>
-        <a class="btn btn-secondary" href="#/cloud/environment">Open connector lab</a>
-      </section>
-
-      <section class="card card-body">
-        <div class="alert-section-title">SC-200 response handoff</div>
-        <div class="button-stack">
-          <a class="btn btn-primary" href="#/cloud/alerts">Investigate workload alerts</a>
-          <a class="btn btn-secondary" href="#/cloud/attack-paths">Review attack paths</a>
-          <a class="btn btn-secondary" href="#/cloud/recommendations">Remediate recommendations</a>
-        </div>
-      </section>
-    </aside>
-  </div>`;
-};
-
 VIEWS['cloud/explorer'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › <strong>Cloud Security Explorer</strong></div><h1>Cloud Security Explorer</h1><div class="page-subtitle">Explore resource queries that combine exposure, alerts, and recommendations.</div></div></div>
   <div class="card card-body">
@@ -7595,77 +7016,6 @@ VIEWS['cloud/cloud-security'] = () => `
     <a class="tile" href="#/cloud/recommendations"><strong>Recommendations</strong><span>Reduce posture findings that feed attack paths.</span></a>
   </div>`;
 
-VIEWS['cloud/environment'] = () => {
-  const state = defenderCloudMulticloudState();
-  const awsPlans = ['CSPM', 'Servers', 'Containers', 'Databases'];
-  const gcpPlans = ['CSPM', 'Servers', 'Containers', 'Databases'];
-  return `
-  <div class="page-header">
-    <div><div class="breadcrumb">Defender for Cloud › Management › <strong>Environment settings</strong></div><h1>Environment settings</h1><div class="page-subtitle">Onboard AWS and GCP connectors, then review file integrity monitoring and just-in-time VM access.</div></div>
-    <div class="page-actions"><button class="btn btn-secondary" onclick="resetDefenderCloudMulticloudState()">Reset lab</button></div>
-  </div>
-  <div class="kpi-strip">
-    <div class="kpi"><span class="kpi-label">AWS connector</span><span class="kpi-value">${esc(state.aws.health)}</span></div>
-    <div class="kpi"><span class="kpi-label">GCP connector</span><span class="kpi-value">${esc(state.gcp.health)}</span></div>
-    <div class="kpi"><span class="kpi-label">FIM</span><span class="kpi-value">${state.fim.enabled ? 'On' : 'Off'}</span></div>
-    <div class="kpi"><span class="kpi-label">JIT requests</span><span class="kpi-value">${esc(state.jit.requestState)}</span></div>
-  </div>
-  <div class="two-col">
-    <section class="card card-body">
-      <div class="alert-section-title">AWS connector wizard</div>
-      <div class="flowline vertical-flow" style="margin-top:12px;">
-        <div class="flow-step"><strong>1. Account and region scope</strong><span>Account ${esc(state.aws.accountId)} with coverage in ${esc((state.aws.regions || []).join(', '))}.</span></div>
-        <div class="flow-step"><strong>2. Plan selection</strong><span>The lab includes CSPM and Servers coverage; you can toggle Containers or Databases if the scenario calls for it.</span></div>
-        <div class="flow-step"><strong>3. Template deployment</strong><span>A CloudFormation-style stack provisions the cross-account role, permissions, and monitoring hooks in one pass.</span></div>
-        <div class="flow-step"><strong>4. Connector health</strong><span>Status: <span class="tag ${state.aws.health === 'Healthy' ? 'green' : 'orange'}">${esc(state.aws.health)}</span> · Last sync ${fmtTime(state.aws.lastSync)}</span></div>
-      </div>
-      <div class="form-grid two" style="margin-top:14px;">
-        ${awsPlans.map(plan => `<button class="btn ${state.aws.plans.includes(plan) ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="toggleDefenderCloudPlan('aws', '${plan}')">${esc(plan)}</button>`).join('')}
-      </div>
-      <div class="callout info" style="margin-top:14px;">${esc(state.aws.bootstrap)}. The lab keeps the workflow static, but the connector list, plan selection, and health state are persisted locally.</div>
-      <div class="button-row" style="margin-top:14px;"><button class="btn btn-primary" onclick="advanceDefenderCloudOnboarding('aws')">Validate AWS connector</button></div>
-    </section>
-    <section class="card card-body">
-      <div class="alert-section-title">GCP connector wizard</div>
-      <div class="flowline vertical-flow" style="margin-top:12px;">
-        <div class="flow-step"><strong>1. Project and region scope</strong><span>Project ${esc(state.gcp.projectId)} with coverage in ${esc((state.gcp.regions || []).join(', '))}.</span></div>
-        <div class="flow-step"><strong>2. Plan selection</strong><span>Containers and Databases are included for the lab scenario, with CSPM keeping posture findings in view.</span></div>
-        <div class="flow-step"><strong>3. Cloud Shell bootstrap</strong><span>A short shell bootstrap script assigns the project permissions and prepares the connector registration.</span></div>
-        <div class="flow-step"><strong>4. Connector health</strong><span>Status: <span class="tag ${state.gcp.health === 'Healthy' ? 'green' : 'orange'}">${esc(state.gcp.health)}</span> · Last sync ${fmtTime(state.gcp.lastSync)}</span></div>
-      </div>
-      <div class="form-grid two" style="margin-top:14px;">
-        ${gcpPlans.map(plan => `<button class="btn ${state.gcp.plans.includes(plan) ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="toggleDefenderCloudPlan('gcp', '${plan}')">${esc(plan)}</button>`).join('')}
-      </div>
-      <div class="callout info" style="margin-top:14px;">${esc(state.gcp.bootstrap)}. Warning health keeps the inventory and alert surfaces noisy enough for triage practice.</div>
-      <div class="button-row" style="margin-top:14px;"><button class="btn btn-primary" onclick="advanceDefenderCloudOnboarding('gcp')">Validate GCP connector</button></div>
-    </section>
-  </div>
-  <div class="two-col" style="margin-top:16px;">
-    <section class="card card-body">
-      <div class="alert-section-title">File integrity monitoring</div>
-      <div class="callout ${state.fim.enabled ? 'success' : 'warn'}">Enable FIM on the plan that matters most, then watch for unexpected edits to critical files on servers and container nodes.</div>
-      <div class="flowline vertical-flow" style="margin-top:12px;">
-        <div class="flow-step"><strong>Monitored entities</strong><span>${esc(state.fim.monitored.join(' · '))}</span></div>
-        <div class="flow-step"><strong>Recent change events</strong><span>${esc(state.fim.recentChanges.map(ev => `${ev.item} (${ev.source})`).join(' · '))}</span></div>
-      </div>
-      <table class="grid" style="margin-top:14px;"><thead><tr><th>Item</th><th>Change</th><th>Source</th></tr></thead><tbody>${state.fim.recentChanges.map(ev => `<tr><td>${esc(ev.item)}</td><td>${esc(ev.change)}</td><td>${esc(ev.source)}</td></tr>`).join('')}</tbody></table>
-      <div class="button-row" style="margin-top:14px;"><button class="btn ${state.fim.enabled ? 'btn-secondary' : 'btn-primary'}" onclick="toggleDefenderCloudFim()">${state.fim.enabled ? 'Disable FIM' : 'Enable FIM'}</button></div>
-    </section>
-    <section class="card card-body">
-      <div class="alert-section-title">Just-in-time VM access</div>
-      <div class="callout info">Request access only when you need a port open briefly. In the lab, the approval is static and local-only, but the sequence mirrors the real decision path.</div>
-      <table class="grid" style="margin-top:14px;"><thead><tr><th>VM</th><th>Ports</th><th>Duration</th><th>Status</th></tr></thead><tbody>
-        <tr><td><strong>${esc(state.jit.vm)}</strong></td><td>${esc(state.jit.ports.join(', '))}</td><td>${esc(state.jit.duration)}</td><td><span class="tag green">${esc(state.jit.requestState)}</span></td></tr>
-      </tbody></table>
-      <div class="flowline vertical-flow" style="margin-top:14px;">
-        <div class="flow-step"><strong>Requester</strong><span>${esc(state.jit.requestor)}</span></div>
-        <div class="flow-step"><strong>Note</strong><span>${esc(state.jit.note)}</span></div>
-      </div>
-      <div class="button-row" style="margin-top:14px;"><button class="btn btn-primary" onclick="requestDefenderCloudJitAccess()">Request access</button></div>
-    </section>
-  </div>`;
-};
-
 VIEWS['cloud/workflow'] = () => `
   <div class="page-header"><div><div class="breadcrumb">Defender for Cloud › Management › <strong>Workflow automation</strong></div><h1>Workflow automation</h1><div class="page-subtitle">Route Defender for Cloud alerts and recommendations into local response steps.</div></div></div>
   <div class="two-col">
@@ -7678,1270 +7028,11 @@ VIEWS['cloud/workflow'] = () => `
   </div>`;
 
 // ====================================================================
-// PURVIEW
-// ====================================================================
-VIEWS['governance/home'] = () => `
-  <section class="purview-welcome">
-    <div class="purview-welcome-visual" aria-label="Connected data estate">
-      <div class="purview-source-map">
-        ${PURVIEW_CONNECTED_SOURCES.map((s, index) => `
-          <button class="purview-source-node ${s.status === 'Connected' ? 'connected' : ''} node-${index}" onclick="navigate('${s.status === 'Connected' ? '#/governance/solutions' : '#/governance/settings'}')">
-            <span>${esc(s.icon)}</span>
-            <strong>${esc(s.name)}</strong>
-          </button>
-        `).join('')}
-        <div class="purview-cloud-hub">
-          <span class="purview-cloud-mark"></span>
-          <strong>Hack Smarter Labs<br>Purview</strong>
-        </div>
-      </div>
-      <div class="purview-connection-status"><span class="status-dot resolved"></span>2 connected sources · 280 discovered assets</div>
-    </div>
-
-    <div class="purview-welcome-copy">
-      <div class="breadcrumb">Purview</div>
-      <h1>Welcome to the Purview portal</h1>
-      <p>
-        Use the unified portal for data security, risk and compliance, audit,
-        eDiscovery, records, lifecycle, and modern governance workflows across
-        365, Azure, and connected third-party data sources.
-      </p>
-      <div class="purview-consent">
-        <label><input type="checkbox" checked disabled> Terms of data-flow disclosure accepted for this lab tenant</label>
-        <span>Static lab mode · no real tenant data leaves this browser.</span>
-      </div>
-      <div class="page-actions">
-        <button class="btn btn-primary" onclick="navigate('#/governance/solutions')">Get started</button>
-        <button class="btn btn-secondary" onclick="navigate('#/governance/classic-governance')">Go to classic portal</button>
-      </div>
-    </div>
-  </section>
-
-  <div class="purview-notice">
-    <span class="purview-info">i</span>
-    <div>
-      <strong>Which portal should this lab use?</strong>
-      Use the Purview portal for current data security, compliance, audit, eDiscovery, records, lifecycle, and modern governance tasks. Use classic only when the lab explicitly references Data Catalog classic, Data Health Insights classic, Workflow classic, Azure-launched Purview accounts, or web.purview.azure.com.
-    </div>
-  </div>
-
-  <section class="purview-mode-grid" aria-label="Purview portal options">
-    <button class="purview-mode-card active" onclick="navigate('#/governance/solutions')">
-      <span class="purview-mode-label">New portal</span>
-      <strong>Purview portal</strong>
-      <small>Unified data security, risk and compliance, audit, eDiscovery, records, and lifecycle workflows.</small>
-    </button>
-    <button class="purview-mode-card classic" onclick="navigate('#/governance/classic-governance')">
-      <span class="purview-mode-label">Classic option</span>
-      <strong>Classic governance portal</strong>
-      <small>Use when a lab step mentions Data Catalog classic, Data Health Insights classic, Workflow classic, or web.purview.azure.com.</small>
-    </button>
-  </section>
-
-  <section class="purview-solution-strip" aria-label="Purview solutions">
-    <button class="purview-solution-card" onclick="navigate('#/governance/classic-governance')">
-      <span class="purview-solution-icon">▥</span>
-      <strong>Data Catalog classic</strong>
-    </button>
-    <button class="purview-solution-card" onclick="navigate('#/governance/information-protection')">
-      <span class="purview-solution-icon">🔐</span>
-      <strong>Information Protection</strong>
-    </button>
-    <button class="purview-solution-card" onclick="navigate('#/governance/dlp')">
-      <span class="purview-solution-icon">🛡</span>
-      <strong>Data Loss Prevention</strong>
-    </button>
-    <button class="purview-solution-card" onclick="navigate('#/governance/insider-risk')">
-      <span class="purview-solution-icon">👤</span>
-      <strong>Insider Risk Management</strong>
-    </button>
-    <button class="purview-solution-card" onclick="navigate('#/governance/ai-hub')">
-      <span class="purview-solution-icon">✦</span>
-      <strong>AI Hub preview</strong>
-    </button>
-    <button class="purview-solution-card" onclick="navigate('#/governance/solutions')">
-      <span class="purview-solution-icon">▦</span>
-      <strong>View all solutions →</strong>
-    </button>
-  </section>
-
-  <div class="section-title">Related portals</div>
-  <section class="purview-related-grid">
-    ${[
-      ['Privacy Center', 'Discover privacy risk workflows.', '🔒', '#/governance/solutions'],
-      ['Data Fabric', 'Analytics lakehouse and warehouse context.', '▣', '#/siem/logs'],
-      ['Defender', 'Monitor security incidents and alerts.', '🛡', '#/xdr/home'],
-      ['Entra', 'Identity and access context.', '◈', '#/xdr/identities'],
-      ['Service Trust', 'Compliance resources and trust documentation.', '▤', '#/governance/records'],
-    ].map(([name, detail, icon, route]) => `
-      <button class="purview-related-card" onclick="navigate('${route}')">
-        <span class="purview-related-icon">${icon}</span>
-        <div>
-          <strong>${name}</strong>
-          <small>${detail}</small>
-        </div>
-        <span class="purview-external">↗</span>
-      </button>
-    `).join('')}
-  </section>
-`;
-
-VIEWS['governance/classic-governance'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">Purview › <strong>Classic governance portal</strong></div>
-      <h1>Classic Purview governance portal</h1>
-      <div class="page-subtitle">Support-mode governance experience for older Azure Purview-style lab steps.</div>
-    </div>
-    <div class="page-actions">
-      <button class="btn btn-secondary" onclick="navigate('#/governance/home')">Back to Purview home</button>
-      <button class="btn btn-primary" onclick="navigate('#/governance/home')">Open Purview portal</button>
-    </div>
-  </div>
-
-  <div class="purview-classic-note">
-    <strong>Classic support-mode note</strong>
-    <span>Use this path when instructions refer to the classic governance portal, a Purview account launched from Azure, or <code>web.purview.azure.com</code>. New labs should prefer the unified Purview portal unless the step explicitly calls for classic catalog, insights, or workflow screens.</span>
-  </div>
-
-  <div class="kpi-strip">
-    <div class="kpi"><span class="kpi-label">Data sources</span><span class="kpi-value">12</span><span class="kpi-delta">Registered in catalog</span></div>
-    <div class="kpi"><span class="kpi-label">Assets</span><span class="kpi-value">428</span><span class="kpi-delta">Scanned metadata rows</span></div>
-    <div class="kpi"><span class="kpi-label">Glossary terms</span><span class="kpi-value">37</span><span class="kpi-delta">Business taxonomy</span></div>
-    <div class="kpi"><span class="kpi-label">Workflows</span><span class="kpi-value">3</span><span class="kpi-delta">Approval demos</span></div>
-  </div>
-
-  <div class="two-col">
-    <div class="card card-body">
-      <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-        <strong>Classic quick access</strong>
-        <span class="muted">Role-dependent shortcuts</span>
-      </div>
-      <div class="classic-action-grid">
-        <button class="classic-action">Browse assets</button>
-        <button class="classic-action">Manage glossary</button>
-        <button class="classic-action">Knowledge center</button>
-        <button class="classic-action">View glossary</button>
-      </div>
-    </div>
-    <div class="card card-body">
-      <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-        <strong>When to use classic</strong>
-      </div>
-      <ol class="mini-steps">
-        <li>Lab says launch a Purview account from Azure portal.</li>
-        <li>Lab URL references web.purview.azure.com or a Purview account resource path.</li>
-        <li>Task names Data Catalog classic, Data Health Insights classic, or Purview Workflow classic.</li>
-        <li>Task asks for classic home features such as catalog analytics, recently accessed assets, or guided tours.</li>
-      </ol>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:16px;">
-    <div class="card-toolbar"><strong>Classic governance features</strong><span class="muted">Mapped to local lab context</span></div>
-    <div class="solution-grid">
-      ${CLASSIC_PURVIEW_FEATURES.map(f => `
-        <button class="solution-card" onclick="navigate('${f.route}')">
-          <strong>${esc(f.name)}</strong>
-          <span>${esc(f.detail)}</span>
-        </button>
-      `).join('')}
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:16px;">
-    <div class="card-toolbar"><strong>Recently accessed assets</strong><span class="muted">Classic catalog mock data</span></div>
-    <table class="grid">
-      <thead><tr><th>Asset</th><th>Type</th><th>Collection</th><th>Owner</th><th>Classification</th></tr></thead>
-      <tbody>
-        <tr><td><strong>customer-list.xlsx</strong></td><td>Excel workbook</td><td>Finance</td><td>jdoe@hacksmarterlabs.example</td><td><span class="tag">Credit card number</span></td></tr>
-        <tr><td><strong>employee-roster.csv</strong></td><td>CSV file</td><td>HR</td><td>maria.ross@hacksmarterlabs.example</td><td><span class="tag">U.S. SSN</span></td></tr>
-        <tr><td><strong>audit-export-2026</strong></td><td>Storage path</td><td>Security</td><td>soc@hacksmarterlabs.example</td><td><span class="tag">Operational logs</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-`;
-
-VIEWS['governance/solutions'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">Purview › <strong>Solutions</strong></div>
-      <h1>Solutions</h1>
-      <div class="page-subtitle">Solution cards are grouped by Core, Risk & Compliance, Data Governance, and Data Security.</div>
-    </div>
-  </div>
-  ${['Core','Data Security','Risk & Compliance','Data Governance'].map(area => `
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-toolbar"><strong>${esc(area)}</strong></div>
-      <div class="solution-grid">
-        ${PURVIEW_SOLUTIONS.filter(s => s.area === area).map(s => `
-          <button class="solution-card" onclick="navigate('${s.route}')">
-            <strong>${esc(s.name)}</strong>
-            <span>${esc(s.detail)}</span>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `).join('')}
-`;
-
-VIEWS['governance/ai-hub'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">Purview › <strong>AI Hub preview</strong></div>
-      <h1>AI Hub preview</h1>
-      <div class="page-subtitle">Synthetic view for monitoring AI app usage, risky prompts, and sensitive-data exposure in this lab.</div>
-    </div>
-    <div class="page-actions">
-      <button class="btn btn-secondary" onclick="navigate('#/governance/dlp')">Review DLP policies</button>
-      <button class="btn btn-primary" onclick="navigate('#/governance/audit')">Search audit events</button>
-    </div>
-  </div>
-  <div class="kpi-strip">
-    <div class="kpi"><span class="kpi-label">AI apps discovered</span><span class="kpi-value">7</span><span class="kpi-delta">3 sanctioned</span></div>
-    <div class="kpi"><span class="kpi-label">Sensitive prompts</span><span class="kpi-value">14</span><span class="kpi-delta bad">4 need review</span></div>
-    <div class="kpi"><span class="kpi-label">Labeled files used</span><span class="kpi-value">29</span><span class="kpi-delta">Confidential scope</span></div>
-    <div class="kpi"><span class="kpi-label">Policy matches</span><span class="kpi-value">5</span><span class="kpi-delta">DLP + audit</span></div>
-  </div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-toolbar"><strong>Recent AI activity</strong><span class="muted">Lab-only examples</span></div>
-      <table class="grid">
-        <thead><tr><th>User</th><th>App</th><th>Signal</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td>jdoe@hacksmarterlabs.example</td><td>Copilot for 365</td><td>Prompt referenced customer-list.xlsx</td><td><span class="tag orange">Review</span></td></tr>
-          <tr><td>maria.ross@hacksmarterlabs.example</td><td>Approved summarizer</td><td>Used labeled HR document</td><td><span class="tag green">Allowed</span></td></tr>
-          <tr><td>sales.rep@hacksmarterlabs.example</td><td>Unsanctioned AI app</td><td>Browser upload attempted</td><td><span class="tag orange">Blocked</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card card-body">
-      <div class="alert-section-title">Expected SC-200 workflow</div>
-      <ol class="mini-steps">
-        <li>Review discovered AI apps and users.</li>
-        <li>Pivot sensitive prompts to DLP incidents.</li>
-        <li>Use audit search to validate file access and sharing.</li>
-        <li>Adjust labels, DLP rules, or allowed app controls.</li>
-      </ol>
-    </div>
-  </div>
-`;
-
-// Data loss prevention — the analyst's working surface, not a poster of it.
-//
-// Two tabs, because DLP work has two halves that teach different things:
-//
-//   Alerts   — the alert lifecycle: triage (true/false positive, owner,
-//              status), investigate (per-event verdicts), remediate, comment.
-//              Every action a learner takes is recorded in the alert's
-//              management history, so the workflow leaves a trace they can read
-//              back rather than a toast that vanishes.
-//   Policies — the piece that is usually learned wrong: the action a rule is
-//              CONFIGURED with is not the action that gets APPLIED. Changing a
-//              policy's state here recomputes the applied action live through
-//              dlpAppliedAction(), and the alert queue re-renders with it, so
-//              flipping a simulated policy to enforce visibly changes what
-//              would have happened to a real alert.
-//
-// State is per-learner and local, under hsl.dlp.* — resettable, and separate
-// from the fixture data so a reset restores the authored scenario exactly.
-VIEWS['governance/dlp'] = () => ({
-  html: `<div id="dlp-root"></div>`,
-  onMount: () => {
-    const STATE_KEY = 'hsl.dlp.state';
-
-    const seed = () => ({
-      tab: 'alerts',
-      selected: DLP_INCIDENTS[0].id,
-      filter: { severity: '', status: '', policy: '' },
-      detailTab: 'overview',
-      alerts: DLP_INCIDENTS.reduce((acc, a) => {
-        acc[a.id] = {
-          status: a.status, owner: a.owner || '', verdict: a.verdict || '',
-          comments: [],
-          eventVerdicts: a.events.map(() => ''),
-        };
-        return acc;
-      }, {}),
-      policies: DLP_POLICIES.reduce((acc, p) => { acc[p.id] = { state: p.state }; return acc; }, {}),
-    });
-
-    let state;
-    try {
-      const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
-      // A saved shape from an older fixture set must not half-restore; seed
-      // wins unless every alert the fixtures define is present.
-      state = saved && DLP_INCIDENTS.every(a => saved.alerts && saved.alerts[a.id]) ? saved : seed();
-    } catch (_) { state = seed(); }
-
-    const save = () => { try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (_) {} };
-    const root = document.getElementById('dlp-root');
-    const alertById = id => DLP_INCIDENTS.find(a => a.id === id);
-    const policyByName = name => DLP_POLICIES.find(p => p.name === name);
-
-    // The applied action for an alert follows its policy's CURRENT state, not
-    // the state the fixture was authored with — that is the whole point of the
-    // policies tab.
-    function appliedFor(alert) {
-      const policy = policyByName(alert.policy);
-      if (!policy) return alert.appliedAction;
-      const st = state.policies[policy.id].state;
-      const configured = policy.rules[0].configuredAction;
-      return dlpAppliedAction(configured, st);
-    }
-
-    function logComment(id, text) {
-      state.alerts[id].comments.push({ at: new Date().toISOString(), text });
-    }
-
-    function actionPill(key) {
-      if (!key) return `<span class="tag">No action — policy off</span>`;
-      const a = DLP_ACTIONS[key];
-      const tone = ['green', 'blue', 'orange', 'red'][a.rank];
-      return `<span class="tag ${tone}" title="${esc(a.note)}">${esc(a.label)}</span>`;
-    }
-
-    /* ---------------------------------------------------------------- alerts */
-
-    function filteredAlerts() {
-      const f = state.filter;
-      return DLP_INCIDENTS.filter(a =>
-        (!f.severity || a.severity === f.severity) &&
-        (!f.status   || state.alerts[a.id].status === f.status) &&
-        (!f.policy   || a.policy === f.policy));
-    }
-
-    function renderAlertsTab() {
-      const rows = filteredAlerts();
-      const alert = alertById(state.selected) || rows[0] || DLP_INCIDENTS[0];
-      const open = rows.filter(a => state.alerts[a.id].status !== 'Resolved' && state.alerts[a.id].status !== 'Dismissed').length;
-      const statuses = ['Needs review', 'User override requested', 'Investigating', 'Resolved', 'Dismissed'];
-
-      return `
-        <div class="kpi-strip" style="margin-bottom:14px;">
-          <div class="kpi"><div class="kpi-label">Open alerts</div><div class="kpi-value">${open}</div></div>
-          <div class="kpi"><div class="kpi-label">High severity</div><div class="kpi-value">${rows.filter(a => a.severity === 'high').length}</div></div>
-          <div class="kpi"><div class="kpi-label">Unassigned</div><div class="kpi-value">${rows.filter(a => !state.alerts[a.id].owner).length}</div></div>
-          <div class="kpi"><div class="kpi-label">Policies enforcing</div><div class="kpi-value">${DLP_POLICIES.filter(p => state.policies[p.id].state === 'on').length}/${DLP_POLICIES.length}</div></div>
-        </div>
-
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-toolbar">
-            <strong>Alert queue</strong>
-            <span>
-              <select class="ipt" data-dlp-filter="severity">
-                <option value="">All severities</option>
-                ${['high','medium','low'].map(v => `<option value="${v}" ${state.filter.severity===v?'selected':''}>${cap(v)}</option>`).join('')}
-              </select>
-              <select class="ipt" data-dlp-filter="status">
-                <option value="">All statuses</option>
-                ${statuses.map(v => `<option value="${esc(v)}" ${state.filter.status===v?'selected':''}>${esc(v)}</option>`).join('')}
-              </select>
-              <select class="ipt" data-dlp-filter="policy">
-                <option value="">All policies</option>
-                ${DLP_POLICIES.map(p => `<option value="${esc(p.name)}" ${state.filter.policy===p.name?'selected':''}>${esc(p.name)}</option>`).join('')}
-              </select>
-            </span>
-          </div>
-          <table class="grid">
-            <thead><tr><th>Severity</th><th>Alert</th><th>User</th><th>Location</th><th>Sensitive info</th><th>Applied action</th><th>Status</th><th>Owner</th></tr></thead>
-            <tbody>
-              ${rows.length ? rows.map(a => {
-                const s = state.alerts[a.id];
-                const sel = a.id === alert.id ? ' class="selected-row"' : '';
-                return `
-                  <tr${sel} data-dlp-open="${esc(a.id)}" style="cursor:pointer;">
-                    <td><span class="sev ${a.severity}">${cap(a.severity)}</span></td>
-                    <td><strong>${esc(a.id)}</strong><br><span class="muted">${esc(a.activity)} · ${fmtTime(a.time)}</span></td>
-                    <td>${esc(a.user)}</td>
-                    <td>${esc(a.location)}<br><span class="kv">${esc(a.item)}</span></td>
-                    <td>${a.sensitiveInfo.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</td>
-                    <td>${actionPill(appliedFor(a))}</td>
-                    <td>${esc(s.status)}${s.verdict ? `<br><span class="kv">${esc(s.verdict)}</span>` : ''}</td>
-                    <td>${s.owner ? esc(s.owner) : '<span class="muted">—</span>'}</td>
-                  </tr>`;
-              }).join('') : `<tr><td colspan="8" class="muted" style="padding:18px;">No alerts match the current filters.</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-
-        ${rows.length ? renderAlertDetail(alert) : ''}
-      `;
-    }
-
-    function renderAlertDetail(a) {
-      const s = state.alerts[a.id];
-      const applied = appliedFor(a);
-      const policy = policyByName(a.policy);
-      const tabs = [['overview','Overview'],['events','Events'],['manage','Manage'],['history','History']];
-
-      return `
-        <div class="card">
-          <div class="card-toolbar">
-            <strong>${esc(a.id)} · ${esc(a.policy)}</strong>
-            <span class="muted">Insider-risk level for this user: ${esc(a.insiderRisk)}</span>
-          </div>
-          <div class="tabs" style="padding:0 16px;">
-            ${tabs.map(([k,label]) => `<button class="tab${state.detailTab===k?' active':''}" data-dlp-detail-tab="${k}">${label}</button>`).join('')}
-          </div>
-          <div class="card-body">
-            ${state.detailTab === 'overview' ? `
-              <div class="two-col">
-                <div>
-                  <div class="alert-section-title">What happened</div>
-                  <p>${esc(a.what)}</p>
-                  <div class="alert-section-title">Who</div>
-                  <p>${esc(a.who)}</p>
-                </div>
-                <div>
-                  <dl class="hd-dl">
-                    <dt>Policy</dt><dd>${esc(a.policy)}${policy ? ` <span class="kv">priority ${policy.priority}</span>` : ''}</dd>
-                    <dt>Policy state</dt><dd>${policy ? esc(DLP_POLICY_STATES[state.policies[policy.id].state].label) : '—'}</dd>
-                    <dt>Configured action</dt><dd>${policy ? actionPill(policy.rules[0].configuredAction) : '—'}</dd>
-                    <dt>Applied action</dt><dd>${actionPill(applied)}</dd>
-                    <dt>Matches</dt><dd>${a.matchCount} sensitive value${a.matchCount === 1 ? '' : 's'}</dd>
-                    <dt>Item</dt><dd>${esc(a.item)} <span class="kv">${esc(a.location)}</span></dd>
-                    <dt>Detected</dt><dd>${fmtTime(a.time)}</dd>
-                  </dl>
-                  ${policy && state.policies[policy.id].state !== 'on' ? `
-                    <div class="callout warn">This policy is not enforcing. The configured
-                    <strong>${esc(DLP_ACTIONS[policy.rules[0].configuredAction].label)}</strong> was applied as
-                    <strong>${applied ? esc(DLP_ACTIONS[applied].label) : 'nothing'}</strong>, so the activity was not stopped.
-                    Change the state on the Policies tab to see the difference.</div>` : ''}
-                </div>
-              </div>
-              <div class="alert-section-title" style="margin-top:14px;">Timeline</div>
-              <ol class="mini-steps">${a.timeline.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
-            ` : ''}
-
-            ${state.detailTab === 'events' ? `
-              <p class="muted">Mark each event as a true match or a false positive. The verdicts you
-              record here are what a real tuning pass is built from — a policy that produces mostly
-              false positives is a policy that needs its conditions narrowed, not an analyst who
-              needs to click faster.</p>
-              <table class="grid">
-                <thead><tr><th>Time</th><th>Activity</th><th>Detail</th><th>Verdict</th><th>Actions</th></tr></thead>
-                <tbody>
-                  ${a.events.map((e, i) => `
-                    <tr>
-                      <td>${fmtTime(e.time)}</td>
-                      <td><strong>${esc(e.activity)}</strong><br><span class="kv">${esc(e.item)}</span></td>
-                      <td>${esc(e.detail)}</td>
-                      <td>${s.eventVerdicts[i] ? `<span class="tag ${s.eventVerdicts[i] === 'True match' ? 'red' : 'green'}">${esc(s.eventVerdicts[i])}</span>` : '<span class="muted">Not reviewed</span>'}</td>
-                      <td>
-                        <button class="btn btn-secondary" data-dlp-verdict="${i}" data-value="True match">True match</button>
-                        <button class="btn btn-secondary" data-dlp-verdict="${i}" data-value="False positive">False positive</button>
-                      </td>
-                    </tr>`).join('')}
-                </tbody>
-              </table>
-            ` : ''}
-
-            ${state.detailTab === 'manage' ? `
-              <div class="two-col">
-                <div>
-                  <div class="alert-section-title">Triage</div>
-                  <label class="lbl"><span>Status</span>
-                    <select class="ipt" data-dlp-status>
-                      ${['Needs review','User override requested','Investigating','Resolved','Dismissed']
-                        .map(v => `<option value="${esc(v)}" ${s.status===v?'selected':''}>${esc(v)}</option>`).join('')}
-                    </select>
-                  </label>
-                  <label class="lbl"><span>Assigned owner</span>
-                    <select class="ipt" data-dlp-owner>
-                      <option value="">Unassigned</option>
-                      ${['A. Ansbergs','T. Martinez','A. Lee','Compliance review queue']
-                        .map(v => `<option value="${esc(v)}" ${s.owner===v?'selected':''}>${esc(v)}</option>`).join('')}
-                    </select>
-                  </label>
-                  <label class="lbl"><span>Alert verdict</span>
-                    <select class="ipt" data-dlp-alert-verdict>
-                      <option value="">Undetermined</option>
-                      <option value="True positive" ${s.verdict==='True positive'?'selected':''}>True positive</option>
-                      <option value="False positive" ${s.verdict==='False positive'?'selected':''}>False positive</option>
-                    </select>
-                  </label>
-                </div>
-                <div>
-                  <div class="alert-section-title">Remediation</div>
-                  <p class="muted">Recorded against the alert; nothing leaves the lab.</p>
-                  <div class="hd-action-grid">
-                    ${a.actions.map(act => `<button class="btn btn-secondary" data-dlp-action="${esc(act)}">${esc(act)}</button>`).join('')}
-                  </div>
-                  <div class="alert-section-title" style="margin-top:14px;">Comment</div>
-                  <textarea class="ipt" id="dlp-comment" rows="3" placeholder="What did you find, and what did you do about it?"></textarea>
-                  <button class="btn btn-primary" data-dlp-comment style="margin-top:8px;">Add comment</button>
-                </div>
-              </div>
-            ` : ''}
-
-            ${state.detailTab === 'history' ? (s.comments.length ? `
-              <ol class="mini-steps">
-                ${s.comments.map(c => `<li><span class="kv">${fmtTime(c.at)}</span> ${esc(c.text)}</li>`).join('')}
-              </ol>` : `<p class="muted">Nothing recorded yet. Triage actions, verdicts, and comments all land here.</p>`) : ''}
-          </div>
-        </div>
-      `;
-    }
-
-    /* -------------------------------------------------------------- policies */
-
-    function renderPoliciesTab() {
-      return `
-        <div class="callout info" style="margin-bottom:14px;">
-          A rule's <strong>configured action</strong> is what it would do under full enforcement.
-          The <strong>applied action</strong> is what actually happens, and it depends on the policy's state.
-          Change a state below and watch both this table and the alert queue change.
-        </div>
-
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-toolbar"><strong>Runtime behaviour by policy state</strong><span class="muted">Reference</span></div>
-          <table class="grid">
-            <thead><tr><th>Configured action</th><th>Off</th><th>Simulation</th><th>Simulation + tips</th><th>On</th></tr></thead>
-            <tbody>
-              ${Object.keys(DLP_ACTIONS).map(cfg => `
-                <tr>
-                  <td>${actionPill(cfg)}</td>
-                  ${['off','simulation','simulation-tips','on'].map(st => `<td>${actionPill(dlpAppliedAction(cfg, st))}</td>`).join('')}
-                </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        ${DLP_POLICIES.map(p => {
-          const st = state.policies[p.id].state;
-          return `
-            <div class="card">
-              <div class="card-toolbar">
-                <strong>${esc(p.name)}</strong>
-                <span>
-                  <span class="kv">priority ${p.priority}</span>
-                  <select class="ipt" data-dlp-policy-state="${esc(p.id)}">
-                    ${Object.entries(DLP_POLICY_STATES).map(([k, v]) =>
-                      `<option value="${k}" ${st===k?'selected':''}>${esc(v.label)}</option>`).join('')}
-                  </select>
-                </span>
-              </div>
-              <div class="card-body">
-                <p class="muted">${esc(DLP_POLICY_STATES[st].note)}</p>
-                <div class="kv" style="margin-bottom:10px;">Scope: ${esc(p.scope)}</div>
-                ${p.rules.map(r => {
-                  const applied = dlpAppliedAction(r.configuredAction, st);
-                  return `
-                    <div style="margin-bottom:10px;">
-                      <strong>${esc(r.name)}</strong>
-                      <div style="margin:6px 0;">
-                        Configured ${actionPill(r.configuredAction)}
-                        <span class="muted">→</span>
-                        Applied ${actionPill(applied)}
-                      </div>
-                      <div class="alert-section-title" style="margin:8px 0 4px;">Conditions</div>
-                      <ul style="margin:0; padding-left:18px; font-size:12px;">${r.conditions.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
-                      <div class="alert-section-title" style="margin:8px 0 4px;">Actions</div>
-                      <ul style="margin:0; padding-left:18px; font-size:12px;">${r.actions.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
-                    </div>`;
-                }).join('')}
-              </div>
-            </div>`;
-        }).join('')}
-      `;
-    }
-
-    /* ----------------------------------------------------------------- shell */
-
-    function render() {
-      root.innerHTML = `
-        <div class="page-header">
-          <div>
-            <div class="breadcrumb">Data Governance › <strong>Data loss prevention</strong></div>
-            <h1>Data loss prevention</h1>
-            <div class="page-subtitle">Triage alerts, record verdicts, and see how policy state changes what a rule actually does.</div>
-          </div>
-          <div><button class="btn btn-secondary" data-dlp-reset>Reset lab state</button></div>
-        </div>
-        <div class="tabs" style="margin-bottom:14px;">
-          <button class="tab${state.tab==='alerts'?' active':''}" data-dlp-tab="alerts">Alerts</button>
-          <button class="tab${state.tab==='policies'?' active':''}" data-dlp-tab="policies">Policies</button>
-        </div>
-        ${state.tab === 'alerts' ? renderAlertsTab() : renderPoliciesTab()}
-      `;
-      bind();
-    }
-
-    function bind() {
-      const on = (sel, ev, fn) => root.querySelectorAll(sel).forEach(el => el.addEventListener(ev, fn));
-      const cur = () => state.alerts[state.selected];
-
-      on('[data-dlp-tab]', 'click', e => { state.tab = e.currentTarget.dataset.dlpTab; save(); render(); });
-      on('[data-dlp-open]', 'click', e => {
-        state.selected = e.currentTarget.dataset.dlpOpen; save(); render();
-      });
-      on('[data-dlp-detail-tab]', 'click', e => { state.detailTab = e.currentTarget.dataset.dlpDetailTab; save(); render(); });
-      on('[data-dlp-filter]', 'change', e => {
-        state.filter[e.currentTarget.dataset.dlpFilter] = e.currentTarget.value; save(); render();
-      });
-      on('[data-dlp-verdict]', 'click', e => {
-        const i = Number(e.currentTarget.dataset.dlpVerdict), v = e.currentTarget.dataset.value;
-        cur().eventVerdicts[i] = v;
-        logComment(state.selected, `Event ${i + 1} marked ${v}.`);
-        save(); render();
-      });
-      on('[data-dlp-status]', 'change', e => {
-        cur().status = e.currentTarget.value;
-        logComment(state.selected, `Status set to ${e.currentTarget.value}.`);
-        save(); render();
-      });
-      on('[data-dlp-owner]', 'change', e => {
-        cur().owner = e.currentTarget.value;
-        logComment(state.selected, e.currentTarget.value ? `Assigned to ${e.currentTarget.value}.` : 'Unassigned.');
-        save(); render();
-      });
-      on('[data-dlp-alert-verdict]', 'change', e => {
-        cur().verdict = e.currentTarget.value;
-        logComment(state.selected, `Alert marked ${e.currentTarget.value || 'undetermined'}.`);
-        save(); render();
-      });
-      on('[data-dlp-action]', 'click', e => {
-        logComment(state.selected, `Remediation: ${e.currentTarget.dataset.dlpAction}.`);
-        state.detailTab = 'history';
-        save(); render();
-      });
-      on('[data-dlp-comment]', 'click', () => {
-        const box = document.getElementById('dlp-comment');
-        const text = (box && box.value || '').trim();
-        if (!text) return;
-        logComment(state.selected, text);
-        state.detailTab = 'history';
-        save(); render();
-      });
-      on('[data-dlp-policy-state]', 'change', e => {
-        state.policies[e.currentTarget.dataset.dlpPolicyState].state = e.currentTarget.value;
-        save(); render();
-      });
-      on('[data-dlp-reset]', 'click', () => {
-        state = seed();
-        save(); render();
-      });
-    }
-
-    render();
-  },
-});
-
-VIEWS['governance/insider-risk'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Purview › <strong>Insider risk</strong></div><h1>Insider risk management</h1></div></div>
-  <div class="card" style="margin-bottom:16px;">
-    <div class="card-toolbar"><strong>Cases</strong><a class="chip-link" href="#/governance/ediscovery">Open eDiscovery →</a></div>
-    <table class="grid">
-      <thead><tr><th>Priority</th><th>Case</th><th>User</th><th>Risk score</th><th>Evidence</th><th>Next steps</th></tr></thead>
-      <tbody>
-        ${INSIDER_RISK_CASES.map(c => `
-          <tr>
-            <td><span class="sev ${c.priority.toLowerCase() === 'high' ? 'high' : 'medium'}">${esc(c.priority)}</span></td>
-            <td><strong>${esc(c.id)}</strong><br><span class="muted">${esc(c.policy)} · ${esc(c.status)}</span></td>
-            <td>${esc(c.user)}<br><span class="muted">${esc(c.trigger)}</span></td>
-            <td><strong>${c.riskScore}</strong></td>
-            <td>${c.evidence.map(e => `<span class="tag">${esc(e)}</span>`).join('')}</td>
-            <td>${c.nextSteps.map(s => `<span class="entity-chip">${esc(s)}</span>`).join('')}</td>
-          </tr>
-          <tr class="detail-row"><td></td><td colspan="5">${esc(c.summary)}</td></tr>
-        `).join('')}
-      </tbody>
-    </table>
-  </div>
-  <div class="card">
-    <table class="grid">
-      <thead><tr><th>Policy</th><th>Status</th><th>Alerts</th><th>Triggers</th></tr></thead>
-      <tbody>
-        ${INSIDER_RISK_POLICIES.map(p => `
-          <tr>
-            <td><strong>${esc(p.name)}</strong></td>
-            <td><span class="tag ${p.status==='Active'?'green':'orange'}">${esc(p.status)}</span></td>
-            <td>${p.alerts}</td>
-            <td><span class="muted" style="font-size:12px;">${p.triggers.map(esc).join(' · ')}</span></td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-`;
-
-VIEWS['governance/communication-compliance'] = () => `
-  <div class="page-header">
-    <div><div class="breadcrumb">Purview › <strong>Communication compliance</strong></div><h1>Communication compliance</h1></div>
-  </div>
-  <div class="card">
-    <div class="card-toolbar"><strong>${COMMUNICATION_REVIEWS.length}</strong> items pending or recently reviewed</div>
-    <table class="grid">
-      <thead><tr><th>Severity</th><th>Review</th><th>User</th><th>Channel</th><th>Detected condition</th><th>Status</th></tr></thead>
-      <tbody>
-        ${COMMUNICATION_REVIEWS.map(r => `
-          <tr>
-            <td><span class="sev ${r.severity}">${cap(r.severity)}</span></td>
-            <td><strong>${esc(r.id)}</strong><br><span class="muted">${esc(r.policy)}</span></td>
-            <td>${esc(r.user)}</td>
-            <td>${esc(r.channel)}</td>
-            <td>${esc(r.detected)}<br><span class="muted">${esc(r.message)}</span></td>
-            <td>${esc(r.status)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  </div>
-`;
-
-VIEWS['governance/graph-activity'] = () => {
-  const rows = MOCK_QUERY_RESULTS.GraphActivityLogs || [];
-  return `
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb">Purview › <strong>Graph activity logs</strong></div>
-        <h1>Graph activity logs</h1>
-        <div class="page-subtitle">Investigation guidance and fixture rows for API activity after OAuth consent, risky sign-ins, or compromised-token events.</div>
-      </div>
-      <div class="page-actions">
-        <a class="btn btn-secondary" href="#/xdr/hunting">Advanced hunting</a>
-        <a class="btn btn-primary" href="#/governance/audit">Audit search</a>
-      </div>
-    </div>
-    <div class="three-col">
-      ${GRAPH_ACTIVITY_GUIDANCE.map(g => `
-        <div class="card card-body">
-          <div class="alert-section-title">${esc(g.title)}</div>
-          <p class="muted">${esc(g.detail)}</p>
-        </div>
-      `).join('')}
-    </div>
-    <div class="two-col" style="margin-top:16px; grid-template-columns: 1fr 340px;">
-      <div class="card">
-        <div class="card-toolbar"><strong>GraphActivityLogs fixture rows</strong><span class="muted">${rows.length} rows</span></div>
-        <table class="grid">
-          <thead><tr><th>Time</th><th>User</th><th>App</th><th>Operation</th><th>Request</th><th>IP</th><th>Status</th></tr></thead>
-          <tbody>
-            ${rows.map(r => `
-              <tr>
-                <td>${fmtTime(r.TimeGenerated)}</td>
-                <td>${esc(r.UserPrincipalName)}</td>
-                <td><strong>${esc(r.AppDisplayName)}</strong><br><span class="muted">${esc(r.AppId)}</span></td>
-                <td>${esc(r.Operation)}</td>
-                <td class="kv">${esc(r.RequestUri)}</td>
-                <td>${esc(r.IPAddress)}</td>
-                <td>${esc(r.ResultStatus)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-      <div class="card card-body">
-        <div class="alert-section-title">Hunting query</div>
-        <pre class="kql-snippet">GraphActivityLogs
-| where AppDisplayName == "DocViewer Pro"
-| project TimeGenerated, UserPrincipalName, AppDisplayName, Operation, RequestUri, IPAddress, ResultStatus</pre>
-        <div class="alert-section-title">Use with</div>
-        <div class="connector-list">
-          <div><strong>Threat analytics</strong><span>Validate affected assets and exposed apps.</span></div>
-          <div><strong>CloudAppEvents</strong><span>Correlate consent grants and app governance events.</span></div>
-          <div><strong>Purview Audit</strong><span>Confirm user-visible mailbox and file operations.</span></div>
-        </div>
-      </div>
-    </div>
-  `;
-};
-
-VIEWS['governance/ediscovery'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">Purview › <strong>eDiscovery</strong></div>
-      <h1>eDiscovery cases</h1>
-      <div class="page-subtitle">Build a Content search, preview matching evidence, then prepare an investigation export.</div>
-    </div>
-  </div>
-  <div class="three-col">
-    ${EDISCOVERY_CASES.map(c => `
-      <div class="card card-body">
-        <div class="card-toolbar" style="padding:0 0 8px; border-bottom:0;">
-          <strong>${esc(c.name)}</strong>
-          <span class="tag ${c.status === 'Active' ? 'green' : 'orange'}">${esc(c.status)}</span>
-        </div>
-        <div class="muted">${esc(c.id)} · linked to ${esc(c.linkedCase)}</div>
-        <div class="alert-section-title">Custodians</div>
-        ${c.custodians.map(x => `<span class="entity-chip">${esc(x)}</span>`).join('')}
-        <div class="alert-section-title">Sources and holds</div>
-        ${c.sources.concat(c.holds).map(x => `<span class="tag">${esc(x)}</span>`).join('')}
-        <div class="alert-section-title">Searches</div>
-        <ol class="mini-steps">${c.searches.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
-      </div>
-    `).join('')}
-  </div>
-  <div class="card" style="margin-top:16px;">
-    <div class="card-toolbar">
-      <strong>Content search workflow</strong>
-      <span class="muted">${esc(EDISCOVERY_CONTENT_SEARCH.caseId)} · ${esc(EDISCOVERY_CONTENT_SEARCH.name)}</span>
-    </div>
-    <div class="two-col" style="grid-template-columns: 340px 1fr; padding:14px;">
-      <div>
-        <div class="alert-section-title">Build search</div>
-        <div class="connector-list">
-          <div><strong>Query</strong><span class="kv">${esc(EDISCOVERY_CONTENT_SEARCH.query)}</span></div>
-          <div><strong>Locations</strong><span>${EDISCOVERY_CONTENT_SEARCH.locations.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span></div>
-          <div><strong>Conditions</strong><span>${EDISCOVERY_CONTENT_SEARCH.conditions.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span></div>
-        </div>
-        <div class="alert-section-title">Export for investigation</div>
-        <ol class="mini-steps">${EDISCOVERY_CONTENT_SEARCH.export.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
-      </div>
-      <div>
-        <div class="alert-section-title">Preview results</div>
-        <table class="grid">
-          <thead><tr><th>Location</th><th>Item</th><th>Custodian</th><th>Date</th><th>Match</th></tr></thead>
-          <tbody>
-            ${EDISCOVERY_CONTENT_SEARCH.preview.map(r => `
-              <tr>
-                <td>${esc(r.location)}<br><span class="muted">${esc(r.kind)}</span></td>
-                <td><strong>${esc(r.item)}</strong></td>
-                <td>${esc(r.custodian)}</td>
-                <td>${fmtTime(r.date)}</td>
-                <td>${esc(r.match)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <div class="callout info" style="margin-top:12px;">${esc(EDISCOVERY_CONTENT_SEARCH.interpretation)}</div>
-      </div>
-    </div>
-  </div>
-`;
-
-VIEWS['governance/records'] = () => `
-  <div class="page-header">
-    <div><div class="breadcrumb">Purview › <strong>Records management</strong></div><h1>Records management</h1></div>
-  </div>
-  <div class="card">
-    <div class="card-toolbar"><strong>Retention and record labels</strong></div>
-    <table class="grid">
-      <thead><tr><th>Status</th><th>Name</th><th>Type</th><th>Locations</th><th>Disposition</th></tr></thead>
-      <tbody>
-        ${RECORD_LABELS.map(r => `
-          <tr>
-            <td><span class="status-dot resolved"></span>${esc(r.status)}</td>
-            <td><strong>${esc(r.name)}</strong></td>
-            <td>${esc(r.type)}</td>
-            <td>${esc(r.locations)}</td>
-            <td>${esc(r.disposition)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  </div>
-`;
-
-VIEWS['governance/lifecycle'] = () => `
-  <div class="page-header">
-    <div><div class="breadcrumb">Purview › <strong>Data lifecycle management</strong></div><h1>Data lifecycle management</h1></div>
-  </div>
-  <div class="card">
-    <div class="card-toolbar"><strong>Lifecycle policies</strong></div>
-    <table class="grid">
-      <thead><tr><th>Status</th><th>Policy</th><th>Scope</th><th>Rule</th><th>Action</th></tr></thead>
-      <tbody>
-        ${LIFECYCLE_POLICIES.map(p => `
-          <tr>
-            <td><span class="tag ${p.status === 'Active' ? 'green' : 'orange'}">${esc(p.status)}</span></td>
-            <td><strong>${esc(p.name)}</strong></td>
-            <td>${esc(p.scope)}</td>
-            <td>${esc(p.rule)}</td>
-            <td>${esc(p.action)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  </div>
-`;
-
-VIEWS['governance/settings'] = () => `
-  <div class="page-header">
-    <div>
-      <div class="breadcrumb">Purview › <strong>Settings</strong></div>
-      <h1>Settings</h1>
-      <div class="page-subtitle">Centralized portal and solution settings, matching the new Purview portal model.</div>
-    </div>
-  </div>
-  <div class="three-col">
-    <div class="card card-body"><div class="alert-section-title">Portal-wide</div><span class="entity-chip">Themes</span><span class="entity-chip">Language and time zone</span><span class="entity-chip">Contact preferences</span></div>
-    <div class="card card-body"><div class="alert-section-title">Solution settings</div><span class="entity-chip">DLP</span><span class="entity-chip">Insider risk</span><span class="entity-chip">Audit</span><span class="entity-chip">eDiscovery</span></div>
-    <div class="card card-body"><div class="alert-section-title">Roles and scopes</div><span class="entity-chip">Role groups</span><span class="entity-chip">Administrative units</span><span class="entity-chip">PIM delay note</span></div>
-  </div>
-`;
-
-VIEWS['governance/information-protection'] = () => `
-  <div class="page-header"><div><div class="breadcrumb">Purview › <strong>Information protection</strong></div><h1>Sensitivity labels</h1></div></div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-toolbar"><strong>${SENSITIVITY_LABELS.length}</strong> labels</div>
-      <table class="grid">
-        <thead><tr><th>Label</th><th>Protection</th></tr></thead>
-        <tbody>
-          ${SENSITIVITY_LABELS.map(l => `
-            <tr>
-              <td><span class="status-dot" style="background:${l.color}"></span><strong>${esc(l.name)}</strong></td>
-              <td>${esc(l.protection)}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-toolbar"><strong>Label policies</strong></div>
-      <div class="card-body">
-        ${LABEL_POLICIES.map(p => `
-          <div style="margin-bottom:14px;">
-            <strong>${esc(p.name)}</strong> <span class="tag green">${esc(p.status)}</span>
-            <div class="muted" style="font-size:12px;">${esc(p.users)} · ${p.labels.map(esc).join(', ')}</div>
-            <ul style="margin:6px 0 0; padding-left:18px; font-size:12px; line-height:1.6;">${p.settings.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  </div>
-  <div class="card" style="margin-top:16px;">
-    <div class="card-toolbar"><strong>Recent labeling activity</strong></div>
-    <table class="grid">
-      <thead><tr><th>Time</th><th>User</th><th>File</th><th>Label</th><th>Action</th></tr></thead>
-      <tbody>${LABEL_ACTIVITY.map(a => `
-        <tr><td>${fmtTime(a.time)}</td><td>${esc(a.user)}</td><td class="kv">${esc(a.file)}</td><td>${esc(a.label)}</td><td>${esc(a.action)}</td></tr>
-      `).join('')}</tbody>
-    </table>
-  </div>
-`;
-
-VIEWS['governance/audit'] = () => ({
-  html: `<div id="audit-premium-root"></div>`,
-  onMount: () => {
-    const state = {
-      tab: 'search',
-      filters: { op: '', user: '', workload: '', ip: '' },
-      selected: new Set(),
-      exportSummary: null,
-      policies: AUDIT_RETENTION_POLICIES.map(p => ({ ...p, recordTypes: [...p.recordTypes], users: [...p.users] })),
-      draft: { name: '', users: '', recordTypes: 'ExchangeItem, SharePointFileOperation', duration: '90 days', priority: '3' },
-    };
-
-    const root = document.getElementById('audit-premium-root');
-
-    function filteredRows() {
-      const op = state.filters.op.trim().toLowerCase();
-      const user = state.filters.user.trim().toLowerCase();
-      const workload = state.filters.workload.trim().toLowerCase();
-      const ip = state.filters.ip.trim().toLowerCase();
-      return AUDIT_LOG.filter(a =>
-        (!op || op === 'any' || a.op.toLowerCase().includes(op)) &&
-        (!user || a.user.toLowerCase().includes(user)) &&
-        (!workload || a.workload.toLowerCase().includes(workload)) &&
-        (!ip || a.ip.toLowerCase().includes(ip)));
-    }
-
-    function selectedRows(rows) {
-      return rows.filter(row => state.selected.has(row.time + '|' + row.user + '|' + row.op));
-    }
-
-    function estimateExport(rows) {
-      const count = rows.length;
-      return {
-        count,
-        size: `${Math.max(1, count * 9)} KB`,
-        limit: 'Mock preview capped at 50 rows in the lab; export packages are fictional and local only.',
-      };
-    }
-
-    function renderSearchTab(rows) {
-      const picked = selectedRows(rows);
-      const exportBase = picked.length ? picked : rows;
-      const exportInfo = state.exportSummary || estimateExport(exportBase);
-      return `
-        <div class="two-col" style="margin-top:14px;">
-          <section class="card card-body">
-            <div class="alert-section-title">Search audit events</div>
-            <div class="two-col">
-              <div><label class="lbl">Activity</label><input id="audit-op" class="ipt" value="${esc(state.filters.op)}" placeholder="FileDownloaded, UserLoggedIn, CopilotInteraction"></div>
-              <div><label class="lbl">User</label><input id="audit-user" class="ipt" value="${esc(state.filters.user)}" placeholder="user@hacksmarterlabs.example"></div>
-            </div>
-            <div class="two-col" style="margin-top:8px;">
-              <div><label class="lbl">Workload</label><input id="audit-workload" class="ipt" value="${esc(state.filters.workload)}" placeholder="AzureAD, SharePoint, OneDrive"></div>
-              <div><label class="lbl">IP address</label><input id="audit-ip" class="ipt" value="${esc(state.filters.ip)}" placeholder="76.21.55.4"></div>
-            </div>
-            <div class="sidepanel-footer" style="padding-top:12px; align-items:center;">
-              <button id="audit-search" class="btn btn-primary">Search</button>
-              <button id="audit-export" class="btn btn-secondary">Prepare export</button>
-              <span class="muted">${rows.length} matched rows</span>
-            </div>
-            <div class="callout info" style="margin-top:12px;">
-              Premium audit keeps older activity searchable and includes record types such as <strong>CopilotInteraction</strong>. Use it when the investigation spans beyond the default retention window.
-            </div>
-          </section>
-          <section class="card card-body">
-            <div class="alert-section-title">Audit export summary</div>
-            <div class="callout ${state.exportSummary ? 'success' : 'info'}">
-              <strong>${esc(exportInfo.count)} row preview</strong>
-              <div>${esc(exportInfo.size)}</div>
-              <div style="margin-top:4px;">${esc(exportInfo.limit)}</div>
-            </div>
-            ${state.exportSummary ? `
-              <div class="callout success" style="margin-top:12px;">
-                Export queued for ${esc(state.exportSummary.count)} rows from ${esc(state.exportSummary.source)}.
-              </div>
-            ` : ''}
-            <div class="alert-section-title" style="margin-top:12px;">Premium-only samples</div>
-            <table class="grid">
-              <thead><tr><th>Time</th><th>User</th><th>Workload</th><th>Detail</th></tr></thead>
-              <tbody>
-                ${AUDIT_COPILOT_EVENTS.map(a => `
-                  <tr>
-                    <td>${fmtTime(a.time)}</td>
-                    <td>${esc(a.user)}</td>
-                    <td>${esc(a.workload)}</td>
-                    <td class="kv">${esc(a.detail)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </section>
-        </div>
-        <div class="card" style="margin-top:16px;">
-          <div class="card-toolbar">
-            <strong>Audit results</strong>
-            <span class="muted">${rows.length} matching rows</span>
-          </div>
-          <table class="grid">
-            <thead><tr><th></th><th>Date (UTC)</th><th>User</th><th>Operation</th><th>Workload</th><th>Item</th><th>IP</th></tr></thead>
-            <tbody>
-              ${rows.map(a => {
-                const id = a.time + '|' + a.user + '|' + a.op;
-                const checked = state.selected.has(id) ? 'checked' : '';
-                return `
-                  <tr>
-                    <td><input type="checkbox" class="audit-select" data-audit-id="${esc(id)}" ${checked}></td>
-                    <td>${fmtTime(a.time)}</td>
-                    <td>${esc(a.user)}</td>
-                    <td><strong>${esc(a.op)}</strong></td>
-                    <td>${esc(a.workload)}</td>
-                    <td class="kv">${esc(a.item)}</td>
-                    <td>${esc(a.ip)}</td>
-                  </tr>`;
-              }).join('') || '<tr><td colspan="7" class="muted">No matching audit events.</td></tr>'}
-            </tbody>
-          </table>
-        </div>`;
-    }
-
-    function renderPoliciesTab() {
-      return `
-        <div class="two-col" style="margin-top:14px;">
-          <section class="card card-body">
-            <div class="alert-section-title">Standard vs Premium</div>
-            <div class="two-col">
-              <div class="callout info">
-                <strong>Standard audit</strong>
-                <div>Good for recent activity and baseline triage. The lab keeps the surface intentionally small here.</div>
-              </div>
-              <div class="callout success">
-                <strong>Audit (Premium)</strong>
-                <div>Longer searchable retention, policy-based retention control, and record types like <strong>CopilotInteraction</strong>.</div>
-              </div>
-            </div>
-            <div class="callout warn" style="margin-top:12px;">
-              Premium search matters when the incident timeline crosses retention windows or when you need to track Copilot activity alongside mailbox and file events.
-            </div>
-          </section>
-          <section class="card card-body">
-            <div class="alert-section-title">Create retention policy</div>
-            <div class="two-col">
-              <div><label class="lbl">Policy name</label><input id="audit-policy-name" class="ipt" value="${esc(state.draft.name)}" placeholder="Finance quarterly retention"></div>
-              <div><label class="lbl">Users</label><input id="audit-policy-users" class="ipt" value="${esc(state.draft.users)}" placeholder="user1@hacksmarterlabs.example, user2@hacksmarterlabs.example"></div>
-            </div>
-            <div class="two-col" style="margin-top:8px;">
-              <div><label class="lbl">Record types</label><input id="audit-policy-recordtypes" class="ipt" value="${esc(state.draft.recordTypes)}" placeholder="ExchangeItem, CopilotInteraction"></div>
-              <div><label class="lbl">Duration</label><input id="audit-policy-duration" class="ipt" value="${esc(state.draft.duration)}" placeholder="90 days"></div>
-            </div>
-            <div class="two-col" style="margin-top:8px;">
-              <div><label class="lbl">Priority</label><input id="audit-policy-priority" class="ipt" value="${esc(state.draft.priority)}" placeholder="3"></div>
-              <div class="callout info" style="margin-top:0;">Priority decides which policy wins when a user matches more than one rule.</div>
-            </div>
-            <div class="sidepanel-footer" style="padding-top:12px;">
-              <button id="audit-policy-save" class="btn btn-primary">Save policy</button>
-            </div>
-          </section>
-        </div>
-        <div class="card" style="margin-top:16px;">
-          <div class="card-toolbar">
-            <strong>Retention policy table</strong>
-            <span class="muted">${state.policies.length} policies</span>
-          </div>
-          <table class="grid">
-            <thead><tr><th>Name</th><th>Users</th><th>Record types</th><th>Duration</th><th>Priority</th></tr></thead>
-            <tbody>
-              ${state.policies.map(p => `
-                <tr>
-                  <td><strong>${esc(p.name)}</strong></td>
-                  <td>${esc(p.users.length ? p.users.join(', ') : 'All users')}</td>
-                  <td>${esc(p.recordTypes.join(', '))}</td>
-                  <td>${esc(p.duration)}</td>
-                  <td>${esc(p.priority)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>`;
-    }
-
-    function renderExportTab(rows) {
-      const selectedCount = state.selected.size;
-      const exportRows = selectedCount ? rows.filter(r => state.selected.has(r.time + '|' + r.user + '|' + r.op)) : rows;
-      const preview = estimateExport(exportRows);
-      return `
-        <div class="two-col" style="margin-top:14px;">
-          <section class="card card-body">
-            <div class="alert-section-title">Export workflow</div>
-            <ol style="margin:0; padding-left:18px; line-height:1.7;">
-              <li>Run a search and pick the rows you want to investigate.</li>
-              <li>Prepare a mock export for the selected rows, or export the filtered set if nothing is selected.</li>
-              <li>Keep the package local; this lab never calls a real Purview service.</li>
-            </ol>
-            <div class="callout info" style="margin-top:12px;">
-              Export preview respects the current search filters and selected checkboxes. The mock package estimates size from row count only.
-            </div>
-          </section>
-          <section class="card card-body">
-            <div class="alert-section-title">Export limits</div>
-            <div class="callout warn">
-              <strong>${esc(preview.count)} rows selected for export</strong>
-              <div>${esc(preview.size)} package estimate</div>
-              <div style="margin-top:4px;">Fictional lab limit: preview bundles stay under 50 rows.</div>
-            </div>
-            ${state.exportSummary ? `
-              <div class="callout success" style="margin-top:12px;">
-                Latest export request: ${esc(state.exportSummary.count)} rows from ${esc(state.exportSummary.source)}.
-              </div>
-            ` : ''}
-          </section>
-        </div>`;
-    }
-
-    function render() {
-      const rows = filteredRows();
-      root.innerHTML = `
-        <div class="page-header">
-          <div>
-            <div class="breadcrumb">Purview › <strong>Audit</strong></div>
-            <h1>Audit search</h1>
-            <div class="page-subtitle">Search standard and premium audit events, create retention policies, and prepare local export previews.</div>
-          </div>
-          <div class="page-actions">
-            <button class="btn btn-secondary" data-audit-tab="search">Search</button>
-            <button class="btn btn-secondary" data-audit-tab="policies">Retention policies</button>
-            <button class="btn btn-secondary" data-audit-tab="export">Export</button>
-          </div>
-        </div>
-        <div class="card card-body">
-          <div class="two-col">
-            <div class="callout info">
-              <strong>Standard vs Premium</strong>
-              <div>Standard audit is enough for recent triage. Premium adds longer retention, policy-based control, and CopilotInteraction visibility for this lab.</div>
-            </div>
-            <div class="callout success">
-              <strong>Searchable record types</strong>
-              <div>Use the search form to query file activity, role changes, app consent, risky sign-ins, and Copilot interactions across the lab fixtures.</div>
-            </div>
-          </div>
-          <div class="tabs" style="margin-top:12px;">
-            <span class="tab ${state.tab === 'search' ? 'active' : ''}" data-audit-tab="search">Search</span>
-            <span class="tab ${state.tab === 'policies' ? 'active' : ''}" data-audit-tab="policies">Retention policies</span>
-            <span class="tab ${state.tab === 'export' ? 'active' : ''}" data-audit-tab="export">Export</span>
-          </div>
-        </div>
-        <div id="audit-section">
-          ${state.tab === 'search' ? renderSearchTab(rows) : state.tab === 'policies' ? renderPoliciesTab() : renderExportTab(rows)}
-        </div>`;
-
-      const bind = () => {
-        root.querySelectorAll('[data-audit-tab]').forEach(el => {
-          el.addEventListener('click', () => {
-            state.tab = el.getAttribute('data-audit-tab');
-            state.exportSummary = null;
-            render();
-          });
-        });
-
-        if (state.tab === 'search') {
-          ['audit-op', 'audit-user', 'audit-workload', 'audit-ip'].forEach(id => {
-            const input = document.getElementById(id);
-            if (!input) return;
-            input.addEventListener('input', () => {
-              state.filters[id.replace('audit-', '')] = input.value;
-              state.selected.clear();
-              state.exportSummary = null;
-              render();
-            });
-          });
-          const searchBtn = document.getElementById('audit-search');
-          if (searchBtn) searchBtn.addEventListener('click', () => render());
-          const exportBtn = document.getElementById('audit-export');
-          if (exportBtn) exportBtn.addEventListener('click', () => {
-            const exportRows = selectedRows(rows);
-            const effective = exportRows.length ? exportRows : rows;
-            state.exportSummary = {
-              source: selectedRows(rows).length ? 'selected rows' : 'filtered rows',
-              count: effective.length,
-              size: `${Math.max(1, effective.length * 9)} KB`,
-            };
-            state.tab = 'export';
-            render();
-          });
-          root.querySelectorAll('.audit-select').forEach(cb => {
-            cb.addEventListener('change', () => {
-              const id = cb.getAttribute('data-audit-id');
-              if (cb.checked) state.selected.add(id);
-              else state.selected.delete(id);
-            });
-          });
-        }
-
-        if (state.tab === 'policies') {
-          ['audit-policy-name', 'audit-policy-users', 'audit-policy-recordtypes', 'audit-policy-duration', 'audit-policy-priority'].forEach(id => {
-            const input = document.getElementById(id);
-            if (!input) return;
-            input.addEventListener('input', () => {
-              state.draft[id.replace('audit-policy-', '')] = input.value;
-            });
-          });
-          const save = document.getElementById('audit-policy-save');
-          if (save) save.addEventListener('click', () => {
-            const name = document.getElementById('audit-policy-name').value.trim();
-            const users = document.getElementById('audit-policy-users').value.split(',').map(s => s.trim()).filter(Boolean);
-            const recordTypes = document.getElementById('audit-policy-recordtypes').value.split(',').map(s => s.trim()).filter(Boolean);
-            const duration = document.getElementById('audit-policy-duration').value.trim() || '90 days';
-            const priority = Number(document.getElementById('audit-policy-priority').value.trim() || '3');
-            if (!name) {
-              toast('Add a policy name first.');
-              return;
-            }
-            state.policies.unshift({ name, users, recordTypes, duration, priority });
-            state.draft = { name:'', users:'', recordTypes:'ExchangeItem, SharePointFileOperation', duration:'90 days', priority:'3' };
-            state.exportSummary = null;
-            render();
-            toast('Retention policy saved in the lab.');
-          });
-        }
-      };
-      bind();
-    }
-
-    render();
-  }
-});
-
-// ====================================================================
 // Helper renderers used by side panels (called from app.js)
 // ====================================================================
 // Derive the entities of a single alert (source device/IP -> account -> target/DC)
 // so the alert page can draw its own "Alert graph" — the Defender for Identity
-// alert-page diagram, as opposed to the incident-scoped Attack story.
+// alert-page diagram, as opposed to the incident-scoped Attack narrative.
 function alertGraphEntities(a) {
   const e = a.event || {};
   const isIp = v => /^\d{1,3}(\.\d{1,3}){3}$/.test(v);
@@ -9091,12 +7182,12 @@ function renderAttackStory(inc, incAlerts) {
     <div class="attack-story" data-incident-id="${esc(inc.id)}">
       <div class="attack-story-toolbar">
         <div>
-          <strong>Attack story</strong>
+          <strong>Attack narrative</strong>
           <span>Replay the incident graph, inspect entity evidence, and keep response actions in the same context.</span>
         </div>
         <div class="attack-story-actions">
           <button class="btn btn-secondary btn-sm" onclick="setAttackStoryStep('${esc(inc.id)}', 0)">Reset</button>
-          <button class="btn btn-primary btn-sm" onclick="playAttackStory('${esc(inc.id)}')">Play attack story</button>
+          <button class="btn btn-primary btn-sm" onclick="playAttackStory('${esc(inc.id)}')">Play attack narrative</button>
         </div>
       </div>
       ${renderIncidentGraph(inc.id, story, activeStep.node)}
@@ -9108,7 +7199,7 @@ function renderAttackStory(inc, incAlerts) {
             <p>${esc(story.steps[0].detail)}</p>
             <div class="attack-story-actions-inline">
               <button class="btn btn-secondary btn-sm" onclick="openAlert('${esc(story.steps[0].alertId)}')">Open alert</button>
-              <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Investigate further</button>
             </div>
             <div class="attack-story-remediation"><strong>Response action:</strong> ${esc(story.steps[0].remediation || activeNode.remediation || 'Review the entity details and choose the least disruptive containment action.')}</div>
           ` : '<div class="muted">No ordered alerts available for this incident.</div>'}
@@ -9121,14 +7212,14 @@ function renderAttackStory(inc, incAlerts) {
             <dt>Verdict</dt><dd>${esc(activeNode.verdict || 'Suspicious')}</dd>
             <dt>Remediation</dt><dd>${esc(activeNode.remediation || 'Review evidence, validate verdict, then contain or dismiss.')}</dd>
           </dl>
-          <div class="attack-entity-subtitle">Evidence and response</div>
+          <div class="attack-entity-subtitle">Evidence and remediation</div>
           <div class="attack-entity-actions">
             ${activeNode.type === 'Device' && deviceExists(activeNode.label)
               ? `<button class="btn btn-primary btn-sm" onclick="openDevice('${esc(activeNode.label)}')">Open device page</button>`
               : `<button class="btn btn-secondary btn-sm" onclick="toast('Entity pivot opened for ${esc(activeNode.type || 'entity')} (lab stub).')">Open entity page</button>`}
             <button class="btn btn-primary btn-sm" onclick="viewBlastRadius('${esc(inc.id)}', '${esc(activeNode.id || '')}')">View blast radius</button>
             <button class="btn btn-secondary btn-sm" onclick="runSentinelEntityPlaybook('${esc(activeNode.label || inc.id)}', 'Defender incident side panel')">Run playbook (entity)</button>
-            <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>
+            <button class="btn btn-secondary btn-sm" onclick="navigate('#/xdr/hunting')">Investigate further</button>
           </div>
           <ul class="attack-evidence-list">
             ${(activeNode.evidence || story.steps.filter(step => step.node === activeNode.id).map(step => step.title)).map(item => `<li>${esc(item)}</li>`).join('') || '<li>No evidence attached to this entity.</li>'}
@@ -9167,8 +7258,16 @@ const GRAPH_GEOM = {
   ring1: { rX: 25, rY: 22, arc: 300, start: -150 },
   ring2: { rX: 44, rY: 40, arc: 312, start: -156 },
 };
-const NODE_CLEAR_X = 6.2; // ~half node width (%) + margin
-const NODE_CLEAR_Y = 8.5; // ~half node height (%) + margin
+// Clearance is checked center-to-center, so it must cover BOTH boxes' half-extents
+// combined, not just one — a label sitting exactly `node half-width` away from a
+// node's center still has its own half-width overlapping that node.
+// Node: 104px wide / 76px min-tall on a 1040x560 stage -> half-extent ~5.0% x / ~6.8% y.
+// Label (.attack-web-edge-label): max-width 108px, up to 2 lines at ~9px font ->
+// half-extent ~5.2% x / ~2.4% y.
+const NODE_CLEAR_X = 11.2; // node half-width + label half-width + margin
+const NODE_CLEAR_Y = 10.2; // node half-height + label half-height + margin
+const LABEL_CLEAR_X = 11.4; // 2x label half-width + margin
+const LABEL_CLEAR_Y = 5.8; // 2x label half-height + margin
 
 function graphPoint(node, index, counts) {
   const ring = Number(node.ring || 0);
@@ -9222,7 +7321,7 @@ function graphEdgeRoute(from, to, edge) {
 // Place an edge label at the edge midpoint, then nudge it (outward from centre,
 // then perpendicular to the edge) until it clears every node box. Guarantees
 // labels don't sit on top of node bubbles regardless of story density.
-function graphLabelPoint(from, to, nodes, layout) {
+function graphLabelPoint(from, to, nodes, layout, placedLabels) {
   const mx = (from.x + to.x) / 2;
   const my = (from.y + to.y) / 2;
   let ax = mx - GRAPH_GEOM.cx, ay = my - GRAPH_GEOM.cy;
@@ -9230,30 +7329,55 @@ function graphLabelPoint(from, to, nodes, layout) {
   const dx = to.x - from.x, dy = to.y - from.y;
   const dl = Math.hypot(dx, dy) || 1;
   const px = -dy / dl, py = dx / dl;
-  const clears = (x, y) => nodes.every(n => {
+  const clearsNodes = (x, y) => nodes.every(n => {
     const p = layout[n.id];
     if (!p) return true;
     return Math.abs(x - p.x) >= NODE_CLEAR_X || Math.abs(y - p.y) >= NODE_CLEAR_Y;
   });
+  const clearsLabels = (x, y) => (placedLabels || []).every(p =>
+    Math.abs(x - p.x) >= LABEL_CLEAR_X || Math.abs(y - p.y) >= LABEL_CLEAR_Y);
+  const clears = (x, y) => clearsNodes(x, y) && clearsLabels(x, y);
   const cands = [];
-  for (let d = 3; d <= 16; d += 1.5) cands.push({ x: mx + ax * d, y: my + ay * d });
-  for (let d = 6; d <= 16; d += 2) {
+  for (let d = 3; d <= 36; d += 1.5) cands.push({ x: mx + ax * d, y: my + ay * d });
+  for (let d = 6; d <= 36; d += 2) {
     cands.push({ x: mx + px * d, y: my + py * d });
     cands.push({ x: mx - px * d, y: my - py * d });
   }
-  return cands.find(c => clears(c.x, c.y)) || { x: mx + ax * 4, y: my + ay * 4 };
+  // Diagonal ring: combines outward + perpendicular offsets so dense graphs (many
+  // labels already placed) still have somewhere left to search once the two
+  // straight rays above are exhausted.
+  for (let d = 6; d <= 32; d += 4) {
+    cands.push({ x: mx + ax * d + px * d * 0.6, y: my + ay * d + py * d * 0.6 });
+    cands.push({ x: mx + ax * d - px * d * 0.6, y: my + ay * d - py * d * 0.6 });
+  }
+  // Clamp to the visible canvas — `.attack-web` clips overflow, and a candidate
+  // chasing clearance from a dense cluster of nodes/labels can otherwise land
+  // past the frame edge, clipping the label text itself.
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const inBounds = c => c.x >= LABEL_CLEAR_X && c.x <= 100 - LABEL_CLEAR_X
+    && c.y >= LABEL_CLEAR_Y && c.y <= 100 - LABEL_CLEAR_Y;
+  const chosen = cands.find(c => inBounds(c) && clears(c.x, c.y))
+    || cands.find(c => clears(c.x, c.y))
+    || { x: mx + ax * 4, y: my + ay * 4 };
+  return {
+    x: clamp(chosen.x, LABEL_CLEAR_X, 100 - LABEL_CLEAR_X),
+    y: clamp(chosen.y, LABEL_CLEAR_Y, 100 - LABEL_CLEAR_Y),
+  };
 }
 
 function renderIncidentGraph(incidentId, story, activeNodeId) {
   const layout = graphLayout(story);
+  const placedLabels = [];
   const routes = story.edges.map(edge => {
     const from = layout[edge.from];
     const to = layout[edge.to];
     if (!from || !to) return null;
+    const label = graphLabelPoint(from, to, story.nodes, layout, placedLabels);
+    placedLabels.push(label);
     return {
       edge,
       path: graphEdgeRoute(from, to, edge),
-      label: graphLabelPoint(from, to, story.nodes, layout),
+      label,
     };
   }).filter(Boolean);
   return `
@@ -9445,7 +7569,7 @@ function renderIncidentActivities(inc) {
 function renderIncidentEvidence(inc) {
   const items = INCIDENT_EVIDENCE[inc.id];
   if (!items) {
-    return `<div class="muted">Defender XDR auto-analyzes events and entities and tags them Malicious, Suspicious, or Clean with a remediation status. None recorded for this incident yet.</div>`;
+    return `<div class="muted">Events and entities are auto-analyzed and tagged Malicious, Suspicious, or Clean with a remediation status. None recorded for this incident yet.</div>`;
   }
   const pending = items.filter(e => e.remediation === 'Pending approval');
   return `
@@ -9462,7 +7586,7 @@ function renderIncidentEvidence(inc) {
             <td>${esc(e.action)}</td>
             <td>${e.remediation === 'Pending approval'
               ? `<button class="btn btn-primary btn-sm">Approve</button> <button class="btn btn-ghost btn-sm">Reject</button>`
-              : `<button class="btn btn-ghost btn-sm" onclick="navigate('#/xdr/hunting')">Go hunt</button>`}</td>
+              : `<button class="btn btn-ghost btn-sm" onclick="navigate('#/xdr/hunting')">Investigate further</button>`}</td>
           </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9516,7 +7640,7 @@ function renderIncidentDetail(inc) {
     <div class="incident-preview-open">
       <div>
         <strong>Incident preview</strong>
-        <span>Open the full incident page to work in the Defender attack story and graph area.</span>
+        <span>Open the full incident page to work in the attack narrative and graph area.</span>
       </div>
       <button class="btn btn-primary" onclick="openIncidentPage('${esc(inc.id)}')">Open incident page</button>
     </div>
@@ -9561,7 +7685,7 @@ function renderIncidentDetail(inc) {
     <div class="alert-section-title">Activities</div>
     ${renderIncidentActivities(inc)}
 
-    <div class="alert-section-title">Evidence and Response</div>
+    <div class="alert-section-title">Evidence and remediation</div>
     ${renderIncidentEvidence(inc)}
 
     <div class="alert-section-title">Blast radius (possible paths)</div>
@@ -9609,7 +7733,7 @@ function renderIncidentDetail(inc) {
 
     <div class="sidepanel-footer">
       <button class="btn btn-primary" onclick="openIncidentPage('${esc(inc.id)}')">Open incident page</button>
-      <button class="btn btn-primary">Classify & resolve</button>
+      <button class="btn btn-primary">Set verdict & resolve</button>
       <button class="btn btn-secondary">Assign to me</button>
     </div>`;
 }
@@ -9653,7 +7777,7 @@ VIEWS['siem/hunting/dns'] = () => renderMockAsimLab({
     xdr: {
       context:'Defender XDR',
       goal:'Use this surface to orient where the portal feature sits during incident response, tuning, or tenant configuration.',
-      pivots:['#/xdr/incidents', '#/xdr/hunting', '#/xdr/settings'],
+      pivots:['#/xdr/incidents', '#/xdr/hunting', '#/xdr/devices'],
     },
     siem: {
       context:'Sentinel',
@@ -9663,12 +7787,7 @@ VIEWS['siem/hunting/dns'] = () => renderMockAsimLab({
     cloud: {
       context:'Defender for Cloud',
       goal:'Use this supporting surface for workload-protection and posture context while keeping SC-200 focus on alerts and response.',
-      pivots:['#/cloud/alerts', '#/cloud/recommendations', '#/cloud/regulatory'],
-    },
-    governance: {
-      context:'Purview',
-      goal:'Use this surface for investigation context that supports Audit, eDiscovery, Graph activity logs, and risk cases.',
-      pivots:['#/governance/audit', '#/governance/ediscovery', '#/governance/graph-activity'],
+      pivots:['#/cloud/alerts', '#/cloud/recommendations'],
     },
   };
 
@@ -9732,14 +7851,6 @@ function copilotSelectedSession() {
   return getCopilotSession(selectedId) || sessions[0];
 }
 
-function copilotSelectedPromptbook() {
-  const books = getCopilotPromptbooks();
-  const tab = sessionStorage.getItem('hsl.ai-agent.promptbook.tab') || 'Hack Smarter Labs';
-  const selectedId = sessionStorage.getItem('hsl.ai-agent.promptbook.id');
-  const list = books.filter(book => tab === 'All' || book.source === tab);
-  return books.find(book => book.id === selectedId) || list.find(book => book.id === selectedId) || list[0] || books[0];
-}
-
 function copilotSelectedPlugin() {
   const plugins = getCopilotPlugins();
   const selectedId = sessionStorage.getItem('hsl.ai-agent.plugin.id');
@@ -9754,7 +7865,6 @@ function copilotSelectedKnowledgeSource() {
 
 VIEWS['ai-agent/home'] = () => {
   const sessions = copilotSessionsSorted();
-  const promptbooks = getCopilotPromptbooks();
   const pinned = sessions.filter(s => s.pinned).slice(0, 4);
   const activePrompt = sessionStorage.getItem('hsl.ai-agent.home.prompt') || 'Summarize incident INC-1042';
   return `
@@ -9762,7 +7872,7 @@ VIEWS['ai-agent/home'] = () => {
       <div>
         <div class="breadcrumb">Security Copilot › <strong>Home</strong></div>
         <h1>Security Copilot</h1>
-        <div class="page-subtitle">Standalone experience for sessions, promptbooks, plugins, knowledge, and capacity. All content is fictional and local.</div>
+        <div class="page-subtitle">Standalone experience for sessions, plugins, and knowledge. All content is fictional and local.</div>
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary" onclick="openCopilot()">Open embedded panel</button>
@@ -9785,7 +7895,7 @@ VIEWS['ai-agent/home'] = () => {
         <div class="sidepanel-footer">
           <button class="btn btn-primary" onclick="openCopilot(0)">Open in panel</button>
           <button class="btn btn-secondary" onclick="openCopilotSession('cs-009')">Open matching session</button>
-          <button class="btn btn-secondary" onclick="navigate('#/ai-agent/promptbooks')">Browse promptbooks</button>
+          <button class="btn btn-secondary" onclick="navigate('#/siem/automation')">Run AI-Assisted Playbook</button>
         </div>
       </section>
 
@@ -9813,16 +7923,14 @@ VIEWS['ai-agent/home'] = () => {
     <div class="copilot-home-columns">
       <section class="card card-body">
         <div class="card-toolbar">
-          <strong>Promptbook shortcuts</strong>
-          <span class="muted">built-in and custom study flows</span>
+          <strong>AI-assisted playbooks</strong>
+          <span class="muted">now part of SIEM & SOAR automation</span>
         </div>
-        <div class="copilot-shortcut-grid">
-          ${promptbooks.slice(0, 4).map(book => `
-            <button class="copilot-shortcut" onclick="selectCopilotPromptbook('${esc(book.id)}'); navigate('#/ai-agent/promptbooks');">
-              <span class="copilot-shortcut-title">${esc(book.name)}</span>
-              <span class="copilot-shortcut-meta">${esc(book.source)} · ${book.prompts.length} steps</span>
-            </button>
-          `).join('')}
+        <div class="muted">
+          Prompt-chain scenarios that used to live here as a standalone library now run from the Playbooks surface, next to the rest of incident-response automation — so the resulting session transcript sits beside the playbook that produced it.
+        </div>
+        <div class="sidepanel-footer" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="navigate('#/siem/automation')">Run AI-Assisted Playbook</button>
         </div>
       </section>
       <section class="card card-body">
@@ -9832,7 +7940,7 @@ VIEWS['ai-agent/home'] = () => {
         </div>
         <div class="muted">
           The topbar Copilot button opens the embedded panel for quick prompts inside Defender or Purview.
-          This workload manages durable sessions, promptbooks, plugins, grounding sources, and SCU settings.
+          This workload manages durable sessions, plugins, and grounding sources.
         </div>
         <div class="callout info" style="margin-top:12px;">
           Use the panel for fast summaries, then jump into the matching standalone session when you need the transcript, pin board, or rerun controls.
@@ -9855,7 +7963,7 @@ VIEWS['ai-agent/sessions'] = () => {
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary" onclick="openCopilot()">Open embedded panel</button>
-        <button class="btn btn-primary" onclick="navigate('#/ai-agent/promptbooks')">Run promptbook</button>
+        <button class="btn btn-primary" onclick="navigate('#/siem/automation')">Run AI-Assisted Playbook</button>
       </div>
     </div>
 
@@ -10008,101 +8116,6 @@ VIEWS['ai-agent/session'] = () => {
   `;
 };
 
-VIEWS['ai-agent/promptbooks'] = () => {
-  const tab = sessionStorage.getItem('hsl.ai-agent.promptbook.tab') || 'Hack Smarter Labs';
-  const books = getCopilotPromptbooks();
-  const filtered = books.filter(book => tab === 'All' || book.source === tab);
-  const selected = copilotSelectedPromptbook();
-  return `
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb">Security Copilot › <strong>Promptbooks</strong></div>
-        <h1>Promptbooks</h1>
-        <div class="page-subtitle">Browse built-in and custom promptbooks, then run one to create a canned session.</div>
-      </div>
-      <div class="page-actions">
-        <button class="btn btn-secondary" onclick="navigate('#/ai-agent/home')">Home</button>
-        <button class="btn btn-primary" onclick="runCopilotPromptbook('${esc(selected?.id || books[0]?.id || '')}')">Run selected promptbook</button>
-      </div>
-    </div>
-
-    <div class="copilot-tabbar">
-      ${['Hack Smarter Labs', 'Custom', 'All'].map(source => `
-        <button class="copilot-tab ${tab === source ? 'active' : ''}" onclick="sessionStorage.setItem('hsl.ai-agent.promptbook.tab', '${source}'); render();">${source}</button>
-      `).join('')}
-    </div>
-
-    <div class="copilot-promptbook-layout">
-      <section class="card">
-        <div class="card-toolbar">
-          <strong>Library</strong>
-          <span class="muted">${filtered.length} promptbooks</span>
-        </div>
-        <div class="copilot-book-list">
-          ${filtered.map(book => `
-            <button class="copilot-book ${selected?.id === book.id ? 'active' : ''}" onclick="selectCopilotPromptbook('${esc(book.id)}')">
-              <span class="copilot-book-title">${esc(book.name)}</span>
-              <span class="copilot-book-meta">${esc(book.source)} · ${book.prompts.length} prompts${book.inputs.length ? ` · ${book.inputs.length} inputs` : ''}</span>
-              <span class="copilot-book-desc">${esc(book.description)}</span>
-            </button>
-          `).join('')}
-        </div>
-      </section>
-
-      <section class="card card-body">
-        <div class="card-toolbar">
-          <strong>Promptbook detail</strong>
-          <span class="muted">${esc(selected?.source || '—')}</span>
-        </div>
-        ${selected ? `
-          <div class="summary-info">
-            <div><span class="muted">Inputs</span><strong>${selected.inputs.length ? selected.inputs.join(', ') : 'None'}</strong></div>
-            <div><span class="muted">Prompts</span><strong>${selected.prompts.length}</strong></div>
-            <div><span class="muted">Source</span><strong>${esc(selected.source)}</strong></div>
-          </div>
-          <div class="alert-section-title">Sequenced prompts</div>
-          <ol class="copilot-book-steps">
-            ${selected.prompts.map(prompt => `<li>${esc(prompt)}</li>`).join('')}
-          </ol>
-          <div class="sidepanel-footer">
-            <button class="btn btn-primary" onclick="runCopilotPromptbook('${esc(selected.id)}')">Run promptbook</button>
-            <button class="btn btn-secondary" onclick="openCopilotPromptForSession('cs-009')">Open agentic session</button>
-          </div>
-        ` : `<div class="muted">Choose a promptbook from the library.</div>`}
-      </section>
-    </div>
-
-    <div class="copilot-builder-grid">
-      <section class="card card-body">
-        <div class="card-toolbar">
-          <strong>Create your own</strong>
-          <span class="muted">Saved locally in browser storage</span>
-        </div>
-        <div class="form-grid two">
-          <label class="lbl">Name<input class="ipt" id="copilot-pb-name" placeholder="Custom incident summarizer"></label>
-          <label class="lbl">Inputs<input class="ipt" id="copilot-pb-inputs" placeholder="Incident ID, User principal name"></label>
-        </div>
-        <label class="lbl">Description<textarea class="ipt" id="copilot-pb-description" rows="3" placeholder="Describe when to use this promptbook."></textarea></label>
-        <label class="lbl">Prompts<textarea class="ipt" id="copilot-pb-prompts" rows="6" placeholder="First prompt line&#10;Second prompt line&#10;Third prompt line"></textarea></label>
-        <div class="sidepanel-footer">
-          <button class="btn btn-primary" onclick="saveCopilotPromptbook()">Save promptbook</button>
-        </div>
-      </section>
-
-      <section class="card card-body">
-        <div class="card-toolbar">
-          <strong>Run promptbook flow</strong>
-          <span class="muted">Creates a canned session</span>
-        </div>
-        <div class="muted">Running a promptbook records a local session transcript and opens it in the session detail view, which makes it easy to compare built-in and custom promptbooks side by side.</div>
-        <div class="callout info" style="margin-top:12px;">
-          Use this flow to practice repeatable triage: pick a promptbook, run it, then inspect the transcript and rerun a prompt from the generated session.
-        </div>
-      </section>
-    </div>
-  `;
-};
-
 VIEWS['ai-agent/plugins'] = () => {
   const plugins = getCopilotPlugins();
   const selected = copilotSelectedPlugin();
@@ -10227,76 +8240,6 @@ VIEWS['ai-agent/knowledge'] = () => {
   `;
 };
 
-VIEWS['ai-agent/settings'] = () => {
-  const settings = getCopilotSettings();
-  const usage = COPILOT_USAGE;
-  const avgUnits = usage.reduce((sum, row) => sum + row.unitsUsed, 0) / usage.length;
-  const avgSessions = usage.reduce((sum, row) => sum + row.sessions, 0) / usage.length;
-  return `
-    <div class="page-header">
-      <div>
-        <div class="breadcrumb">Security Copilot › <strong>Settings</strong></div>
-        <h1>Capacity and owner settings</h1>
-        <div class="page-subtitle">Provision SCUs, choose ownership, and decide how much data the tenant shares with Copilot.</div>
-      </div>
-      <div class="page-actions">
-        <button class="btn btn-secondary" onclick="sessionStorage.removeItem('hsl.ai-agent.settings'); render();">Reset defaults</button>
-        <button class="btn btn-primary" onclick="toast('Settings are persisted locally in browser storage.')">Saved locally</button>
-      </div>
-    </div>
-
-    <div class="copilot-settings-grid">
-      <section class="card card-body">
-        <div class="card-toolbar">
-          <strong>Capacity dashboard</strong>
-          <span class="muted">${settings.region} · ${settings.tenant}</span>
-        </div>
-        <div class="kpi-strip">
-          <div class="kpi"><span class="kpi-label">Provisioned SCUs</span><span class="kpi-value">${esc(settings.provisionedSCU)}</span></div>
-          <div class="kpi"><span class="kpi-label">Average burn</span><span class="kpi-value">${avgUnits.toFixed(1)}</span></div>
-          <div class="kpi"><span class="kpi-label">Average sessions</span><span class="kpi-value">${avgSessions.toFixed(1)}</span></div>
-          <div class="kpi"><span class="kpi-label">Overage</span><span class="kpi-value">${settings.overageAllowed ? 'On' : 'Off'}</span></div>
-        </div>
-        <table class="grid">
-          <thead><tr><th>Date</th><th>SCU used</th><th>Sessions</th></tr></thead>
-          <tbody>
-            ${usage.map(row => `
-              <tr><td>${fmtTime(row.date)}</td><td>${row.unitsUsed.toFixed(1)}</td><td>${row.sessions}</td></tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </section>
-
-      <section class="card card-body">
-        <div class="card-toolbar">
-          <strong>Owner settings</strong>
-          <span class="muted">Persisted locally</span>
-        </div>
-        <div class="form-grid two">
-          <label class="lbl">Role
-            <select class="ipt" onchange="updateCopilotSetting('ownerRole', this.value)">
-              <option ${settings.ownerRole === 'Owner' ? 'selected' : ''}>Owner</option>
-              <option ${settings.ownerRole === 'Contributor' ? 'selected' : ''}>Contributor</option>
-            </select>
-          </label>
-          <label class="lbl">Tenant<input class="ipt" value="${esc(settings.tenant)}" onchange="updateCopilotSetting('tenant', this.value)"></label>
-          <label class="lbl">Provisioned SCUs
-            <input class="ipt" type="range" min="1" max="20" value="${esc(settings.provisionedSCU)}" onchange="updateCopilotSetting('provisionedSCU', Number(this.value))">
-          </label>
-          <label class="lbl">Daily session limit
-            <input class="ipt" type="range" min="1" max="20" value="${esc(settings.dailyLimit)}" onchange="updateCopilotSetting('dailyLimit', Number(this.value))">
-          </label>
-        </div>
-        <label class="check-row"><input type="checkbox" ${settings.dataSharing ? 'checked' : ''} onchange="updateCopilotSetting('dataSharing', this.checked)"> Allow tenant data to ground answers</label>
-        <label class="check-row"><input type="checkbox" ${settings.logging ? 'checked' : ''} onchange="updateCopilotSetting('logging', this.checked)"> Keep session logging for local review</label>
-        <label class="check-row"><input type="checkbox" ${settings.overageAllowed ? 'checked' : ''} onchange="updateCopilotSetting('overageAllowed', this.checked)"> Allow overage when SCU demand spikes</label>
-        <div class="alert-section-title">Usage notes</div>
-        <div class="muted">Owners provision capacity, contributors run investigations, and the lab keeps all telemetry local. Geo and tenant notes are informational only.</div>
-      </section>
-    </div>
-  `;
-};
-
 // === local-tasks views (auto-merged by add_view.py — do not hand-edit between markers) ===
 
 // --- v17-defender-vulnerabilities ---
@@ -10337,7 +8280,7 @@ VIEWS['xdr/vulnerabilities'] = () => {
   <div class="two-col">
     <section class="card card-body">
       <div class="card-toolbar">
-        <strong>Exposure score trend</strong>
+        <strong>Vulnerability exposure trend</strong>
         <a class="chip-link" href="#/xdr/exposure">Open exposure management →</a>
       </div>
       <div class="tvm-trend">
@@ -10477,9 +8420,9 @@ VIEWS['xdr/vulnerabilities'] = () => {
 };
 
 // --- v18-defender-threat-explorer ---
-// nav: Email & collaboration | Threat explorer | 📧
+// nav: Email & collaboration | Mail investigation | 📧
 VIEWS['xdr/threat-explorer'] = () => ({
-  html: `<div id="threat-explorer-root"><div class="page-header"><div><h1>Threat explorer</h1><div class="page-subtitle">Loading the local message investigation queue…</div></div></div></div>`,
+  html: `<div id="threat-explorer-root"><div class="page-header"><div><h1>Mail investigation</h1><div class="page-subtitle">Loading the local message investigation queue…</div></div></div></div>`,
   onMount: () => {
     const root = document.getElementById('threat-explorer-root');
     const campaigns = THREAT_EXPLORER_CAMPAIGNS;
@@ -10558,7 +8501,7 @@ VIEWS['xdr/threat-explorer'] = () => ({
 
     function renderCampaignCards() {
       return campaigns.map(c => `
-        <button class="tile" type="button" data-campaign="${esc(c.name)}" style="text-align:left; width:100%; border:none; background:#fff;">
+        <button class="tile" type="button" data-campaign="${esc(c.name)}" style="text-align:left; width:100%; border:none; background:var(--bg-card);">
           <strong>${esc(c.name)}</strong>
           <span>${esc(c.verdict)} wave · ${esc(c.messageCount)} messages · ${esc(c.summary)}</span>
         </button>
@@ -10575,8 +8518,8 @@ VIEWS['xdr/threat-explorer'] = () => ({
       root.innerHTML = `
         <div class="page-header">
           <div>
-            <div class="breadcrumb">Email & collaboration › <strong>Threat explorer</strong></div>
-            <h1>Threat explorer</h1>
+            <div class="breadcrumb">Email & collaboration › <strong>Mail investigation</strong></div>
+            <h1>Mail investigation</h1>
             <div class="page-subtitle">Pivot by verdict or campaign, inspect message entities, and queue a mock remediation batch.</div>
           </div>
           <div class="page-actions">
@@ -10727,7 +8670,7 @@ VIEWS['xdr/threat-explorer'] = () => ({
 VIEWS['xdr/email-collab/threat-explorer/campaigns'] = () => `
   <div class="page-header">
     <div>
-      <div class="breadcrumb">Email &amp; collaboration › <strong>Threat explorer › Campaigns</strong></div>
+      <div class="breadcrumb">Email &amp; collaboration › <strong>Mail investigation › Campaigns</strong></div>
       <h1>Campaign pivots</h1>
       <div class="page-subtitle">Break the mail corpus into lure waves, affected users, and the response pattern you would take in the portal.</div>
     </div>
@@ -10830,7 +8773,7 @@ VIEWS['identity/overview'] = () => {
     </div>
     <div class="page-actions">
       <button class="btn btn-secondary" onclick="toast('Lab action: a user CSV export would be generated for ${ENTRA_USERS.length} principals.')">⬇ Export directory</button>
-      <button class="btn btn-primary" onclick="navigate('#/identity/identity-protection')">Open Identity Protection</button>
+      <button class="btn btn-primary" onclick="navigate('#/identity/identity-protection')">Open Identity risk</button>
     </div>
   </div>
 
@@ -10838,7 +8781,7 @@ VIEWS['identity/overview'] = () => {
     <div class="kpi"><span class="kpi-label">Directory principals</span><span class="kpi-value">${ENTRA_USERS.length}</span><span class="kpi-delta">${members.length} member · ${guests.length} guest · ${spns.length} service</span></div>
     <div class="kpi"><span class="kpi-label">Flagged for risk</span><span class="kpi-value">${atRisk.length}</span><span class="kpi-delta bad">${ENTRA_USERS.filter(u=>u.riskState==='Confirmed compromised').length} confirmed compromised · ${detections} detections/7d</span></div>
     <div class="kpi"><span class="kpi-label">MFA not registered</span><span class="kpi-value">${noMfa.length}</span><span class="kpi-delta bad">Cannot self-remediate risk</span></div>
-    <div class="kpi"><span class="kpi-label">Privileged</span><span class="kpi-value">${privileged.length}</span><span class="kpi-delta">Role-bearing · secure score ${t.secureScore}%</span></div>
+    <div class="kpi"><span class="kpi-label">Privileged</span><span class="kpi-value">${privileged.length}</span><span class="kpi-delta">Role-bearing · exposure score ${t.secureScore}%</span></div>
   </div>
 
   <div class="two-col">
@@ -10915,7 +8858,7 @@ VIEWS['identity/overview'] = () => {
     <section class="card">
       <div class="card-toolbar"><strong>Recent risky sign-ins</strong><span class="muted">Tenant-wide · last 24 hours</span></div>
       <table class="grid compact-grid">
-        <thead><tr><th>Time</th><th>User</th><th>App</th><th>IP / location</th><th>Result</th><th>Risk</th><th>Conditional Access</th></tr></thead>
+        <thead><tr><th>Time</th><th>User</th><th>App</th><th>IP / location</th><th>Result</th><th>Risk</th><th>Access policy</th></tr></thead>
         <tbody>${ENTRA_RECENT_SIGNINS.map(s => `
           <tr onclick="openEntraUser('${esc(s.user)}')">
             <td>${fmtTime(s.time)}</td>
@@ -10945,7 +8888,7 @@ VIEWS['identity/overview'] = () => {
   </div>
 
   <div class="card">
-    <div class="card-toolbar"><strong>Identity posture recommendations</strong><span class="muted">Identity secure score ${t.secureScore}/${t.secureScoreMax}</span></div>
+    <div class="card-toolbar"><strong>Identity posture recommendations</strong><span class="muted">Identity exposure score ${t.secureScore}/${t.secureScoreMax}</span></div>
     <table class="grid compact-grid">
       <thead><tr><th>Recommendation</th><th>Impact</th><th>Status</th><th>Why it matters here</th></tr></thead>
       <tbody>${ENTRA_RECOMMENDATIONS.map(r => `
@@ -10960,11 +8903,11 @@ VIEWS['identity/overview'] = () => {
 
   <div class="two-col">
     <section class="card card-body" onclick="navigate('#/identity/identity-protection')" style="cursor:pointer;">
-      <div class="alert-section-title">🛡 Identity Protection</div>
+      <div class="alert-section-title">🛡 Identity risk</div>
       <p class="muted">Risk detections, risky users, and risky sign-ins from Entra ID Protection. Understand sign-in risk vs. user risk.</p>
     </section>
     <section class="card card-body" onclick="navigate('#/identity/conditional-access')" style="cursor:pointer;">
-      <div class="alert-section-title">🔐 Conditional Access</div>
+      <div class="alert-section-title">🔐 Access policy</div>
       <p class="muted">Build the sign-in risk-based policy that lets users self-remediate with MFA. Interactive builder inside.</p>
     </section>
   </div>
@@ -10998,7 +8941,7 @@ VIEWS['identity/sign-in-logs'] = () => {
 
   <div class="filterbar signin-filterbar">
     <label class="signin-filter">Date range:
-      <select disabled><option>2026-06-27 → 2026-06-28</option></select>
+      <select disabled><option>${shiftLabDateText('2026-06-27')} → ${shiftLabDateText('2026-06-28')}</option></select>
     </label>
     <label class="signin-filter">User:
       <select id="signin-user-filter" onchange="setSigninFilter('user', this.value)">
@@ -11060,9 +9003,9 @@ VIEWS['identity/sign-in-logs'] = () => {
 VIEWS['identity/identity-protection'] = () => `
   <div class="page-header">
     <div>
-      <div class="breadcrumb">Entra › Protection › <strong>Identity Protection</strong></div>
-      <h1>Identity Protection</h1>
-      <div class="page-subtitle">Risk signals feed risk-based Conditional Access. Requires Entra ID P2.</div>
+      <div class="breadcrumb">Entra › Protection › <strong>Identity risk</strong></div>
+      <h1>Identity risk</h1>
+      <div class="page-subtitle">Risk signals feed risk-based Access policy. Requires Entra ID P2.</div>
     </div>
   </div>
   <div class="card card-body">
@@ -11112,8 +9055,8 @@ VIEWS['identity/conditional-access'] = () => {
   return `
     <div class="page-header">
       <div>
-        <div class="breadcrumb">Entra › Protection › <strong>Conditional Access</strong></div>
-        <h1>Conditional Access | Policies</h1>
+        <div class="breadcrumb">Entra › Protection › <strong>Access policy</strong></div>
+        <h1>Access policy</h1>
         <div class="page-subtitle">Create a sign-in risk-based policy that allows self-remediation.</div>
       </div>
       <div class="page-actions">
@@ -11143,7 +9086,7 @@ VIEWS['identity/conditional-access'] = () => {
       <section class="card automation-blade">
         <div class="blade-mini-header">
           <div>
-            <div class="breadcrumb">${isEditing ? 'Edit Conditional Access policy' : 'New Conditional Access policy'}</div>
+            <div class="breadcrumb">${isEditing ? 'Edit access policy' : 'New access policy'}</div>
             <h2>${isEditing ? esc(nameValue) : 'Sign-in risk self-remediation'}</h2>
           </div>
           ${isEditing ? `<button class="iconbtn" title="Close / new policy" onclick="newCaPolicy()">×</button>` : ''}
@@ -11246,7 +9189,6 @@ VIEWS['workspace/home'] = () => {
     <div class="section-title">Common tasks</div>
     <div class="tile-grid" style="margin-bottom:16px;">
       <button class="tile" onclick="navigate('#/workspace/users')"><span class="tile-title"><span class="tile-icon">👥</span>Manage users</span><span class="tile-sub">Add or review users, reset passwords, and inspect assigned products.</span><strong>Users › Active users</strong></button>
-      <button class="tile" onclick="navigate('#/workspace/licenses')"><span class="tile-title"><span class="tile-icon">🪪</span>Manage licenses</span><span class="tile-sub">Review product capacity and which assignments are direct or group based.</span><strong>Billing › Licenses</strong></button>
       <button class="tile" onclick="navigate('#/workspace/service-health')"><span class="tile-title"><span class="tile-icon">💚</span>Check service health</span><span class="tile-sub">Review active incidents and advisories affecting 365 services.</span><strong>Health › Service health</strong></button>
       <button class="tile" onclick="navigate('#/workspace/usage')"><span class="tile-title"><span class="tile-icon">📊</span>Review usage</span><span class="tile-sub">Compare enabled and active users across 365 products.</span><strong>Reports › Usage</strong></button>
     </div>
@@ -11302,7 +9244,7 @@ VIEWS['workspace/users'] = () => {
   return `
     ${m365AdminHeader('Active users', 'Create and manage people who can access 365 apps and services.',
       '<button class="btn btn-secondary" onclick="toast(\'CSV user export prepared from fictional lab rows.\')">⬇ Export users</button><button class="btn btn-primary" onclick="toast(\'Lab-only flow: add identity details, assign a product license, choose optional roles, then review.\')">＋ Add a user</button>')}
-    <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Users › Active users</strong>. Select a user to review its shared Entra/Defender identity details. Product licenses can be managed here per user or from <button class="chip-link" onclick="navigate('#/workspace/licenses')">Billing › Licenses</button>.</div>
+    <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Users › Active users</strong>. Select a user to review its shared Entra/Defender identity details. Product licenses can be managed here per user.</div>
     <div class="tabs">${M365_USER_FILTERS.map(f => `<button class="tab ${f.key === filter ? 'active' : ''}" onclick="setM365UserFilter('${f.key}')">${esc(f.label)}<span class="pill">${allUsers.filter(f.test).length}</span></button>`).join('')}</div>
     <div class="inventory-toolbar"><span class="muted">${rows.length} of ${allUsers.length} users</span><div class="inventory-toolbar-actions"><input class="input-sm" style="width:280px" type="search" placeholder="Search users" value="${esc(search)}" onchange="setM365UserSearch(this.value)">${search ? '<button class="chip active" onclick="setM365UserSearch(\'\')">Clear search ✕</button>' : ''}</div></div>
     <div class="card table-scroll"><table class="grid"><thead><tr><th>Display name</th><th>Username</th><th>Licenses</th><th>Admin roles</th><th>Sign-in status</th><th>User type</th><th>Last sign-in</th></tr></thead><tbody>
@@ -11310,19 +9252,14 @@ VIEWS['workspace/users'] = () => {
     </tbody></table></div>`;
 };
 
-VIEWS['workspace/licenses'] = () => `
-  ${m365AdminHeader('Licenses', 'Review subscriptions, assignment capacity, and license errors.', '<button class="btn btn-primary" onclick="toast(\'Lab-only purchase flow opened. No subscription is changed.\')">Buy licenses</button>')}
-  <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Billing › Licenses</strong>. Select a product to assign licenses by product; use <button class="chip-link" onclick="navigate('#/workspace/users')">Users › Active users</button> when managing one or more specific users.</div>
-  <div class="card"><table class="grid"><thead><tr><th>Product</th><th>Status</th><th>Assigned</th><th>Available</th><th>Total purchased</th><th>Renewal</th><th></th></tr></thead><tbody>${M365_LICENSE_PRODUCTS.map(p => `<tr><td><strong>${esc(p.product)}</strong></td><td><span class="tag green">${esc(p.status)}</span></td><td>${p.assigned}</td><td>${p.purchased - p.assigned}</td><td>${p.purchased}</td><td>${esc(p.renewal)}</td><td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); toast('Assignment panel opened for ${esc(p.product)}. Changes remain local to the lab.')">Assign licenses</button></td></tr>`).join('')}</tbody></table></div>
-  <div class="callout success" style="margin-top:14px;"><strong>Least privilege:</strong> the real workflow requires at least the License Administrator or User Administrator role. Global Administrator should be reserved for tasks that cannot use a narrower role.</div>`;
 
 VIEWS['workspace/usage'] = () => `
-  ${m365AdminHeader('Usage', '365 product adoption for the fictional Hack Smarter Labs tenant.', '<button class="btn btn-secondary" onclick="toast(\'A fictional usage CSV would be exported.\')">⬇ Export</button>')}
+  ${m365AdminHeader('Usage', '365 product adoption for the fictional Hack Smarter SOC tenant.', '<button class="btn btn-secondary" onclick="toast(\'A fictional usage CSV would be exported.\')">⬇ Export</button>')}
   <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Reports › Usage</strong>. Real usage reports can cover 7, 30, 90, or 180 days and normally conceal user, group, and site names by default. This lab shows only aggregate fictional values.</div>
   <div class="card"><div class="card-toolbar"><strong>Active users by product</strong><span class="muted">Last 30 days</span></div><table class="grid"><thead><tr><th>Product</th><th>Enabled users</th><th>Active users</th><th>Adoption</th><th>Activity</th></tr></thead><tbody>${M365_USAGE_REPORTS.map(r => { const pct = Math.round(r.active / r.enabled * 100); return `<tr><td><strong>${esc(r.product)}</strong></td><td>${r.enabled}</td><td>${r.active}</td><td>${pct}%</td><td style="min-width:220px"><div style="height:8px;background:var(--bg-selected);border-radius:4px"><div style="height:8px;width:${pct}%;background:var(--workload);border-radius:4px"></div></div></td></tr>`; }).join('')}</tbody></table></div>`;
 
 VIEWS['workspace/service-health'] = () => `
-  ${m365AdminHeader('Service health', 'Current health and active advisories for services used by Hack Smarter Labs.', '<button class="btn btn-secondary" onclick="toast(\'Fictional service-health snapshot refreshed.\')">↻ Refresh</button>')}
+  ${m365AdminHeader('Service health', 'Current health and active advisories for services used by Hack Smarter SOC.', '<button class="btn btn-secondary" onclick="toast(\'Fictional service-health snapshot refreshed.\')">↻ Refresh</button>')}
   <div class="callout info" style="margin-bottom:14px;">Product documentation path: <strong>Health › Service health</strong>. The Health area also provides health history; Message center is where admins track upcoming product changes.</div>
   <div class="card"><table class="grid"><thead><tr><th>Service</th><th>Status</th><th>Current detail</th><th>Last updated</th></tr></thead><tbody>${M365_SERVICE_HEALTH.map(s => `<tr><td><strong>${esc(s.service)}</strong></td><td>${m365ServiceTag(s.status)}</td><td>${esc(s.detail)}</td><td>${fmtTime(s.updated)}</td></tr>`).join('')}</tbody></table></div>
   <div class="two-col" style="margin-top:14px"><section class="card card-body"><div class="alert-section-title">Active issue</div><strong>SharePoint search indexing delay</strong><p class="muted">Classification: advisory. Search results can lag behind recent content changes; file access and collaboration remain available.</p><button class="btn btn-secondary btn-sm" onclick="toast('Notification preference saved locally for this fictional advisory.')">Notify me</button></section><section class="card card-body"><div class="alert-section-title">Operations note</div><p>Service incidents describe outages or degradation. Advisories describe a condition administrators should know about even when the service remains available.</p><button class="chip-link" onclick="navigate('#/workspace/message-center')">Open Message center →</button></section></div>`;
@@ -11359,8 +9296,8 @@ VIEWS['workspace/admin-centers'] = () => `
   <div class="callout info" style="margin-bottom:14px;">Product documentation describes 365 Admin as the common entry point. Specialist centers provide deeper controls and vary by subscription plan and region.</div>
   <div class="solution-grid sentinel-content-grid">
     <button class="solution-card" onclick="navigate('#/xdr/home')"><strong>Security</strong><span>Defender XDR incidents, alerts, hunting, identities, endpoints, and email security.</span></button>
-    <button class="solution-card" onclick="navigate('#/governance/home')"><strong>Compliance</strong><span>Purview data security, Audit, eDiscovery, and compliance workflows.</span></button>
-    <button class="solution-card" onclick="navigate('#/identity/overview')"><strong>Entra</strong><span>Identity, roles, Conditional Access, risky users, and sign-in protection.</span></button>
+    <button class="solution-card" onclick="toast('Compliance/Purview admin center is outside the current lab scope.')"><strong>Compliance</strong><span>Data security, audit, eDiscovery, and compliance workflows.</span></button>
+    <button class="solution-card" onclick="navigate('#/identity/overview')"><strong>Entra</strong><span>Identity, roles, Access policy, risky users, and sign-in protection.</span></button>
     <button class="solution-card" onclick="toast('Exchange admin center is outside the SC-200 lab scope.')"><strong>Exchange</strong><span>Mail flow, recipients, calendars, and Exchange organization settings.</span></button>
     <button class="solution-card" onclick="toast('Teams admin center is outside the SC-200 lab scope.')"><strong>Teams</strong><span>Messaging, meetings, voice, teams, and organization-wide settings.</span></button>
     <button class="solution-card" onclick="toast('SharePoint admin center is outside the SC-200 lab scope.')"><strong>SharePoint</strong><span>Sites, sharing, OneDrive, migration, and content-service settings.</span></button>

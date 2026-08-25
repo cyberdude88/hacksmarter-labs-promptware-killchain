@@ -3,76 +3,76 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hack Smarter Labs</title>
+<title>HACK SMARTER SOC</title>
 <link rel="icon" type="image/png" href="assets/hacksmarter-mark.png" />
 <link rel="stylesheet" href="styles.css?v=20260819d" />
 </head>
 <body>
 
+<script>
+// Restore theme preference synchronously before rendering to avoid flash.
+// Runs before other scripts load, so it executes very early.
+(function() {
+  var themeKey = 'hsl.ui.theme';
+  var saved = null;
+  try { saved = localStorage.getItem(themeKey); } catch(e) {}
+
+  var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  document.body.dataset.theme = theme;
+})();
+</script>
+
 <header class="topbar" id="topbar">
   <div class="topbar-left">
-    <button class="iconbtn" id="btn-waffle" title="App switcher" aria-label="App switcher">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 4h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 10h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 16h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
-    </button>
-    <span class="wordmark">
+    <button class="wordmark wordmark-button" id="btn-logo-home" type="button" title="Home hub" aria-label="Home hub">
       <img class="brand-logo" src="assets/hacksmarter-mark.png"
-           alt="Hack Smarter Labs" />
+           alt="HACK SMARTER SOC" />
       <span class="wordmark-text">
-        <span id="portal-name">Hack Smarter Labs</span>
+        <span id="portal-name">HACK SMARTER SOC</span>
         <span class="wordmark-faint" id="portal-context">· XDR Security</span>
       </span>
-    </span>
-  </div>
-  <div class="topbar-search">
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 105.3 14L20 20.7 21.7 19l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
-    <input id="global-search" type="text" placeholder="Search across incidents, alerts, devices, users, files..." autocomplete="off" spellcheck="false" />
-    <div id="global-search-dropdown" class="search-dropdown" role="listbox" hidden></div>
+    </button>
+    <div class="topbar-search">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 105.3 14L20 20.7 21.7 19l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
+      <input id="global-search" type="text" placeholder="Search incidents, alerts, devices, users, files..." autocomplete="off" spellcheck="false" />
+      <div id="global-search-dropdown" class="search-dropdown" role="listbox" hidden></div>
+    </div>
   </div>
   <div class="topbar-right">
-    <button class="iconbtn" id="btn-copilot" title="AI Security Agent" aria-label="AI Security Agent">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2l2.4 5 5.6.8-4 3.9 1 5.5L12 14.8 6.9 17.2l1-5.5-4-3.9L9.6 7z"/></svg>
+    <button class="iconbtn" id="btn-theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme">
+      <svg id="theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="display:none;"><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0-2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-10a1 1 0 0 0-1-1V3a1 1 0 0 0 2 0V5a1 1 0 0 0-1-1zm0 16a1 1 0 0 0-1 1v2a1 1 0 0 0 2 0v-2a1 1 0 0 0-1-1zM6.22 6.22a1 1 0 0 0-1.414 0L4.464 7.464a1 1 0 1 0 1.414 1.414l.342-.342a1 1 0 0 0 0-1.414zm11.07 11.07a1 1 0 0 0-1.414 0l-.342.342a1 1 0 0 0 1.414 1.414l.342-.342a1 1 0 0 0 0-1.414zM4 12a1 1 0 0 0-1-1H1a1 1 0 0 0 0 2h2a1 1 0 0 0 1-1zm16 0a1 1 0 0 0-1-1h-2a1 1 0 0 0 0 2h2a1 1 0 0 0 1-1zM6.22 17.78a1 1 0 0 0-1.414-1.414l-.342.342a1 1 0 0 0 1.414 1.414l.342-.342zm11.07-11.07a1 1 0 0 0-1.414-1.414l-.342.342a1 1 0 1 0 1.414 1.414l.342-.342z"/></svg>
+      <svg id="theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-    <button class="iconbtn" title="What's new">🔔</button>
-    <button class="iconbtn" title="Settings">⚙</button>
-    <button class="iconbtn" title="Help">?</button>
-    <div class="tenant">Hack Smarter Labs · Tenant</div>
+    <div class="tenant">HACK SMARTER SOC · Tenant</div>
     <div class="avatar" title="Me">ME</div>
   </div>
 </header>
 
-<div class="portal-tabs" id="portal-tabs">
-  <button class="portal-tab" data-portal="xdr" onclick="switchPortalContext('xdr')">XDR Security</button>
-  <button class="portal-tab" data-portal="cloud" onclick="switchPortalContext('cloud')">Cloud Console</button>
-  <button class="portal-tab" data-portal="admin" onclick="switchPortalContext('admin')">Workspace Admin</button>
-</div>
-<div class="workload-strip" id="workload-strip"></div>
-
 <div class="shell" id="shell">
-  <nav class="pane pane-azure" id="pane-azure" hidden>
+  <nav class="pane pane-cloud" id="pane-cloud" hidden>
     <div class="pane-header">
       <span class="pane-title">Cloud</span>
-      <button class="pane-toggle" id="toggle-azure" title="Collapse" aria-label="Collapse Cloud pane">«</button>
+      <button class="pane-toggle" id="toggle-cloud" title="Collapse" aria-label="Collapse Cloud pane">«</button>
     </div>
-    <ul class="pane-list" id="sidenav-azure"></ul>
+    <ul class="pane-list" id="sidenav-cloud"></ul>
   </nav>
   <nav class="pane pane-blade" id="pane-blade">
     <div class="pane-header">
-      <span class="pane-title" id="blade-title">Workload</span>
-      <button class="pane-toggle" id="toggle-blade" title="Collapse" aria-label="Collapse blade pane">«</button>
+      <span class="pane-title" id="blade-title">Navigation</span>
+      <button class="pane-toggle" id="toggle-blade" title="Collapse" aria-label="Collapse navigation pane">«</button>
     </div>
     <ul class="pane-list" id="sidenav"></ul>
   </nav>
   <main class="content" id="content"></main>
 </div>
 
-<!-- APP SWITCHER (waffle) -->
-<aside id="panel-switcher" class="sidepanel left hidden">
-  <div class="sidepanel-header switcher-header">
-    <span class="switcher-close-spacer"></span>
-    <h2>Hack Smarter Labs training portals</h2>
-    <button class="iconbtn" data-close="panel-switcher">✕</button>
+<!-- HOME HUB (single entry point, replaces the old 3-tab portal switcher) -->
+<aside id="panel-home-hub" class="sidepanel left hidden">
+  <div class="sidepanel-header">
+    <h2>Home</h2>
+    <button class="iconbtn" data-close="panel-home-hub">✕</button>
   </div>
-  <div class="sidepanel-body switcher-grid" id="switcher-grid"></div>
+  <div class="sidepanel-body" id="home-hub-body"></div>
 </aside>
 
 <!-- AI SECURITY AGENT -->
@@ -87,7 +87,7 @@
   </div>
 </aside>
 
-<!-- SENTINEL ANALYTICS RULE WIZARD -->
+<!-- SIEM ANALYTICS RULE WIZARD -->
 <section id="panel-analytics-wizard" class="wizard-window hidden" role="dialog" aria-modal="true" aria-labelledby="analytics-wizard-title">
   <div class="wizard-header">
     <div>
@@ -242,7 +242,7 @@
   <div id="hunt-record-body" class="sidepanel-body"></div>
 </aside>
 
-<!-- DEFENDER FOR CLOUD ALERT DETAIL -->
+<!-- CLOUD SECURITY ALERT DETAIL -->
 <aside id="panel-cloud-alert" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-alert-title">
   <div class="sidepanel-header">
     <h2 id="cloud-alert-title">Security alert</h2>
@@ -251,7 +251,7 @@
   <div id="cloud-alert-body" class="sidepanel-body"></div>
 </aside>
 
-<!-- DEFENDER FOR CLOUD RECOMMENDATION DETAIL -->
+<!-- CLOUD SECURITY RECOMMENDATION DETAIL -->
 <aside id="panel-cloud-recommendation" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-recommendation-title">
   <div class="sidepanel-header">
     <h2 id="cloud-recommendation-title">Security recommendation</h2>
@@ -260,7 +260,7 @@
   <div id="cloud-recommendation-body" class="sidepanel-body"></div>
 </aside>
 
-<!-- DEFENDER FOR CLOUD RESOURCE HEALTH -->
+<!-- CLOUD SECURITY RESOURCE HEALTH -->
 <aside id="panel-cloud-resource" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-resource-title">
   <div class="sidepanel-header">
     <h2 id="cloud-resource-title">Resource health</h2>
@@ -269,7 +269,7 @@
   <div id="cloud-resource-body" class="sidepanel-body"></div>
 </aside>
 
-<!-- DEFENDER FOR CLOUD SECURITY INCIDENT -->
+<!-- CLOUD SECURITY INCIDENT -->
 <aside id="panel-cloud-incident" class="sidepanel wide hidden" role="dialog" aria-modal="true" aria-labelledby="cloud-incident-title">
   <div class="sidepanel-header">
     <h2 id="cloud-incident-title">Security incident</h2>
@@ -332,22 +332,13 @@
   <div id="device-response-body" class="sidepanel-body"></div>
 </aside>
 
-<!-- DEFENDER TVM DETAIL / WORKFLOW -->
+<!-- TVM DETAIL / WORKFLOW -->
 <aside id="panel-tvm" class="sidepanel wide hidden">
   <div class="sidepanel-header">
     <h2 id="tvm-title">Vulnerability management</h2>
     <button class="iconbtn" data-close="panel-tvm">✕</button>
   </div>
   <div id="tvm-body" class="sidepanel-body"></div>
-</aside>
-
-<!-- MSSP CUSTOMER TENANT DETAILS -->
-<aside id="panel-tenant" class="sidepanel wide hidden">
-  <div class="sidepanel-header">
-    <h2 id="tenant-title">Customer tenant</h2>
-    <button class="iconbtn" data-close="panel-tenant">✕</button>
-  </div>
-  <div id="tenant-body" class="sidepanel-body"></div>
 </aside>
 
 <!-- SUPPRESSION RULE EDITOR -->
@@ -362,7 +353,7 @@
 
     <label class="lbl">Triggering IOC (alert applies when ALL conditions match)</label>
     <div class="callout warn">
-      Defender joins these conditions with logical <strong>AND</strong>.
+      The security engine joins these conditions with logical <strong>AND</strong>.
       If any one indicator changes (e.g. the file hash after a vendor update),
       the rule will no longer match and alerts will fire again.
     </div>
@@ -383,7 +374,7 @@
   </div>
 </aside>
 
-<!-- MITRE TECHNIQUE SIDE PANE (Defender for Endpoint device Timeline) -->
+<!-- MITRE TECHNIQUE SIDE PANE (endpoint device Timeline) -->
 <aside id="panel-technique" class="sidepanel hidden">
   <div class="sidepanel-header">
     <h2 id="technique-title">Technique</h2>
@@ -416,7 +407,7 @@
 <div id="scrim" class="scrim hidden"></div>
 
 <footer class="legal-footer" id="legal-footer">
-  <span><strong>Hack Smarter Labs</strong> is an independent fictional training
+  <span><strong>HACK SMARTER SOC</strong> is an independent fictional training
     simulator. It is not affiliated with, authorized, sponsored, or approved by any software
     vendor. Interface labels use generic industry terminology, and all lab data is fictional.</span>
 </footer>

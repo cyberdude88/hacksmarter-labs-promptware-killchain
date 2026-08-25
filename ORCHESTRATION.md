@@ -30,6 +30,18 @@ reports **129/129 clean, 0 dead NAV routes, exit 0**. The old
 `purview/audit: tiny/empty render` was never a defect; the harness could not
 mount an `{ html, onMount }` view and mislabeled all ten of them.
 
+Also done since: the three-sprint de-Microsofting project (`docs/DEMICROSOFTING_PLAN.md`
+→ `docs/DEMICROSOFTING_PROGRESS.md`, all 3 sprints closed out) — this is what
+finished Lane B below, removed promptbooks/Settings pages and merged
+AI-assisted playbooks into `siem/automation`, and de-Microsofted the
+`xdr/incident` page's own tab taxonomy and action-button copy (not just word-
+level vendor names). Read `docs/DEMICROSOFTING_PROGRESS.md`'s closing summary
+before assuming any further de-Microsofting work is needed — check its
+"Reviewed and deliberately left alone" notes first, since several things that
+look like leaks at a glance (helpdesk's raw "Defender"/"PowerShell"/"Windows,"
+`AAD`-prefixed hostnames, bare "Graph") are documented, intentional carve-outs,
+not gaps.
+
 ## Hard rules
 
 1. **No vendor product names in learner-facing copy.** `ui/neutral-terminology.js`
@@ -63,17 +75,75 @@ Finish what the mechanical pass could not reach.
 - [ ] Confirm the footer disclaimer still reads correctly for a range rather
       than a course.
 
-## Lane B — Vendor-neutral terminology guard
+## Lane B — Vendor-neutral terminology guard ✅ DONE
 
-- [ ] Read `ui/neutral-terminology.js` end to end (220 lines) and extend it to
+- [x] Read `ui/neutral-terminology.js` end to end (220 lines) and extend it to
       cover anything currently slipping through — walk the rendered DOM of all
       129 views, not just the source.
-- [ ] Write `bin/neutral-check.js`: render every view (reuse the harness in
+- [x] Write `bin/neutral-check.js`: render every view (reuse the harness in
       `bin/render_all.js`) and fail non-zero if any vendor product name reaches
       visible text. Wire it into `bin/qa-sweep.sh` and CI.
-- [ ] Decide the policy on names that are genuinely generic industry terms
+- [x] Decide the policy on names that are genuinely generic industry terms
       (KQL, MITRE ATT&CK, SPF/DKIM/DMARC) and write it down in the README so
       the next agent does not over-neutralize.
+
+Done across `docs/DEMICROSOFTING_PLAN.md` / `docs/DEMICROSOFTING_PROGRESS.md`'s
+three-sprint de-Microsofting project (full history and verification detail
+lives there, not duplicated here):
+
+- `bin/neutral-check.js` exists, is wired into `bin/qa-sweep.sh`, and is clean
+  (124/124 views, 0 post-neutralization leaks) as of Sprint 3's close-out.
+- `ui/neutral-terminology.js` was extended with 7 compound-identifier patterns
+  (Sprint 1) and a corrected `.wl-helpdesk`/`#sidenav` carve-out scope
+  (Sprint 1 — the old guard had started exempting the *entire* shared nav rail
+  once `NAVIGATION_PROGRESS.md` Sprint 2 made `#sidenav` a single global rail;
+  it's now scoped to only helpdesk's own `#/helpdesk/*` rows).
+- The generic-industry-term policy (below) is the permanent answer to this
+  bullet — read it before adding a new pattern to `neutral-terminology.js` or
+  flagging something as a leak.
+
+**Generic-industry-term policy — what stays un-neutralized, and why.** A term
+is left alone (not added to `neutral-terminology.js`'s pattern list, not
+flagged as a leak by `bin/neutral-check.js` or a manual audit) when it meets
+all three:
+
+1. It names a real, external standard, protocol, framework, or language —
+   not a specific vendor's product, portal, or marketing-coined feature name.
+   Examples already in the app and deliberately kept raw: KQL / Kusto Query
+   Language, MITRE ATT&CK, SPF, DKIM, DMARC, CVE, CVSS, OAuth, SAML, RBAC,
+   STIX/TAXII, IaaS/PaaS/SaaS.
+2. Removing or renaming it would strip the exact vocabulary a working analyst
+   needs on the job — i.e. the loss would be pedagogical, not just cosmetic
+   de-branding. (This is why KQL stays even though Microsoft originated it:
+   it is the field-standard name for the query language this app's own
+   hunting surfaces teach, not a UI feature name.)
+3. It is not a vendor-marketing-coined portal/feature name, even when the
+   underlying mechanic is real and worth keeping. Contrast: "Attack story,"
+   "Alert story," "Go hunt," and "Evidence and Response" were confirmed via
+   live Microsoft Learn research (see `DEMICROSOFTING_PROGRESS.md` Sprint 3)
+   to be Defender XDR's own coined names for generic capabilities (an
+   incident timeline/graph, a hunting pivot, an evidence tab) and were
+   renamed at the source ("Attack narrative," "Alert narrative,"
+   "Investigate further," "Evidence and remediation") even though the
+   underlying mechanic stayed identical. "Blast radius," by contrast, was
+   judged generic-enough (common security/SRE postmortem vocabulary, not
+   coined by or unique to Microsoft) and was kept.
+
+Terms that must always render neutralized, never whitelisted: Microsoft,
+Defender (+ variants), Sentinel, Purview, Entra, Azure (+ named services),
+Copilot, Microsoft 365/M365/Office 365, Teams, SharePoint, OneDrive,
+Exchange, Outlook, Windows (outside the helpdesk carve-out below), GitHub,
+Intune, Microsoft Learn.
+
+One standing carve-out: `ui/helpdesk.js` / `helpdesk-data.js` content behind
+`isHelpDeskTechnicalContent` (real Windows-desktop-support vocabulary —
+"Windows Desktop," "PowerShell," and GPO purpose text that names "Defender"
+as an OS component) renders un-neutralized on purpose, because a helpdesk
+simulation needs the real names of the OS features it's teaching. This is
+the one place a blocked term (`Defender`) is known to survive raw in a live
+render — confirmed and intentional, see `DEMICROSOFTING_PROGRESS.md` Sprint 1
+and Sprint 3 notes. It is why Sprint 3 kept the stronger disclaimer instead
+of shortening it.
 
 ## Lane C — Cut the last portal cords ✅ DONE
 

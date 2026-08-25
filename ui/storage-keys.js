@@ -58,3 +58,6 @@
     // still runs without persistence, so a failed migration is not fatal.
   }
 })();
+
+// Storage key constants — centralized for consistency across the app.
+window.THEME_PREFERENCE_KEY = 'hsl.ui.theme';

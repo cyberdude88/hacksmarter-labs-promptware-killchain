@@ -15,20 +15,20 @@
 
   const TENANT_TERMINOLOGY = [
     // Final fictional tenant plus compatibility for values saved before the
-    // Hack Smarter Labs tenant migration.
-    [new RegExp(`\\b${TEMPORARY_TENANT}\\b`, 'g'), 'Hack Smarter Labs'],
-    [/\bexample\.org\b/gi, 'hacksmarterlabs.example'],
-    [/\bexample-org\b/gi, 'hacksmarterlabs'],
-    [legacyTenantPattern('\\b{tenant}\\.onmicrosoft\\.com\\b'), 'hacksmarterlabs.example'],
-    [legacyTenantPattern('\\b{tenant}\\.(?:com|example)\\b'), 'hacksmarterlabs.example'],
-    [legacyTenantPattern('\\bDC={tenant},DC=com\\b'), 'DC=hacksmarterlabs,DC=example'],
-    [legacyTenantPattern('\\b{tenant}(?=[\\\\/-])'), 'hacksmarterlabs'],
-    [legacyTenantPattern('([\\\\/-]){tenant}\\b'), '$1hacksmarterlabs'],
+    // Hack Smarter SOC tenant migration.
+    [new RegExp(`\\b${TEMPORARY_TENANT}\\b`, 'g'), 'Hack Smarter SOC'],
+    [/\bexample\.org\b/gi, 'hacksmartersoc.example'],
+    [/\bexample-org\b/gi, 'hacksmartersoc'],
+    [legacyTenantPattern('\\b{tenant}\\.onmicrosoft\\.com\\b'), 'hacksmartersoc.example'],
+    [legacyTenantPattern('\\b{tenant}\\.(?:com|example)\\b'), 'hacksmartersoc.example'],
+    [legacyTenantPattern('\\bDC={tenant},DC=com\\b'), 'DC=hacksmartersoc,DC=example'],
+    [legacyTenantPattern('\\b{tenant}(?=[\\\\/-])'), 'hacksmartersoc'],
+    [legacyTenantPattern('([\\\\/-]){tenant}\\b'), '$1hacksmartersoc'],
     [legacyTenantPattern('\\bnon-{tenant}\\b'), 'third-party'],
     [legacyTenantPattern('\\b{tenant} first-party\\b'), 'platform-native'],
     [legacyTenantPattern('\\b{tenant} and custom\\b'), 'built-in and custom'],
-    [legacyTenantPattern('\\b{tenant}\\b'), 'Hack Smarter Labs'],
-    [legacyTenantPattern('{tenant}'), 'hacksmarterlabs'],
+    [legacyTenantPattern('\\b{tenant}\\b'), 'Hack Smarter SOC'],
+    [legacyTenantPattern('{tenant}'), 'hacksmartersoc'],
   ];
 
   const TERMINOLOGY = [
@@ -36,6 +36,7 @@
     // AI investigation assistant.
     [/\bMicrosoft Security Copilot\b/gi, 'AI Security Agent'],
     [/\bSecurity Copilot\b/gi, 'AI Security Agent'],
+    [/\bSecurityCopilot\b/g, 'AISecurityAgent'],
     [/\bCopilotInteraction\b/g, 'AISecurityAgentInteraction'],
     [/\bCopilot\b/gi, 'AI Security Agent'],
 
@@ -65,6 +66,7 @@
     [/\bMicrosoft Sentinel graph\b/gi, 'Entity Graph'],
     [/\bSentinel graph\b/gi, 'Entity Graph'],
     [/\bMicrosoft Sentinel\b/gi, 'SIEM & SOAR'],
+    [/SentinelDataLake\b/g, 'SiemDataLake'],
     [/\bSentinel\b/gi, 'SIEM & SOAR'],
     [/\bMicrosoft Entra ID Protection\b/gi, 'Identity Risk Protection'],
     [/\bEntra ID Protection\b/gi, 'Identity Risk Protection'],
@@ -77,6 +79,7 @@
     [/\bMicrosoft Intune\b/gi, 'Endpoint Management'],
     [/\bIntune\b/gi, 'Endpoint Management'],
     [/\bAzure Active Directory\b/gi, 'Identity Directory'],
+    [/\bAzureAD\b/gi, 'IdentityDirectory'],
     [/\bAzure AI Search\b/gi, 'Enterprise Search'],
     [/\bAzure Data Explorer\b/gi, 'Cloud Data Explorer'],
     [/\bAzure Resource Manager\b/gi, 'Cloud Resource Manager'],
@@ -86,24 +89,35 @@
     [/\bAzure Policy\b/gi, 'Cloud Policy'],
     [/\bAzure Lighthouse\b/gi, 'Delegated Cloud Administration'],
     [/\bAzure Activity\b/gi, 'Cloud Activity'],
+    [/\bAzureActivity\b/g, 'CloudActivity'],
+    [/\bAzureDiagnostics\b/g, 'CloudDiagnostics'],
+    [/\bAzureID\b/gi, 'CloudID'],
+    // No word-boundary before AzureSync on purpose: the fixture's sync
+    // service-account name is written as MSOL_AzureSync, and `_` counts as a
+    // regex word character, so \bAzureSync would never match after it.
+    [/AzureSync\b/g, 'CloudSync'],
+    [/\bazurecr\.io\b/gi, 'cloudregistry.example'],
     [/\bAzure portal\b/gi, 'Cloud Console'],
     [/\bAzure\b/gi, 'Cloud Platform'],
 
     // Productivity and collaboration product names.
-    [/\bMicrosoft 365 admin center\b/gi, 'Workspace Admin'],
+    [/\bMicrosoft 365 admin center\b/gi, 'Tenant operations'],
     [/\bMicrosoft 365\b/gi, 'Productivity Workspace'],
     [/\bOffice 365 Outlook\b/gi, 'Hosted Email'],
     [/\bOffice 365\b/gi, 'Productivity Workspace'],
     [/\bM365\b/gi, 'Workspace Suite'],
-    [/\b365 Admin\b/gi, 'Workspace Admin'],
+    [/\b365 Admin\b/gi, 'Tenant operations'],
     [/\bMicrosoft Graph\b/gi, 'Directory & Activity API'],
     [/\bMicrosoft Teams\b/gi, 'Team Messaging'],
     [/\bTeams\b/gi, 'Team Messaging'],
+    [/\bSharePointFileOperation\b/g, 'ContentCollaborationFileOperation'],
     [/\bSharePoint\b/gi, 'Content Collaboration'],
     [/\bOneDrive\b/gi, 'Cloud File Storage'],
     [/\bPower BI\b/gi, 'Business Intelligence'],
     [/\bExchange Online\b/gi, 'Hosted Email'],
     [/\bMicrosoft Exchange\b/gi, 'Email Service'],
+    [/\bExchangeItem\b/g, 'HostedEmailItem'],
+    [/\bExchange\b/gi, 'Hosted Email'],
     [/\bOutlook\b/gi, 'Email Client'],
     [/\bOffice child process\b/gi, 'Productivity app child process'],
 
@@ -131,10 +145,24 @@
   // The IT Help Desk course explicitly teaches named Windows administration
   // tools and commands. Preserve that required technical vocabulary inside its
   // own workload while keeping the SOC simulator's neutral presentation layer.
+  //
+  // #sidenav is a single global rail shared by every workload (see
+  // ui/NAVIGATION_PROGRESS.md Sprint 2 — the left rail stopped being
+  // per-portal there) — it is not helpdesk-specific just because the current
+  // route happens to be a helpdesk one, so a blanket `#sidenav` match here
+  // would carve out every OTHER workload's nav labels too (confirmed: two
+  // NAV entries — "Sentinel Graph", "Purview" — sit un-neutralized in the
+  // rail's markup and would render raw while any helpdesk page is open).
+  // Only exempt the nav rows that are themselves helpdesk's own items (their
+  // `data-route`, stamped by navItemRow() in app.js, starts with
+  // `#/helpdesk/`) — that is what actually needs "Windows Desktop"/
+  // "PowerShell" preserved, not the rest of the rail.
   function isHelpDeskTechnicalContent(node) {
     const element = node instanceof Element ? node : node?.parentElement;
-    return document.body.classList.contains('wl-helpdesk') &&
-      !!element?.closest('#content, #sidenav');
+    if (!document.body.classList.contains('wl-helpdesk') || !element) return false;
+    if (element.closest('#content')) return true;
+    const navRow = element.closest('#sidenav [data-route]');
+    return !!navRow && /^#\/helpdesk\//.test(navRow.getAttribute('data-route') || '');
   }
 
   function neutralizeTerminology(value) {

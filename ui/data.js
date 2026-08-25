@@ -89,13 +89,13 @@ const SEED_ALERTS = [
   { id:'A102', severity:'high', title:'Suspected DCSync attack (replication of directory services)',
     status:'In progress', category:'Credential access', detectionSource:'MDI', asset:'DC01',
     firstActivity:'2026-06-28T03:44:00Z', incidentId:'INC-1019',
-    event:{ user:'svc-backup', source_ip:'10.20.4.55', target:'DC01.hacksmarterlabs.example' } },
+    event:{ user:'svc-backup', source_ip:'10.20.4.55', target:'DC01.hacksmartersoc.example' } },
   { id:'A201', severity:'high', title:'User compromised through phishing email with malicious URL',
-    status:'New', category:'Initial access', detectionSource:'MDO', asset:'jane.doe@hacksmarterlabs.example',
+    status:'New', category:'Initial access', detectionSource:'MDO', asset:'jane.doe@hacksmartersoc.example',
     firstActivity:'2026-06-28T08:11:00Z', incidentId:'INC-1042',
     event:{ url:'https://secure-document-portal[.]xyz/login', subject:'Action required: invoice overdue' } },
   { id:'A202', severity:'medium', title:'Anomalous OAuth consent grant',
-    status:'New', category:'Initial access', detectionSource:'MDA', asset:'jane.doe@hacksmarterlabs.example',
+    status:'New', category:'Initial access', detectionSource:'MDA', asset:'jane.doe@hacksmartersoc.example',
     firstActivity:'2026-06-28T08:23:00Z', incidentId:'INC-1042',
     event:{ app_name:'DocViewer Pro', permissions:'Mail.ReadWrite, Files.Read.All' } },
   { id:'A301', severity:'high', title:'Multiple endpoints encrypted by suspected ransomware',
@@ -108,17 +108,17 @@ const SEED_ALERTS = [
     firstActivity:'2026-06-28T10:20:00Z', incidentId:'INC-1050',
     event:{ process:'vssadmin.exe', cmdline:'vssadmin delete shadows /all /quiet', extension:'.locked' } },
   { id:'A401', severity:'high', title:'Adversary-in-the-middle phishing session detected',
-    status:'New', category:'Initial access', detectionSource:'Entra ID Protection', asset:'maria.ross@hacksmarterlabs.example',
+    status:'New', category:'Initial access', detectionSource:'Entra ID Protection', asset:'maria.ross@hacksmartersoc.example',
     firstActivity:'2026-06-28T06:40:00Z', incidentId:'INC-1051',
-    event:{ user:'maria.ross@hacksmarterlabs.example', source_ip:'185.199.111.12', sign_in_risk:'High', mfa_method:'Push' } },
+    event:{ user:'maria.ross@hacksmartersoc.example', source_ip:'185.199.111.12', sign_in_risk:'High', mfa_method:'Push' } },
   { id:'A501', severity:'high', title:'Container escaped to host namespace',
     status:'In progress', category:'Privilege escalation', detectionSource:'Defender for Containers', asset:'aks-prod/node-3',
     firstActivity:'2026-06-28T12:01:00Z', incidentId:'INC-1052',
-    event:{ cluster:'aks-prod', pod:'pod-api-77', image:'hacksmarterlabs/api:2026.06', syscall:'setns' } },
+    event:{ cluster:'aks-prod', pod:'pod-api-77', image:'hacksmartersoc/api:2026.06', syscall:'setns' } },
   { id:'A601', severity:'medium', title:'Risky sign-in from unfamiliar location',
-    status:'New', category:'Credential access', detectionSource:'Entra ID Protection', asset:'sam.lee@hacksmarterlabs.example',
+    status:'New', category:'Credential access', detectionSource:'Entra ID Protection', asset:'sam.lee@hacksmartersoc.example',
     firstActivity:'2026-06-28T13:27:00Z', incidentId:'INC-1053',
-    event:{ user:'sam.lee@hacksmarterlabs.example', source_ip:'91.219.236.54', country:'NL', risk_level:'High' } },
+    event:{ user:'sam.lee@hacksmartersoc.example', source_ip:'91.219.236.54', country:'NL', risk_level:'High' } },
   { id:'A701', severity:'high', title:'Cloud storage container publicly exposed',
     status:'New', category:'Exfiltration', detectionSource:'Defender for Cloud', asset:'aws-s3-prod-logs',
     firstActivity:'2026-06-28T07:52:00Z', incidentId:'INC-1054',
@@ -165,9 +165,9 @@ const SEED_ALERTS = [
       ],
     } },
   { id:'A901', severity:'low', title:'Password spray attempt blocked by identity protection',
-    status:'New', category:'Credential access', detectionSource:'Entra ID Protection', asset:'liam.chen@hacksmarterlabs.example',
+    status:'New', category:'Credential access', detectionSource:'Entra ID Protection', asset:'liam.chen@hacksmartersoc.example',
     firstActivity:'2026-06-28T16:34:00Z', incidentId:'INC-1060',
-    event:{ user:'liam.chen@hacksmarterlabs.example', source_ip:'203.0.113.74', attempts:8,
+    event:{ user:'liam.chen@hacksmartersoc.example', source_ip:'203.0.113.74', attempts:8,
             result:'Blocked by smart lockout', risk_level:'Low' },
     note:'The sign-in was blocked, but the source and targeted account still warrant quick scoping.' },
   { id:'A1001', severity:'low', title:'Potentially unwanted application was quarantined',
@@ -176,9 +176,9 @@ const SEED_ALERTS = [
     event:{ file_name:'coupon-helper.exe', sha256:'c98e7f6f190c5722277ebd650852486d81087aebf779b09b2411c882db318413',
             path:'C:\\Users\\Public\\Downloads\\coupon-helper.exe', action:'Quarantined' } },
   { id:'A1101', severity:'low', title:'External mailbox forwarding rule detected and disabled',
-    status:'New', category:'Persistence', detectionSource:'MDO', asset:'nina.patel@hacksmarterlabs.example',
+    status:'New', category:'Persistence', detectionSource:'MDO', asset:'nina.patel@hacksmartersoc.example',
     firstActivity:'2026-06-28T17:02:00Z', incidentId:'INC-1062',
-    event:{ user:'nina.patel@hacksmarterlabs.example', rule_name:'Forward invoices', destination:'archive-mail@external.example',
+    event:{ user:'nina.patel@hacksmartersoc.example', rule_name:'Forward invoices', destination:'archive-mail@external.example',
             action:'Rule disabled automatically' } },
   { id:'A1201', severity:'low', title:'Repeated anonymous storage probes were denied',
     status:'New', category:'Discovery', detectionSource:'Defender for Cloud', asset:'stfinancearchive',
@@ -186,19 +186,19 @@ const SEED_ALERTS = [
     event:{ storage_account:'stfinancearchive', source_ip:'198.51.100.62', requests:19,
             result:'Denied by private endpoint policy' } },
   { id:'A1301', severity:'informational', title:'Safe Links blocked a phishing URL before user access',
-    status:'Resolved', category:'Initial access', detectionSource:'MDO', asset:'evan.brooks@hacksmarterlabs.example',
+    status:'Resolved', category:'Initial access', detectionSource:'MDO', asset:'evan.brooks@hacksmartersoc.example',
     firstActivity:'2026-06-28T17:31:00Z', incidentId:'INC-1064',
-    event:{ user:'evan.brooks@hacksmarterlabs.example', subject:'Updated payroll calendar',
+    event:{ user:'evan.brooks@hacksmartersoc.example', subject:'Updated payroll calendar',
             url:'https://payroll-calendar[.]example/signin', action:'Blocked before click-through' } },
   { id:'A1401', severity:'informational', title:'Privileged role activation matched approved PIM request',
-    status:'Resolved', category:'Privilege escalation', detectionSource:'Entra ID Protection', asset:'olivia.kim@hacksmarterlabs.example',
+    status:'Resolved', category:'Privilege escalation', detectionSource:'Entra ID Protection', asset:'olivia.kim@hacksmartersoc.example',
     firstActivity:'2026-06-28T17:44:00Z', incidentId:'INC-1065',
-    event:{ user:'olivia.kim@hacksmarterlabs.example', role:'Security Administrator', duration:'45 minutes',
+    event:{ user:'olivia.kim@hacksmartersoc.example', role:'Security Administrator', duration:'45 minutes',
             approval:'CHG-4821 / approved' } },
   { id:'A1501', severity:'informational', title:'OAuth consent granted to verified publisher application',
-    status:'New', category:'Persistence', detectionSource:'MDA', asset:'jordan.wong@hacksmarterlabs.example',
+    status:'New', category:'Persistence', detectionSource:'MDA', asset:'jordan.wong@hacksmartersoc.example',
     firstActivity:'2026-06-28T17:56:00Z', incidentId:'INC-1066',
-    event:{ user:'jordan.wong@hacksmarterlabs.example', app_name:'Hack Smarter Travel', publisher:'Verified',
+    event:{ user:'jordan.wong@hacksmartersoc.example', app_name:'Hack Smarter Travel', publisher:'Verified',
             permissions:'User.Read, Calendars.Read', consent_policy:'Allowed' } },
   { id:'A1601', severity:'informational', title:'Office child process observed in ASR audit mode',
     status:'New', category:'Execution', detectionSource:'MDE', asset:'MKT-WKS-11',
@@ -209,9 +209,9 @@ const SEED_ALERTS = [
   // timeline as a plain alert card; here it is the SIEM record behind it, so a
   // first-time student sees that both halves describe one event.
   { id:'A1701', severity:'medium', title:'Successful sign-in after repeated failures',
-    status:'New', category:'Credential access', detectionSource:'Identity Protection', asset:'j.santos@hacksmarterlabs.example',
+    status:'New', category:'Credential access', detectionSource:'Identity Protection', asset:'j.santos@hacksmartersoc.example',
     firstActivity:'2026-06-28T09:09:41Z', incidentId:'INC-1070',
-    event:{ user:'j.santos@hacksmarterlabs.example', source_ip:'185.220.101.24', country:'RO',
+    event:{ user:'j.santos@hacksmartersoc.example', source_ip:'185.220.101.24', country:'RO',
             failed_attempts:8, first_failure:'2026-06-28T09:02:11Z', succeeded_at:'2026-06-28T09:09:41Z',
             client_app:'Browser (unmanaged)', risk_level:'High' } },
 ];
@@ -244,7 +244,7 @@ const INCIDENTS = [
   { id:'INC-1042', severity:'high', title:'Phishing leading to OAuth consent abuse',
     status:'New', assignedTo:'Me', classification:'',
     tactics:['Initial Access','Persistence'], alertIds:['A201','A202'],
-    entities:[{type:'User',name:'jane.doe@hacksmarterlabs.example'},{type:'URL',name:'secure-document-portal[.]xyz'},{type:'App',name:'DocViewer Pro'}],
+    entities:[{type:'User',name:'jane.doe@hacksmartersoc.example'},{type:'URL',name:'secure-document-portal[.]xyz'},{type:'App',name:'DocViewer Pro'}],
     createdAt:'2026-06-28T08:11:00Z', alertCount:2,
     summary:'User clicked phishing link, then granted a third-party OAuth app Mail.ReadWrite. Likely token-theft persistence.' },
   { id:'INC-1050', severity:'high', title:'Ransomware activity on finance file server',
@@ -253,7 +253,7 @@ const INCIDENTS = [
     tactics:['Impact','Defense Evasion'], alertIds:['A301','A302'],
     entities:[{type:'Device',name:'FIN-FS-02'},{type:'File',name:'locker.exe'},{type:'Process',name:'vssadmin.exe'}],
     disruptionActions:[
-      { time:'2026-06-28T10:18:36Z', action:'Contain user', target:'fin-svc@hacksmarterlabs.example',
+      { time:'2026-06-28T10:18:36Z', action:'Contain user', target:'fin-svc@hacksmartersoc.example',
         result:'Automated action blocked token reuse and prevented new remote sessions.' },
       { time:'2026-06-28T10:18:48Z', action:'Contain device', target:'FIN-FS-02',
         result:'Device isolated from peer endpoints while preserving Defender service connectivity.' },
@@ -265,7 +265,7 @@ const INCIDENTS = [
   { id:'INC-1051', severity:'high', title:'AiTM phishing against finance user',
     status:'New', assignedTo:'L1-Triage', classification:'',
     tactics:['Initial Access','Credential Access'], alertIds:['A401'],
-    entities:[{type:'User',name:'maria.ross@hacksmarterlabs.example'},{type:'IP',name:'185.199.111.12'},{type:'Session',name:'MFA proxied sign-in'}],
+    entities:[{type:'User',name:'maria.ross@hacksmartersoc.example'},{type:'IP',name:'185.199.111.12'},{type:'Session',name:'MFA proxied sign-in'}],
     createdAt:'2026-06-28T06:41:00Z', alertCount:1,
     summary:'High-risk sign-in used a valid MFA response through a suspected AiTM phishing proxy. Revoke sessions and require phishing-resistant MFA.' },
   { id:'INC-1052', severity:'high', title:'Possible container breakout in AKS production',
@@ -277,7 +277,7 @@ const INCIDENTS = [
   { id:'INC-1053', severity:'medium', title:'AAD risky sign-in for sales user',
     status:'New', assignedTo:'Unassigned', classification:'',
     tactics:['Credential Access','Initial Access'], alertIds:['A601'],
-    entities:[{type:'User',name:'sam.lee@hacksmarterlabs.example'},{type:'IP',name:'91.219.236.54'}],
+    entities:[{type:'User',name:'sam.lee@hacksmartersoc.example'},{type:'IP',name:'91.219.236.54'}],
     createdAt:'2026-06-28T13:28:00Z', alertCount:1,
     summary:'Identity Protection raised a high-risk sign-in from an unfamiliar location. Confirm user activity and reset credentials if suspicious.' },
   { id:'INC-1054', severity:'high', title:'S3-style cloud storage misconfiguration',
@@ -289,13 +289,13 @@ const INCIDENTS = [
   { id:'INC-1055', severity:'high', title:'Suspicious PowerShell script execution on FIN-WKS-07',
     status:'New', assignedTo:'Unassigned', classification:'',
     tactics:['Execution','Defense Evasion','Command and Control','Persistence'], alertIds:['A801'],
-    entities:[{type:'Device',name:'FIN-WKS-07'},{type:'User',name:'j.reyes@hacksmarterlabs.example'},{type:'File',name:'invoice_update.ps1'}],
+    entities:[{type:'Device',name:'FIN-WKS-07'},{type:'User',name:'j.reyes@hacksmartersoc.example'},{type:'File',name:'invoice_update.ps1'}],
     createdAt:'2026-06-28T16:21:00Z', alertCount:1,
     summary:'An encoded PowerShell script spawned by Word downloaded a second-stage payload and set a Run key. Open the alert to analyze the script and view its MITRE ATT&CK techniques.' },
   { id:'INC-1060', severity:'low', title:'Blocked password spray against single user',
     status:'New', assignedTo:'L1-Triage', classification:'',
     tactics:['Credential Access'], alertIds:['A901'],
-    entities:[{type:'User',name:'liam.chen@hacksmarterlabs.example'},{type:'IP',name:'203.0.113.74'}],
+    entities:[{type:'User',name:'liam.chen@hacksmartersoc.example'},{type:'IP',name:'203.0.113.74'}],
     createdAt:'2026-06-28T16:35:00Z', alertCount:1,
     summary:'Smart lockout blocked a small password-spray burst. Check whether the source targeted other users, then close as prevented if no successful sign-in exists.' },
   { id:'INC-1061', severity:'low', title:'Potentially unwanted application on HR workstation',
@@ -307,7 +307,7 @@ const INCIDENTS = [
   { id:'INC-1062', severity:'low', title:'Suspicious external mailbox forwarding rule',
     status:'New', assignedTo:'messaging-sec', classification:'',
     tactics:['Persistence','Collection'], alertIds:['A1101'],
-    entities:[{type:'User',name:'nina.patel@hacksmarterlabs.example'},{type:'Mailbox rule',name:'Forward invoices'},{type:'Email',name:'archive-mail@external.example'}],
+    entities:[{type:'User',name:'nina.patel@hacksmartersoc.example'},{type:'Mailbox rule',name:'Forward invoices'},{type:'Email',name:'archive-mail@external.example'}],
     createdAt:'2026-06-28T17:03:00Z', alertCount:1,
     summary:'An external forwarding rule was disabled automatically. Confirm whether the user created it and review recent sign-ins and mailbox activity before closure.' },
   { id:'INC-1063', severity:'low', title:'Denied anonymous probes against finance storage',
@@ -319,19 +319,19 @@ const INCIDENTS = [
   { id:'INC-1064', severity:'informational', title:'Phishing URL blocked before user access',
     status:'Resolved', assignedTo:'MDO-Automation', classification:'Benign positive',
     tactics:['Initial Access'], alertIds:['A1301'],
-    entities:[{type:'User',name:'evan.brooks@hacksmarterlabs.example'},{type:'URL',name:'payroll-calendar[.]example'}],
+    entities:[{type:'User',name:'evan.brooks@hacksmartersoc.example'},{type:'URL',name:'payroll-calendar[.]example'}],
     createdAt:'2026-06-28T17:32:00Z', alertCount:1,
     summary:'Safe Links blocked the destination before the user could open it. The incident preserves the prevention evidence for campaign scoping and reporting.' },
   { id:'INC-1065', severity:'informational', title:'Approved privileged role activation',
     status:'Resolved', assignedTo:'identity-automation', classification:'Expected activity',
     tactics:['Privilege Escalation'], alertIds:['A1401'],
-    entities:[{type:'User',name:'olivia.kim@hacksmarterlabs.example'},{type:'Role',name:'Security Administrator'},{type:'Change',name:'CHG-4821'}],
+    entities:[{type:'User',name:'olivia.kim@hacksmartersoc.example'},{type:'Role',name:'Security Administrator'},{type:'Change',name:'CHG-4821'}],
     createdAt:'2026-06-28T17:45:00Z', alertCount:1,
     summary:'A time-bound privileged role activation matched its approved change request. Retain the record as an informational audit trail.' },
   { id:'INC-1066', severity:'informational', title:'Verified publisher OAuth consent review',
     status:'New', assignedTo:'Unassigned', classification:'',
     tactics:['Persistence'], alertIds:['A1501'],
-    entities:[{type:'User',name:'jordan.wong@hacksmarterlabs.example'},{type:'App',name:'Hack Smarter Travel'}],
+    entities:[{type:'User',name:'jordan.wong@hacksmartersoc.example'},{type:'App',name:'Hack Smarter Travel'}],
     createdAt:'2026-06-28T17:57:00Z', alertCount:1,
     summary:'A user granted low-impact delegated permissions to a verified application under the tenant consent policy. Confirm business need and publisher identity.' },
   { id:'INC-1067', severity:'informational', title:'Office child process recorded in ASR audit mode',
@@ -343,43 +343,10 @@ const INCIDENTS = [
   { id:'INC-1070', severity:'medium', title:'Successful sign-in after repeated failures',
     status:'New', assignedTo:'L1-Triage', classification:'',
     tactics:['Credential Access'], alertIds:['A1701'],
-    entities:[{type:'User',name:'j.santos@hacksmarterlabs.example'},{type:'IP',name:'185.220.101.24'},{type:'Session',name:'Unmanaged browser session'}],
+    entities:[{type:'User',name:'j.santos@hacksmartersoc.example'},{type:'IP',name:'185.220.101.24'},{type:'Session',name:'Unmanaged browser session'}],
     createdAt:'2026-06-28T09:10:00Z', alertCount:1,
     summary:'Eight password failures were followed by one success for the same account, from an IP and browser the account has never used. Service desk reached the account owner on the registered phone number at 09:14 — the user confirms they did not attempt these sign-ins and was not travelling.' },
 ];
-
-const MDE_SETTINGS = {
-  advancedFeatures:[
-    { name:'EDR in block mode', enabled:true, note:'Blocks malicious artifacts after EDR conviction even when another antivirus is primary.' },
-    { name:'Live response', enabled:true, note:'Allows approved responders to open device sessions for investigation commands.' },
-    { name:'Automated investigation', enabled:true, note:'Lets AIR collect evidence and remediate low-risk findings automatically.' },
-    { name:'Custom network indicators', enabled:true, note:'Applies tenant IP/domain allow and block indicators to onboarded endpoints.' },
-    { name:'Preview features', enabled:false, note:'Kept off in this lab tenant until SOC leads approve pilot devices.' },
-  ],
-  rulesSettings:[
-    { area:'Alert suppression', setting:'Enabled with expiration review', owner:'SOC engineering' },
-    { area:'Indicators', setting:'File, certificate, IP, URL, and domain indicators allowed', owner:'Threat intel' },
-    { area:'Endpoint notifications', setting:'User notifications on block actions', owner:'Endpoint platform' },
-    { area:'Advanced hunting', setting:'Custom detections can trigger device and file actions', owner:'Detection engineering' },
-  ],
-  customCollection:[
-    { name:'Browser extension inventory', scope:'Pilot devices', table:'DeviceTvmBrowserExtensions', status:'Collecting' },
-    { name:'Finance app plugin audit', scope:'Finance device group', table:'DeviceFileEvents', status:'Planned' },
-    { name:'High-value server script logs', scope:'Tier 0 servers', table:'DeviceEvents', status:'Collecting' },
-  ],
-  deviceGroups:[
-    { name:'Tier 0 servers', devices:14, automation:'Semi - require approval', role:'Privileged responders', rank:1 },
-    { name:'Finance workstations', devices:128, automation:'Full - remediate threats', role:'SOC analysts', rank:2 },
-    { name:'Pilot endpoints', devices:32, automation:'Full - preview features', role:'Endpoint engineering', rank:3 },
-    { name:'Default', devices:842, automation:'Semi - remediate safe actions', role:'Security readers', rank:4 },
-  ],
-  roles:[
-    { role:'Security administrator', members:'4 users', rights:'Manage settings, device groups, indicators, and roles' },
-    { role:'Security operator', members:'12 users', rights:'Investigate alerts, run response actions, approve AIR actions' },
-    { role:'Security reader', members:'26 users', rights:'Read-only investigation and reporting access' },
-    { role:'Live response operator', members:'5 users', rights:'Run approved live response commands on scoped devices' },
-  ],
-};
 
 const ASR_POLICIES = [
   { rule:'Block Office from creating child processes', state:'Block', mode:'Enforced', exclusions:['finance-macro-runner.exe'], impact:'3 blocks / 24h' },
@@ -391,9 +358,9 @@ const ASR_POLICIES = [
 ];
 
 const NOTIFICATION_RULES = [
-  { name:'High severity incidents', trigger:'Incident created or updated', recipients:'soc-leads@hacksmarterlabs.example', filter:'Severity is High', status:'Enabled' },
-  { name:'Pending action approvals', trigger:'Action center item pending', recipients:'endpoint-response@hacksmarterlabs.example', filter:'Action requires approval', status:'Enabled' },
-  { name:'Threat analytics exposure', trigger:'Threat analytics report impacts assets', recipients:'threat-intel@hacksmarterlabs.example', filter:'Impacted assets > 0', status:'Enabled' },
+  { name:'High severity incidents', trigger:'Incident created or updated', recipients:'soc-leads@hacksmartersoc.example', filter:'Severity is High', status:'Enabled' },
+  { name:'Pending action approvals', trigger:'Response queue item pending', recipients:'endpoint-response@hacksmartersoc.example', filter:'Action requires approval', status:'Enabled' },
+  { name:'Threat analytics exposure', trigger:'Threat analytics report impacts assets', recipients:'threat-intel@hacksmartersoc.example', filter:'Impacted assets > 0', status:'Enabled' },
 ];
 
 const ALERT_TUNING_RULES = [
@@ -410,14 +377,14 @@ const AIR_INVESTIGATIONS = [
 ];
 
 const INCIDENT_INVESTIGATION_GUIDE = {
-  source:'Product documentation: Investigate incidents in the Defender portal',
+  source:'Reference guide: Investigating incidents',
   lastUpdated:'2026-03-11',
   workflow:[
     { title:'Initial investigation',
       detail:'Start from the incident queue or summary pane, review priority, recommendations, related threats, and open the incident page for the full story.' },
-    { title:'Attack story',
-      detail:'Review the alert story, the incident graph, entity context, chronology, and remediation actions while staying in the same investigation context.' },
-    { title:'Go hunt',
+    { title:'Attack narrative',
+      detail:'Review the alert narrative, the incident graph, entity context, chronology, and remediation actions while staying in the same investigation context.' },
+    { title:'Investigate further',
       detail:'Pivot from a device, file, IP, URL, user, mailbox, email, app, or cloud resource into advanced hunting queries, then link useful results back to the incident.' },
     { title:'Blast radius',
       detail:'For supported Sentinel data lake tenants, inspect likely propagation paths from an incident node to critical targets and use that context to contain the breach.' },
@@ -433,7 +400,7 @@ const INCIDENT_INVESTIGATION_GUIDE = {
       detail:'Review impacted devices, users, mailboxes, apps, and cloud resources, then pivot to inventory or entity detail pages for deeper response actions.' },
     { title:'Investigations',
       detail:'Check automated investigation and response status, approve pending actions when required, and inspect the investigation graph for related entities.' },
-    { title:'Evidence and Response',
+    { title:'Evidence and remediation',
       detail:'Review files, processes, emails, services, IP addresses, and other evidence with verdicts and remediation state; approve or reject pending remediation.' },
     { title:'Summary',
       detail:'Use the summary view for a fast snapshot of alert categories, scope, evidence count, incident properties, and key entities.' },
@@ -510,7 +477,7 @@ const INCIDENT_EVIDENCE = {
     { type:'Email',   name:'Phishing message id 0x4f1',   verdict:'Malicious',  remediation:'Remediated',       action:'Soft-deleted' },
     { type:'URL',     name:'secure-document-portal[.]xyz',verdict:'Malicious',  remediation:'Remediated',       action:'Tenant-blocked' },
     { type:'OAuth app', name:'DocViewer Pro',             verdict:'Malicious',  remediation:'Pending approval', action:'Revoke + tenant block' },
-    { type:'User',    name:'jane.doe@hacksmarterlabs.example',        verdict:'Suspicious', remediation:'Remediated',       action:'Sessions revoked' },
+    { type:'User',    name:'jane.doe@hacksmartersoc.example',        verdict:'Suspicious', remediation:'Remediated',       action:'Sessions revoked' },
   ],
   'INC-1050': [
     { type:'File',    name:'locker.exe',                  verdict:'Malicious',  remediation:'Remediated',       action:'Quarantined' },
@@ -546,7 +513,7 @@ const BLAST_RADIUS_PATHS = {
     ],
   },
   'INC-1042': {
-    source:'jane.doe@hacksmarterlabs.example',
+    source:'jane.doe@hacksmartersoc.example',
     paths:[
       { target:'Finance SharePoint site', hops:2, reach:'Exfiltrate quarterly forecast docs',   critical:true  },
       { target:'Exec mailbox delegates',  hops:3, reach:'Read CFO mailbox via OAuth scope',     critical:true  },
@@ -563,7 +530,7 @@ const BLAST_RADIUS_PATHS = {
   },
 };
 
-// Attack story graphs. Nodes carry a `ring` (0=center, 1=primary entity,
+// Attack narrative graphs. Nodes carry a `ring` (0=center, 1=primary entity,
 // 2=blast-radius / downstream target). Edges can connect any two nodes
 // (not just consecutive), so the renderer draws a webby graph instead of
 // a linear chain. Edge.kind hints styling: 'attack' (solid), 'blast'
@@ -628,7 +595,7 @@ const ATTACK_STORIES = {
   },
   'INC-1042': {
     nodes:[
-      { id:'user-jane', type:'User', label:'jane.doe@hacksmarterlabs.example', ring:0,
+      { id:'user-jane', type:'User', label:'jane.doe@hacksmartersoc.example', ring:0,
         verdict:'Suspicious', remediation:'Revoke sessions; require phishing-resistant MFA.' },
       { id:'mailbox-jane', type:'Mailbox', label:'Jane Doe mailbox', ring:1,
         verdict:'At risk', remediation:'Audit inbox rules; check forwarding.' },
@@ -864,7 +831,7 @@ const ATTACK_STORIES = {
   },
   'INC-1051': {
     nodes:[
-      { id:'maria', type:'User', label:'maria.ross@hacksmarterlabs.example', ring:0,
+      { id:'maria', type:'User', label:'maria.ross@hacksmartersoc.example', ring:0,
         verdict:'Compromised', remediation:'Revoke sessions; reset creds; enforce FIDO2.' },
       { id:'aitm-ip', type:'IP', label:'185.199.111.12 (AiTM proxy)', ring:1,
         verdict:'Malicious', remediation:'Block at IdP and edge; report to CTI.' },
@@ -947,7 +914,7 @@ const ATTACK_STORIES = {
   },
   'INC-1053': {
     nodes:[
-      { id:'sam', type:'User', label:'sam.lee@hacksmarterlabs.example', ring:0,
+      { id:'sam', type:'User', label:'sam.lee@hacksmartersoc.example', ring:0,
         verdict:'At risk', remediation:'Confirm sign-in with user; reset creds if needed.' },
       { id:'risky-ip', type:'IP', label:'91.219.236.54', ring:1,
         verdict:'Suspicious', remediation:'Block IP; check threat-intel reputation.' },
@@ -1086,7 +1053,7 @@ const HUNTING_SCHEMA_GROUPS = [
 const GUIDED_HUNTING_DOMAINS = [
   { id:'all',       label:'All domains',             hint:'Look through all available data in your query.' },
   { id:'endpoints', label:'Endpoints',               hint:'Endpoint data as provided by Microsoft Defender for Endpoint.' },
-  { id:'email',     label:'Email and collaboration', hint:'Email and collaboration app data. Same data Threat explorer users know.' },
+  { id:'email',     label:'Email and collaboration', hint:'Email and collaboration app data. Same data Mail investigation users know.' },
   { id:'apps',      label:'Apps and identities',     hint:'Data from Defender for Cloud Apps and Defender for Identity.' },
   { id:'cloud',     label:'Cloud infrastructure',    hint:'Cloud infrastructure data as provided by Microsoft Defender for Cloud.' },
   { id:'exposure',  label:'Exposure management',     hint:'Data as provided by Microsoft Security Exposure Management.' },
@@ -1159,7 +1126,7 @@ const GUIDED_HUNTING_FILTERS = [
     values:['LogonSuccess','LogonFailed','DirectoryServicesReplication'] },
   { domain:'apps', section:'Identity logon events', table:'IdentityLogonEvents',
     column:'AccountUpn', label:'Account UPN', type:'string', basic:true,
-    values:['svc-backup@hacksmarterlabs.example','fin-svc@hacksmarterlabs.example','jane.doe@hacksmarterlabs.example'] },
+    values:['svc-backup@hacksmartersoc.example','fin-svc@hacksmartersoc.example','jane.doe@hacksmartersoc.example'] },
   { domain:'apps', section:'Identity logon events', table:'IdentityLogonEvents',
     column:'Protocol', label:'Protocol', type:'string', basic:false,
     values:['Kerberos','NTLM'] },
@@ -1177,13 +1144,13 @@ const GUIDED_HUNTING_FILTERS = [
     values:['High','Medium','Low'] },
   { domain:'apps', section:'Sign-in logs', table:'SigninLogs',
     column:'UserPrincipalName', label:'User principal name', type:'string', basic:false,
-    values:['sam.lee@hacksmarterlabs.example','maria.ross@hacksmarterlabs.example'] },
+    values:['sam.lee@hacksmartersoc.example','maria.ross@hacksmartersoc.example'] },
 
   // --- Cloud infrastructure ------------------------------------------------
   { domain:'cloud', section:'Container events', table:'ContainerEvents',
     column:'ClusterName', label:'Cluster name', type:'string', basic:true, values:['aks-prod'] },
   { domain:'cloud', section:'Container events', table:'ContainerEvents',
-    column:'Image', label:'Image', type:'string', basic:true, values:['hacksmarterlabs/api:2026.06'] },
+    column:'Image', label:'Image', type:'string', basic:true, values:['hacksmartersoc/api:2026.06'] },
   { domain:'cloud', section:'Container events', table:'ContainerEvents',
     column:'Syscall', label:'Syscall', type:'string', basic:false, values:['setns'] },
 
@@ -1265,12 +1232,12 @@ const CUSTOM_DETECTION_SAMPLE = {
 // entities and relationships are deliberately invented for this simulator.
 const HUNTING_GRAPH_ENTITIES = [
   { id:'guest-kim', type:'External user', label:'kim@fabrikam.example', risk:'medium', internet:true, riskScore:true, detail:'Guest account with a project-scoped cloud role.' },
-  { id:'user-jane', type:'User', label:'jane.doe@hacksmarterlabs.example', risk:'high', riskScore:true, detail:'Finance analyst linked to the OAuth-consent investigation.' },
-  { id:'user-jordan', type:'User', label:'jordan.wilber@hacksmarterlabs.example', risk:'low', detail:'Developer with inherited repository and storage access.' },
-  { id:'user-helpdesk', type:'User', label:'lee.helpdesk@hacksmarterlabs.example', risk:'medium', vulnerable:true, riskScore:true, detail:'Helpdesk identity with password-reset delegation.' },
-  { id:'user-tier0', type:'Sensitive identity', label:'admin.tier0@hacksmarterlabs.example', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Tier 0 administrator protected as a sensitive identity.' },
-  { id:'user-asrep', type:'User', label:'legacy.batch@hacksmarterlabs.example', risk:'high', vulnerable:true, riskScore:true, detail:'Legacy account with Kerberos preauthentication disabled.' },
-  { id:'user-hybrid', type:'Hybrid user', label:'svc.sync.owner@hacksmarterlabs.example', risk:'medium', critical:true, riskScore:true, detail:'Synced account that owns a privileged OAuth application.' },
+  { id:'user-jane', type:'User', label:'jane.doe@hacksmartersoc.example', risk:'high', riskScore:true, detail:'Finance analyst linked to the OAuth-consent investigation.' },
+  { id:'user-jordan', type:'User', label:'jordan.wilber@hacksmartersoc.example', risk:'low', detail:'Developer with inherited repository and storage access.' },
+  { id:'user-helpdesk', type:'User', label:'lee.helpdesk@hacksmartersoc.example', risk:'medium', vulnerable:true, riskScore:true, detail:'Helpdesk identity with password-reset delegation.' },
+  { id:'user-tier0', type:'Sensitive identity', label:'admin.tier0@hacksmartersoc.example', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Tier 0 administrator protected as a sensitive identity.' },
+  { id:'user-asrep', type:'User', label:'legacy.batch@hacksmartersoc.example', risk:'high', vulnerable:true, riskScore:true, detail:'Legacy account with Kerberos preauthentication disabled.' },
+  { id:'user-hybrid', type:'Hybrid user', label:'svc.sync.owner@hacksmartersoc.example', risk:'medium', critical:true, riskScore:true, detail:'Synced account that owns a privileged OAuth application.' },
   { id:'svc-sql', type:'Service account', label:'svc-sql-reporting', risk:'high', vulnerable:true, riskScore:true, detail:'Kerberoastable service account used by the reporting tier.' },
   { id:'svc-backup', type:'Service account', label:'svc-backup', risk:'medium', riskScore:true, detail:'Backup service identity with legacy RDP permissions.' },
   { id:'device-fin-wks07', type:'Device', label:'FIN-WKS-07', risk:'high', vulnerable:true, riskScore:true, detail:'Finance workstation with suspicious PowerShell activity.' },
@@ -1293,7 +1260,7 @@ const HUNTING_GRAPH_ENTITIES = [
   { id:'sql-finance', type:'SQL data store', label:'sql-finance-prod', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Finance SQL store reachable through shared automation identities.' },
   { id:'k8s-payments', type:'Kubernetes cluster', label:'aks-payments-prod', risk:'high', critical:true, vulnerable:true, riskScore:true, detail:'Critical payments cluster with a vulnerable administration path.' },
   { id:'repo-payments', type:'Azure DevOps repository', label:'Payments/API', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Repository containing payment-service deployment definitions.' },
-  { id:'tenant-hacksmarterlabs', type:'Active Directory domain', label:'hacksmarterlabs.example', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Domain object whose replication rights enable DCSync.' },
+  { id:'tenant-hacksmartersoc', type:'Active Directory domain', label:'hacksmartersoc.example', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Domain object whose replication rights enable DCSync.' },
   { id:'ip-76', type:'IP address', label:'76.21.55.4', risk:'high', internet:true, riskScore:true, detail:'External address observed during the phishing-to-OAuth incident.' },
   { id:'mailbox-jane', type:'Mailbox', label:'Jane Doe mailbox', risk:'high', sensitive:true, riskScore:true, detail:'Mailbox accessible through the risky OAuth application.' },
   { id:'subscription-prod', type:'Cloud resource', label:'Production subscription', risk:'high', critical:true, sensitive:true, riskScore:true, detail:'Production cloud scope inherited by contributor principals.' },
@@ -1357,8 +1324,8 @@ const HUNTING_GRAPH_SCENARIOS = [
     nodes:['guest-kim','group-cloud','subscription-prod','kv-prod'],
     edges:[{from:'guest-kim',to:'group-cloud',label:'member of'},{from:'group-cloud',to:'subscription-prod',label:'has role on'},{from:'subscription-prod',to:'kv-prod',label:'contains'}] },
   { id:'domain-compromise', name:'Paths to domain compromise (DCSync)', question:'Which non-privileged identities have hidden paths to domain replication rights?', techniques:['Lateral movement','Privilege escalation','Credential access'], inputs:[],
-    nodes:['user-jordan','group-helpdesk','user-helpdesk','tenant-hacksmarterlabs','server-dc01'],
-    edges:[{from:'user-jordan',to:'group-helpdesk',label:'member of'},{from:'group-helpdesk',to:'user-helpdesk',label:'can impersonate as'},{from:'user-helpdesk',to:'tenant-hacksmarterlabs',label:'has permissions to'},{from:'tenant-hacksmarterlabs',to:'server-dc01',label:'contains'}] },
+    nodes:['user-jordan','group-helpdesk','user-helpdesk','tenant-hacksmartersoc','server-dc01'],
+    edges:[{from:'user-jordan',to:'group-helpdesk',label:'member of'},{from:'group-helpdesk',to:'user-helpdesk',label:'can impersonate as'},{from:'user-helpdesk',to:'tenant-hacksmartersoc',label:'has permissions to'},{from:'tenant-hacksmartersoc',to:'server-dc01',label:'contains'}] },
   { id:'domain-admins', name:'Paths to domain admins', question:'Which paths could elevate non-privileged users into Domain Admins?', techniques:['Privilege escalation','Lateral movement'], inputs:[],
     nodes:['user-jordan','group-helpdesk','user-helpdesk','group-domainadmins'],
     edges:[{from:'user-jordan',to:'group-helpdesk',label:'member of'},{from:'group-helpdesk',to:'user-helpdesk',label:'can impersonate as'},{from:'user-helpdesk',to:'group-domainadmins',label:'has permissions to'}] },
@@ -1397,7 +1364,7 @@ const SAVED_QUERIES = [
     query:`DeviceProcessEvents\n| where FileName == "vssadmin.exe"\n| project Timestamp, DeviceName, FileName, ProcessCommandLine, AccountName` },
   { name:'Risky sign-ins by user',
     table:'SigninLogs', description:'Filter Entra sign-in rows for high-risk users.',
-    query:`SigninLogs\n| where UserPrincipalName == "sam.lee@hacksmarterlabs.example"\n| project TimeGenerated, UserPrincipalName, IPAddress, RiskLevel, ResultType` },
+    query:`SigninLogs\n| where UserPrincipalName == "sam.lee@hacksmartersoc.example"\n| project TimeGenerated, UserPrincipalName, IPAddress, RiskLevel, ResultType` },
   { name:'Container namespace escape signal',
     table:'ContainerEvents', description:'Look for container processes touching host namespaces.',
     query:`ContainerEvents\n| where ClusterName == "aks-prod"\n| where Syscall == "setns"\n| project TimeGenerated, ClusterName, PodName, Image, Syscall, NodeName` },
@@ -1420,13 +1387,13 @@ const SAVED_QUERIES = [
 
 const KQL_PRACTICE_ROWS = [
   { TimeGenerated:'2026-07-06T09:10:00Z', Scenario:'endpoint staging',
-    Message:'user=jane.doe@hacksmarterlabs.example ip=76.21.55.4 action=allow', Payload:'{"user":"jane.doe@hacksmarterlabs.example","device":"WKS-03","risk":"High"}', Tags:'finance|priority|cloud',
+    Message:'user=jane.doe@hacksmartersoc.example ip=76.21.55.4 action=allow', Payload:'{"user":"jane.doe@hacksmartersoc.example","device":"WKS-03","risk":"High"}', Tags:'finance|priority|cloud',
     Domain:'secure-document-portal.xyz', Source:'DeviceProcessEvents' },
   { TimeGenerated:'2026-07-06T10:12:00Z', Scenario:'identity pivot',
-    Message:'user=sam.lee@hacksmarterlabs.example ip=91.219.236.54 action=block', Payload:'{"user":"sam.lee@hacksmarterlabs.example","device":"WKS-11","risk":"Medium"}', Tags:'identity|risk|mfa',
-    Domain:'login.hacksmarterlabs.example', Source:'SigninLogs' },
+    Message:'user=sam.lee@hacksmartersoc.example ip=91.219.236.54 action=block', Payload:'{"user":"sam.lee@hacksmartersoc.example","device":"WKS-11","risk":"Medium"}', Tags:'identity|risk|mfa',
+    Domain:'login.hacksmartersoc.example', Source:'SigninLogs' },
   { TimeGenerated:'2026-07-06T10:14:00Z', Scenario:'cloud app follow-up',
-    Message:'user=maria.ross@hacksmarterlabs.example ip=185.199.111.12 action=alert', Payload:'{"user":"maria.ross@hacksmarterlabs.example","device":"LAP-07","risk":"High"}', Tags:'cloud|oauth|mail',
+    Message:'user=maria.ross@hacksmartersoc.example ip=185.199.111.12 action=alert', Payload:'{"user":"maria.ross@hacksmartersoc.example","device":"LAP-07","risk":"High"}', Tags:'cloud|oauth|mail',
     Domain:'bad-demo.example', Source:'CloudAppEvents' },
 ];
 
@@ -1439,20 +1406,20 @@ const SENTINEL_RESTORE_JOB = {
   scopeNote:'Use a restore job when the investigation needs a reusable table rather than a one-off long-range hunt.',
   query:`ArchiveDns_CL
 | where TimeGenerated between (datetime(2026-06-12T00:00:00Z) .. datetime(2026-06-21T23:59:59Z))
-| where DnsQuery has_any ("sync-a.bad-demo.example","cdn-metrics.hacksmarterlabs.example")
+| where DnsQuery has_any ("sync-a.bad-demo.example","cdn-metrics.hacksmartersoc.example")
 | summarize QueryCount=count(), UniqueHosts=dcount(SrcHostname) by DnsQuery, bin(TimeGenerated, 1d)
 | project TimeGenerated, DnsQuery, QueryCount, UniqueHosts`,
   results:[
     { TimeGenerated:'2026-06-12T00:00:00Z', DnsQuery:'sync-a.bad-demo.example', QueryCount:341, UniqueHosts:2, SourceTable:'ArchiveDns_CL', RestoreJobId:'RST-8401' },
     { TimeGenerated:'2026-06-13T00:00:00Z', DnsQuery:'sync-a.bad-demo.example', QueryCount:328, UniqueHosts:2, SourceTable:'ArchiveDns_CL', RestoreJobId:'RST-8401' },
-    { TimeGenerated:'2026-06-21T00:00:00Z', DnsQuery:'cdn-metrics.hacksmarterlabs.example', QueryCount:411, UniqueHosts:1, SourceTable:'ArchiveDns_CL', RestoreJobId:'RST-8401' },
+    { TimeGenerated:'2026-06-21T00:00:00Z', DnsQuery:'cdn-metrics.hacksmartersoc.example', QueryCount:411, UniqueHosts:1, SourceTable:'ArchiveDns_CL', RestoreJobId:'RST-8401' },
   ],
 };
 
 const ARCHIVE_DNS_AUX_ROWS = [
   { TimeGenerated:'2026-06-12T00:00:00Z', DnsQuery:'sync-a.bad-demo.example', QueryCount:341, UniqueHosts:2, Tier:'Auxiliary', SourceTable:'ArchiveDns_CL' },
   { TimeGenerated:'2026-06-13T00:00:00Z', DnsQuery:'sync-a.bad-demo.example', QueryCount:328, UniqueHosts:2, Tier:'Auxiliary', SourceTable:'ArchiveDns_CL' },
-  { TimeGenerated:'2026-06-21T00:00:00Z', DnsQuery:'cdn-metrics.hacksmarterlabs.example', QueryCount:411, UniqueHosts:1, Tier:'Auxiliary', SourceTable:'ArchiveDns_CL' },
+  { TimeGenerated:'2026-06-21T00:00:00Z', DnsQuery:'cdn-metrics.hacksmartersoc.example', QueryCount:411, UniqueHosts:1, Tier:'Auxiliary', SourceTable:'ArchiveDns_CL' },
 ];
 
 const MOCK_QUERY_RESULTS = {
@@ -1487,148 +1454,148 @@ const MOCK_QUERY_RESULTS = {
       ActionType:'PutBucketAcl', BucketName:'aws-s3-prod-logs', AccessLevel:'public-read' },
   ],
   GraphActivityLogs: [
-    { TimeGenerated:'2026-06-28T08:31:00Z', UserPrincipalName:'jane.doe@hacksmarterlabs.example',
+    { TimeGenerated:'2026-06-28T08:31:00Z', UserPrincipalName:'jane.doe@hacksmartersoc.example',
       AppDisplayName:'DocViewer Pro', AppId:'b9f2-demo-ad21', Operation:'Mail.Read',
-      RequestUri:'/users/jane.doe@hacksmarterlabs.example/messages', IPAddress:'76.21.55.4', ResultStatus:'Success' },
-    { TimeGenerated:'2026-06-28T08:33:12Z', UserPrincipalName:'jane.doe@hacksmarterlabs.example',
+      RequestUri:'/users/jane.doe@hacksmartersoc.example/messages', IPAddress:'76.21.55.4', ResultStatus:'Success' },
+    { TimeGenerated:'2026-06-28T08:33:12Z', UserPrincipalName:'jane.doe@hacksmartersoc.example',
       AppDisplayName:'DocViewer Pro', AppId:'b9f2-demo-ad21', Operation:'Files.Read.All',
-      RequestUri:'/users/jane.doe@hacksmarterlabs.example/drive/root/search(q=invoice)', IPAddress:'76.21.55.4', ResultStatus:'Success' },
-    { TimeGenerated:'2026-06-28T08:36:44Z', UserPrincipalName:'jane.doe@hacksmarterlabs.example',
+      RequestUri:'/users/jane.doe@hacksmartersoc.example/drive/root/search(q=invoice)', IPAddress:'76.21.55.4', ResultStatus:'Success' },
+    { TimeGenerated:'2026-06-28T08:36:44Z', UserPrincipalName:'jane.doe@hacksmartersoc.example',
       AppDisplayName:'DocViewer Pro', AppId:'b9f2-demo-ad21', Operation:'Mail.Send',
-      RequestUri:'/users/jane.doe@hacksmarterlabs.example/sendMail', IPAddress:'76.21.55.4', ResultStatus:'Denied' },
-    { TimeGenerated:'2026-06-28T13:34:09Z', UserPrincipalName:'sam.lee@hacksmarterlabs.example',
+      RequestUri:'/users/jane.doe@hacksmartersoc.example/sendMail', IPAddress:'76.21.55.4', ResultStatus:'Denied' },
+    { TimeGenerated:'2026-06-28T13:34:09Z', UserPrincipalName:'sam.lee@hacksmartersoc.example',
       AppDisplayName:'Graph PowerShell', AppId:'graph-powershell-demo', Operation:'Directory.Read.All',
       RequestUri:'/users?$select=id,userPrincipalName', IPAddress:'91.219.236.54', ResultStatus:'ConditionalAccessBlocked' },
   ],
   DeviceLogonEvents: [
-    { Timestamp:'2026-07-06T03:44:05Z', DeviceName:'FIN-FS-02', ActionType:'LogonSuccess',
-      LogonType:'Network', AccountName:'svc-backup', AccountDomain:'HACKSMARTERLABS',
+    { Timestamp:'2026-06-28T03:44:05Z', DeviceName:'FIN-FS-02', ActionType:'LogonSuccess',
+      LogonType:'Network', AccountName:'svc-backup', AccountDomain:'HACKSMARTERSOC',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1144',
       RemoteIP:'10.20.4.55', RemoteDeviceName:'DC01', Protocol:'Kerberos', IsLocalAdmin:false },
-    { Timestamp:'2026-07-06T10:17:55Z', DeviceName:'FIN-FS-02', ActionType:'LogonSuccess',
-      LogonType:'RemoteInteractive', AccountName:'fin-svc', AccountDomain:'HACKSMARTERLABS',
+    { Timestamp:'2026-06-28T10:17:55Z', DeviceName:'FIN-FS-02', ActionType:'LogonSuccess',
+      LogonType:'RemoteInteractive', AccountName:'fin-svc', AccountDomain:'HACKSMARTERSOC',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-2207',
       RemoteIP:'10.20.7.14', RemoteDeviceName:'WKS-03', Protocol:'NTLM', IsLocalAdmin:true },
-    { Timestamp:'2026-07-06T14:59:48Z', DeviceName:'WKS-03', ActionType:'LogonFailed',
-      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERLABS',
+    { Timestamp:'2026-06-28T14:59:48Z', DeviceName:'WKS-03', ActionType:'LogonFailed',
+      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERSOC',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1812',
       FailureReason:'BadPassword', Protocol:'Kerberos', IsLocalAdmin:false },
-    { Timestamp:'2026-07-06T14:59:52Z', DeviceName:'WKS-03', ActionType:'LogonFailed',
-      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERLABS',
+    { Timestamp:'2026-06-28T14:59:52Z', DeviceName:'WKS-03', ActionType:'LogonFailed',
+      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERSOC',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1812',
       FailureReason:'BadPassword', Protocol:'Kerberos', IsLocalAdmin:false },
-    { Timestamp:'2026-07-06T14:59:57Z', DeviceName:'WKS-03', ActionType:'LogonFailed',
-      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERLABS',
+    { Timestamp:'2026-06-28T14:59:57Z', DeviceName:'WKS-03', ActionType:'LogonFailed',
+      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERSOC',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1812',
       FailureReason:'BadPassword', Protocol:'Kerberos', IsLocalAdmin:false },
-    { Timestamp:'2026-07-06T15:00:00Z', DeviceName:'WKS-03', ActionType:'LogonSuccess',
-      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERLABS',
+    { Timestamp:'2026-06-28T15:00:00Z', DeviceName:'WKS-03', ActionType:'LogonSuccess',
+      LogonType:'Interactive', AccountName:'jdoe', AccountDomain:'HACKSMARTERSOC',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1812',
       RemoteIP:'', Protocol:'Kerberos', IsLocalAdmin:false },
   ],
   IdentityLogonEvents: [
-    { Timestamp:'2026-07-06T03:44:00Z', ActionType:'LogonSuccess', Application:'Active Directory',
+    { Timestamp:'2026-06-28T03:44:00Z', ActionType:'LogonSuccess', Application:'Active Directory',
       LogonType:'Network', Protocol:'Kerberos',
-      AccountName:'svc-backup', AccountDomain:'HACKSMARTERLABS',
-      AccountUpn:'svc-backup@hacksmarterlabs.example',
+      AccountName:'svc-backup', AccountDomain:'HACKSMARTERSOC',
+      AccountUpn:'svc-backup@hacksmartersoc.example',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1144',
       AccountObjectId:'9b21a4e0-1f44-4b13-9fd0-1f6b8a3c0011',
       DeviceName:'DC01', IPAddress:'10.20.4.55', DestinationDeviceName:'DC01' },
-    { Timestamp:'2026-07-06T03:46:00Z', ActionType:'DirectoryServicesReplication', Application:'Active Directory',
+    { Timestamp:'2026-06-28T03:46:00Z', ActionType:'DirectoryServicesReplication', Application:'Active Directory',
       LogonType:'Network', Protocol:'Kerberos',
-      AccountName:'svc-backup', AccountDomain:'HACKSMARTERLABS',
-      AccountUpn:'svc-backup@hacksmarterlabs.example',
+      AccountName:'svc-backup', AccountDomain:'HACKSMARTERSOC',
+      AccountUpn:'svc-backup@hacksmartersoc.example',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1144',
       AccountObjectId:'9b21a4e0-1f44-4b13-9fd0-1f6b8a3c0011',
       DeviceName:'DC01', IPAddress:'10.20.4.55', DestinationDeviceName:'DC01' },
-    { Timestamp:'2026-07-06T10:17:58Z', ActionType:'LogonSuccess', Application:'Active Directory',
+    { Timestamp:'2026-06-28T10:17:58Z', ActionType:'LogonSuccess', Application:'Active Directory',
       LogonType:'Remote interactive', Protocol:'NTLM',
-      AccountName:'fin-svc', AccountDomain:'HACKSMARTERLABS',
-      AccountUpn:'fin-svc@hacksmarterlabs.example',
+      AccountName:'fin-svc', AccountDomain:'HACKSMARTERSOC',
+      AccountUpn:'fin-svc@hacksmartersoc.example',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-2207',
       AccountObjectId:'1c54f7d2-8e09-4d3b-b71a-2cf90a4f7d22',
       DeviceName:'WKS-03', IPAddress:'10.20.7.14', DestinationDeviceName:'FIN-FS-02' },
-    { Timestamp:'2026-07-06T14:59:55Z', ActionType:'LogonFailed', Application:'Active Directory',
+    { Timestamp:'2026-06-28T14:59:55Z', ActionType:'LogonFailed', Application:'Active Directory',
       LogonType:'Interactive', Protocol:'Kerberos', FailureReason:'BadPassword',
-      AccountName:'jdoe', AccountDomain:'HACKSMARTERLABS',
-      AccountUpn:'jane.doe@hacksmarterlabs.example',
+      AccountName:'jdoe', AccountDomain:'HACKSMARTERSOC',
+      AccountUpn:'jane.doe@hacksmartersoc.example',
       AccountSid:'S-1-5-21-1180699209-877415012-3182924384-1812',
       AccountObjectId:'7f2b1e90-5c10-4ad9-b3e3-44ea7c8b1cf3',
       DeviceName:'WKS-03', IPAddress:'10.20.7.42' },
   ],
   SigninLogs: [
-    { TimeGenerated:'2026-06-28T13:27:00Z', UserPrincipalName:'sam.lee@hacksmarterlabs.example',
+    { TimeGenerated:'2026-06-28T13:27:00Z', UserPrincipalName:'sam.lee@hacksmartersoc.example',
       IPAddress:'91.219.236.54', RiskLevel:'High', ResultType:'0' },
-    { TimeGenerated:'2026-06-28T06:40:00Z', UserPrincipalName:'maria.ross@hacksmarterlabs.example',
+    { TimeGenerated:'2026-06-28T06:40:00Z', UserPrincipalName:'maria.ross@hacksmartersoc.example',
       IPAddress:'185.199.111.12', RiskLevel:'High', ResultType:'0' },
   ],
   ContainerEvents: [
     { TimeGenerated:'2026-06-28T12:01:00Z', ClusterName:'aks-prod', PodName:'pod-api-77',
-      Image:'hacksmarterlabs/api:2026.06', Syscall:'setns', NodeName:'aks-prod/node-3' },
+      Image:'hacksmartersoc/api:2026.06', Syscall:'setns', NodeName:'aks-prod/node-3' },
   ],
   SecurityEvent: [
-    { TimeGenerated:'2026-07-06T08:12:00Z', Computer:'DC01', EventID:4624,
+    { TimeGenerated:'2026-06-28T08:12:00Z', Computer:'DC01', EventID:4624,
       Account:'EXAMPLE\\svc-backup', Activity:'An account was successfully logged on', IpAddress:'10.20.4.55', LogonType:3 },
-    { TimeGenerated:'2026-07-06T08:14:32Z', Computer:'WKS-03', EventID:4625,
+    { TimeGenerated:'2026-06-28T08:14:32Z', Computer:'WKS-03', EventID:4625,
       Account:'EXAMPLE\\jdoe', Activity:'An account failed to log on', IpAddress:'10.20.7.42', LogonType:2 },
-    { TimeGenerated:'2026-07-06T08:16:18Z', Computer:'FIN-FS-02', EventID:4672,
+    { TimeGenerated:'2026-06-28T08:16:18Z', Computer:'FIN-FS-02', EventID:4672,
       Account:'EXAMPLE\\fin-svc', Activity:'Special privileges assigned to new logon', IpAddress:'10.20.7.14', LogonType:10 },
-    { TimeGenerated:'2026-07-06T08:17:44Z', Computer:'WKS-03', EventID:4688,
+    { TimeGenerated:'2026-06-28T08:17:44Z', Computer:'WKS-03', EventID:4688,
       Account:'EXAMPLE\\jdoe', Activity:'A new process has been created', NewProcessName:'C:\\Users\\Public\\scanner.exe' },
   ],
   WindowsEvent: [
-    { TimeGenerated:'2026-07-06T08:12:00Z', Computer:'DC01', EventID:4624, Channel:'Security',
+    { TimeGenerated:'2026-06-28T08:12:00Z', Computer:'DC01', EventID:4624, Channel:'Security',
       Provider:'Windows-Security-Auditing', RenderedDescription:'Successful logon for EXAMPLE\\svc-backup' },
-    { TimeGenerated:'2026-07-06T08:17:44Z', Computer:'WKS-03', EventID:4688, Channel:'Security',
+    { TimeGenerated:'2026-06-28T08:17:44Z', Computer:'WKS-03', EventID:4688, Channel:'Security',
       Provider:'Windows-Security-Auditing', RenderedDescription:'Process creation for C:\\Users\\Public\\scanner.exe' },
   ],
   CommonSecurityLog: [
-    { TimeGenerated:'2026-07-06T08:20:00Z', DeviceVendor:'Hack Smarter Labs Firewall', DeviceProduct:'EdgeFW',
+    { TimeGenerated:'2026-06-28T08:20:00Z', DeviceVendor:'Hack Smarter SOC Firewall', DeviceProduct:'EdgeFW',
       DeviceAction:'deny', LogSeverity:'High', SourceIP:'10.20.7.14', DestinationIP:'203.0.113.10', DestinationPort:443 },
-    { TimeGenerated:'2026-07-06T08:21:08Z', DeviceVendor:'Fabrikam Mail', DeviceProduct:'MailSecure',
+    { TimeGenerated:'2026-06-28T08:21:08Z', DeviceVendor:'Fabrikam Mail', DeviceProduct:'MailSecure',
       DeviceAction:'quarantine', LogSeverity:'Medium', SourceIP:'198.51.100.77', DestinationIP:'10.20.5.22', DestinationPort:25 },
-    { TimeGenerated:'2026-07-06T08:22:15Z', DeviceVendor:'Hack Smarter Labs Firewall', DeviceProduct:'EdgeFW',
+    { TimeGenerated:'2026-06-28T08:22:15Z', DeviceVendor:'Hack Smarter SOC Firewall', DeviceProduct:'EdgeFW',
       DeviceAction:'allow', LogSeverity:'Low', SourceIP:'10.20.6.19', DestinationIP:'198.51.100.22', DestinationPort:443 },
   ],
   AzureActivity: [
-    { TimeGenerated:'2026-07-06T07:50:00Z', SubscriptionId:'sub-prod-001',
-      Caller:'cloudadmin@hacksmarterlabs.example', OperationNameValue:'Cloud.Authorization/roleAssignments/write',
+    { TimeGenerated:'2026-06-28T07:50:00Z', SubscriptionId:'sub-prod-001',
+      Caller:'cloudadmin@hacksmartersoc.example', OperationNameValue:'Cloud.Authorization/roleAssignments/write',
       ActivityStatusValue:'Succeeded', ResourceGroup:'rg-prod-identity', ResourceProviderValue:'Cloud.Authorization' },
-    { TimeGenerated:'2026-07-06T07:57:31Z', SubscriptionId:'sub-shared-002',
-      Caller:'platformops@hacksmarterlabs.example', OperationNameValue:'Cloud.Authorization/policyAssignments/write',
+    { TimeGenerated:'2026-06-28T07:57:31Z', SubscriptionId:'sub-shared-002',
+      Caller:'platformops@hacksmartersoc.example', OperationNameValue:'Cloud.Authorization/policyAssignments/write',
       ActivityStatusValue:'Succeeded', ResourceGroup:'rg-policy', ResourceProviderValue:'Cloud.Authorization' },
-    { TimeGenerated:'2026-07-06T08:05:44Z', SubscriptionId:'sub-prod-001',
-      Caller:'storage-owner@hacksmarterlabs.example', OperationNameValue:'Cloud.Storage/storageAccounts/write',
+    { TimeGenerated:'2026-06-28T08:05:44Z', SubscriptionId:'sub-prod-001',
+      Caller:'storage-owner@hacksmartersoc.example', OperationNameValue:'Cloud.Storage/storageAccounts/write',
       ActivityStatusValue:'Succeeded', ResourceGroup:'rg-prod-storage', ResourceProviderValue:'Cloud.Storage' },
   ],
   ArchiveDns_CL: ARCHIVE_DNS_AUX_ROWS,
   ArchiveDns_RST: SENTINEL_RESTORE_JOB.results,
   AppRiskEvents_CL: [
-    { TimeGenerated:'2026-07-06T08:31:00Z', AppId:'app-expense-portal',
-      UserPrincipalName:'maria.ross@hacksmarterlabs.example', SourceIp:'203.0.113.44', RiskScore:92, Action:'BlockedOAuthCallback' },
-    { TimeGenerated:'2026-07-06T08:34:18Z', AppId:'app-partner-sync',
-      UserPrincipalName:'svc-partner@hacksmarterlabs.example', SourceIp:'198.51.100.64', RiskScore:35, Action:'AllowedSync' },
-    { TimeGenerated:'2026-07-06T08:39:02Z', AppId:'app-expense-portal',
-      UserPrincipalName:'sam.lee@hacksmarterlabs.example', SourceIp:'203.0.113.89', RiskScore:78, Action:'HighRiskTokenUse' },
+    { TimeGenerated:'2026-06-28T08:31:00Z', AppId:'app-expense-portal',
+      UserPrincipalName:'maria.ross@hacksmartersoc.example', SourceIp:'203.0.113.44', RiskScore:92, Action:'BlockedOAuthCallback' },
+    { TimeGenerated:'2026-06-28T08:34:18Z', AppId:'app-partner-sync',
+      UserPrincipalName:'svc-partner@hacksmartersoc.example', SourceIp:'198.51.100.64', RiskScore:35, Action:'AllowedSync' },
+    { TimeGenerated:'2026-06-28T08:39:02Z', AppId:'app-expense-portal',
+      UserPrincipalName:'sam.lee@hacksmartersoc.example', SourceIp:'203.0.113.89', RiskScore:78, Action:'HighRiskTokenUse' },
   ],
   KQLPractice_CL: KQL_PRACTICE_ROWS,
 };
 
 const KQL_EXTERNALDATA_CSV = `Domain,Category,Priority
 secure-document-portal.xyz,phish,1
-login.hacksmarterlabs.example,auth,2
+login.hacksmartersoc.example,auth,2
 bad-demo.example,phish,1
 update.example,benign,3`;
 
 const ASIM_AUTHENTICATION_ROWS = [
-  { TimeGenerated:'2026-07-06T03:44:00Z', EventVendor:'Hack Smarter Labs', EventProduct:'Windows', EventSchema:'Authentication', EventType:'Logon', EventResult:'Success',
+  { TimeGenerated:'2026-06-28T03:44:00Z', EventVendor:'Hack Smarter SOC', EventProduct:'Windows', EventSchema:'Authentication', EventType:'Logon', EventResult:'Success',
     SrcIpAddr:'10.20.4.55', DstIpAddr:'10.20.4.10', SrcHostname:'DC01', DstHostname:'DC01', TargetUserName:'svc-backup', DvcAction:'LogonSuccess', Dvc:'DC01' },
-  { TimeGenerated:'2026-07-06T10:17:58Z', EventVendor:'Hack Smarter Labs', EventProduct:'Entra ID', EventSchema:'Authentication', EventType:'Logon', EventResult:'Success',
-    SrcIpAddr:'91.219.236.54', DstIpAddr:'52.96.0.0', SrcHostname:'unknown', DstHostname:'login.identity.example', TargetUserName:'sam.lee@hacksmarterlabs.example', DvcAction:'MFA satisfied', Dvc:'AAD' },
-  { TimeGenerated:'2026-07-06T13:27:00Z', EventVendor:'Hack Smarter Labs', EventProduct:'Entra ID', EventSchema:'Authentication', EventType:'Logon', EventResult:'Failure',
-    SrcIpAddr:'91.219.236.54', DstIpAddr:'52.96.0.0', SrcHostname:'proxy-91-219-236-54', DstHostname:'login.identity.example', TargetUserName:'sam.lee@hacksmarterlabs.example', DvcAction:'Risky sign-in', Dvc:'AAD' },
-  { TimeGenerated:'2026-07-06T06:40:00Z', EventVendor:'Hack Smarter Labs', EventProduct:'Entra ID', EventSchema:'Authentication', EventType:'Logon', EventResult:'Success',
-    SrcIpAddr:'185.199.111.12', DstIpAddr:'52.96.0.0', SrcHostname:'aitm-gateway', DstHostname:'login.identity.example', TargetUserName:'maria.ross@hacksmarterlabs.example', DvcAction:'MFA proxied', Dvc:'AAD' },
+  { TimeGenerated:'2026-06-28T10:17:58Z', EventVendor:'Hack Smarter SOC', EventProduct:'Entra ID', EventSchema:'Authentication', EventType:'Logon', EventResult:'Success',
+    SrcIpAddr:'91.219.236.54', DstIpAddr:'52.96.0.0', SrcHostname:'unknown', DstHostname:'login.identity.example', TargetUserName:'sam.lee@hacksmartersoc.example', DvcAction:'MFA satisfied', Dvc:'AAD' },
+  { TimeGenerated:'2026-06-28T13:27:00Z', EventVendor:'Hack Smarter SOC', EventProduct:'Entra ID', EventSchema:'Authentication', EventType:'Logon', EventResult:'Failure',
+    SrcIpAddr:'91.219.236.54', DstIpAddr:'52.96.0.0', SrcHostname:'proxy-91-219-236-54', DstHostname:'login.identity.example', TargetUserName:'sam.lee@hacksmartersoc.example', DvcAction:'Risky sign-in', Dvc:'AAD' },
+  { TimeGenerated:'2026-06-28T06:40:00Z', EventVendor:'Hack Smarter SOC', EventProduct:'Entra ID', EventSchema:'Authentication', EventType:'Logon', EventResult:'Success',
+    SrcIpAddr:'185.199.111.12', DstIpAddr:'52.96.0.0', SrcHostname:'aitm-gateway', DstHostname:'login.identity.example', TargetUserName:'maria.ross@hacksmartersoc.example', DvcAction:'MFA proxied', Dvc:'AAD' },
 ];
 
 const ASIM_AUTHENTICATION_SAVED_QUERIES = [
@@ -1637,7 +1604,7 @@ const ASIM_AUTHENTICATION_SAVED_QUERIES = [
     description:'Identify successful and failed authentication rows for a user after a suspicious sign-in.',
     expectedRows:3,
     query:`_Im_Authentication(starttime=ago(1d), eventtype="Logon")
-| where TargetUserName in ("sam.lee@hacksmarterlabs.example","maria.ross@hacksmarterlabs.example")
+| where TargetUserName in ("sam.lee@hacksmartersoc.example","maria.ross@hacksmartersoc.example")
 | project TimeGenerated, SrcIpAddr, TargetUserName, EventProduct, EventResult, DvcAction`,
   },
   {
@@ -1666,13 +1633,13 @@ const ASIM_AUTHENTICATION_NOTES = [
 ];
 
 const ASIM_NETWORK_SESSION_ROWS = [
-  { TimeGenerated:'2026-07-06T08:20:00Z', EventVendor:'Hack Smarter Labs Firewall', EventProduct:'EdgeFW', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Allowed',
+  { TimeGenerated:'2026-06-28T08:20:00Z', EventVendor:'Hack Smarter SOC Firewall', EventProduct:'EdgeFW', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Allowed',
     SrcIpAddr:'10.20.7.14', DstIpAddr:'203.0.113.10', SrcHostname:'WKS-03', DstHostname:'bad-demo.example', SrcPortNumber:51550, DstPortNumber:443, NetworkDirection:'Outbound', DvcAction:'allow' },
-  { TimeGenerated:'2026-07-06T08:21:08Z', EventVendor:'Fabrikam Mail', EventProduct:'MailSecure', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Blocked',
+  { TimeGenerated:'2026-06-28T08:21:08Z', EventVendor:'Fabrikam Mail', EventProduct:'MailSecure', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Blocked',
     SrcIpAddr:'198.51.100.77', DstIpAddr:'10.20.5.22', SrcHostname:'mail-gateway', DstHostname:'EXCH-01', SrcPortNumber:25, DstPortNumber:25, NetworkDirection:'Inbound', DvcAction:'quarantine' },
-  { TimeGenerated:'2026-07-06T08:22:15Z', EventVendor:'Hack Smarter Labs Firewall', EventProduct:'EdgeFW', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Allowed',
+  { TimeGenerated:'2026-06-28T08:22:15Z', EventVendor:'Hack Smarter SOC Firewall', EventProduct:'EdgeFW', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Allowed',
     SrcIpAddr:'10.20.6.19', DstIpAddr:'198.51.100.22', SrcHostname:'WKS-11', DstHostname:'update.example', SrcPortNumber:51234, DstPortNumber:443, NetworkDirection:'Outbound', DvcAction:'allow' },
-  { TimeGenerated:'2026-07-06T08:23:44Z', EventVendor:'Hack Smarter Labs Firewall', EventProduct:'EdgeFW', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Blocked',
+  { TimeGenerated:'2026-06-28T08:23:44Z', EventVendor:'Hack Smarter SOC Firewall', EventProduct:'EdgeFW', EventSchema:'NetworkSession', EventType:'NetworkSession', EventResult:'Blocked',
     SrcIpAddr:'10.20.4.55', DstIpAddr:'203.0.113.10', SrcHostname:'DC01', DstHostname:'bad-demo.example', SrcPortNumber:49610, DstPortNumber:443, NetworkDirection:'Outbound', DvcAction:'deny' },
 ];
 
@@ -1898,7 +1865,7 @@ const SENTINEL_GRAPH = {
 
 const CLOUD_APP_INVESTIGATIONS = [
   { id:'MDA-OAUTH-1042', incidentId:'INC-1042', status:'Active investigation',
-    appName:'DocViewer Pro', publisher:'Unverified publisher', user:'jane.doe@hacksmarterlabs.example',
+    appName:'DocViewer Pro', publisher:'Unverified publisher', user:'jane.doe@hacksmartersoc.example',
     consentTime:'2026-06-28T08:23:00Z', risk:'High',
     scopes:['Mail.ReadWrite','Files.Read.All','offline_access'],
     indicators:['Consent followed a phishing URL click by 12 minutes','Publisher has no verified tenant relationship','App requested mailbox write scope and persistent refresh tokens'],
@@ -1913,7 +1880,7 @@ const CLOUD_APP_INVESTIGATIONS = [
 ];
 
 const ENTRA_IDENTITY_INVESTIGATIONS = [
-  { id:'IDRISK-1053', incidentId:'INC-1053', user:'sam.lee@hacksmarterlabs.example',
+  { id:'IDRISK-1053', incidentId:'INC-1053', user:'sam.lee@hacksmartersoc.example',
     status:'Needs analyst decision', userRisk:'High', signInRisk:'High',
     riskDetections:[
       { time:'2026-06-28T13:27:00Z', type:'Unfamiliar sign-in properties', risk:'High', source:'Entra ID Protection', detail:'Sign-in from NL differs from Sam Lee baseline.' },
@@ -1927,7 +1894,7 @@ const ENTRA_IDENTITY_INVESTIGATIONS = [
     ],
     actions:['Confirm compromise','Dismiss user risk','Reset password','Revoke sessions','Require MFA re-registration'],
     decisionGuide:'Confirm compromise when the user cannot validate the NL sign-in or when follow-on activity appears from the same IP. Dismiss only after user verification and matching travel/VPN context.' },
-  { id:'IDRISK-1051', incidentId:'INC-1051', user:'maria.ross@hacksmarterlabs.example',
+  { id:'IDRISK-1051', incidentId:'INC-1051', user:'maria.ross@hacksmartersoc.example',
     status:'Confirmed compromised', userRisk:'High', signInRisk:'High',
     riskDetections:[
       { time:'2026-06-28T06:40:00Z', type:'Adversary-in-the-middle', risk:'High', source:'Entra ID Protection', detail:'MFA token was satisfied through a suspected phishing proxy.' },
@@ -1976,9 +1943,9 @@ const COPILOT_AGENTIC_FLOW = {
   plan:['Read incident alerts and timeline','Expand user, OAuth app, IP, URL, and mailbox entities','Run static CloudAppEvents and SigninLogs checks','Decide containment and case tasks'],
   toolCalls:[
     { tool:'get_incident', input:'INC-1042', output:'2 correlated alerts: phishing URL click and anomalous OAuth consent grant.' },
-    { tool:'expand_entities', input:'jane.doe@hacksmarterlabs.example', output:'Linked URL secure-document-portal[.]xyz, app DocViewer Pro, IP 76.21.55.4, mailbox Jane Doe mailbox.' },
+    { tool:'expand_entities', input:'jane.doe@hacksmartersoc.example', output:'Linked URL secure-document-portal[.]xyz, app DocViewer Pro, IP 76.21.55.4, mailbox Jane Doe mailbox.' },
     { tool:'query_cloud_app_events', input:'AppName == "DocViewer Pro"', output:'Consent grant plus mailbox enumeration within eight minutes.' },
-    { tool:'query_signin_logs', input:'UserPrincipalName == "jane.doe@hacksmarterlabs.example"', output:'Successful MFA-backed sign-in from unfamiliar IP immediately after URL click.' },
+    { tool:'query_signin_logs', input:'UserPrincipalName == "jane.doe@hacksmartersoc.example"', output:'Successful MFA-backed sign-in from unfamiliar IP immediately after URL click.' },
   ],
   verdict:'True positive. Revoke app consent, block DocViewer Pro tenant-wide, revoke Jane Doe sessions, reset credentials, and keep CASE-2406-1042 open until CloudAppEvents hunting completes.',
 };
@@ -2081,19 +2048,19 @@ const SENTINEL_DATA_CONNECTORS = [
 ];
 
 const SENTINEL_CONTENT_SOLUTIONS = [
-  { id:'syslog', name:'Syslog', provider:'Hack Smarter Labs', status:'Not installed',
+  { id:'syslog', name:'Syslog', provider:'Hack Smarter SOC', status:'Not installed',
     connectors:['Syslog via AMA'],
     use:'Adds the Syslog via AMA connector and workbook content for Linux Syslog ingestion.' },
-  { id:'cef', name:'Common Event Format (CEF)', provider:'Hack Smarter Labs', status:'Not installed',
+  { id:'cef', name:'Common Event Format (CEF)', provider:'Hack Smarter SOC', status:'Not installed',
     connectors:['Common Event Format via AMA'],
     use:'Adds the CEF via AMA connector for appliances that emit CEF-formatted Syslog.' },
-  { id:'threat-intel', name:'Threat Intelligence', provider:'Hack Smarter Labs', status:'Installed',
+  { id:'threat-intel', name:'Threat Intelligence', provider:'Hack Smarter SOC', status:'Installed',
     connectors:['Defender Threat Intelligence','Threat Intelligence - TAXII'],
     use:'Adds threat intelligence connectors and analytic content for indicator matching.' },
-  { id:'windows-security', name:'Windows Security Events', provider:'Hack Smarter Labs', status:'Installed',
+  { id:'windows-security', name:'Windows Security Events', provider:'Hack Smarter SOC', status:'Installed',
     connectors:['Windows Security Events via AMA'],
     use:'Adds Windows event collection with Azure Monitor Agent and DCR scoping.' },
-  { id:'azure-activity', name:'Azure Activity', provider:'Hack Smarter Labs', status:'Installed',
+  { id:'azure-activity', name:'Azure Activity', provider:'Hack Smarter SOC', status:'Installed',
     connectors:['Azure Activity'],
     use:'Adds subscription activity collection guidance for Azure Policy and diagnostic settings.' },
   { id:'custom-logs', name:'Custom logs ingestion', provider:'Lab', status:'Planning only',
@@ -2222,7 +2189,7 @@ const SENTINEL_INGESTION_LABS = [
     connector:'Azure Activity',
     workspace:'soc-prod-sentinel',
     dcr:'Diagnostic setting: send AzureActivity to soc-prod-sentinel',
-    target:'Subscriptions: Hack-Smarter-Labs-Prod, Hack-Smarter-Labs-Shared',
+    target:'Subscriptions: Hack-Smarter-SOC-Prod, Hack-Smarter-SOC-Shared',
     table:'AzureActivity',
     prompt:'Collect subscription control-plane operations so Sentinel can detect risky role assignments, policy changes, and public network exposure changes.',
     steps:[
@@ -2299,15 +2266,15 @@ const THREAT_INTEL_INDICATORS = [
 const SYNTHETIC_TRANSACTIONS = [
   { TimeGenerated:'2026-06-28T13:40:00Z', SrcIp:'10.0.0.5', DstIp:'203.0.113.10',
     Url:'http://bad-demo.example/login', Domain:'bad-demo.example',
-    AccountName:'labuser@hacksmarterlabs.example', Action:'OutboundConnection',
+    AccountName:'labuser@hacksmartersoc.example', Action:'OutboundConnection',
     Scenario:'IOC match test', TechniqueId:'T1071' },
   { TimeGenerated:'2026-06-28T13:46:00Z', SrcIp:'10.0.0.8', DstIp:'198.51.100.22',
     Url:'https://update.example/agent', Domain:'update.example',
-    AccountName:'svc-agent@hacksmarterlabs.example', Action:'OutboundConnection',
+    AccountName:'svc-agent@hacksmartersoc.example', Action:'OutboundConnection',
     Scenario:'Benign control row', TechniqueId:'T1071' },
   { TimeGenerated:'2026-06-28T14:04:00Z', SrcIp:'10.0.0.9', DstIp:'192.0.2.44',
     Url:'http://bad-demo.example/payload', Domain:'bad-demo.example',
-    AccountName:'jane.doe@hacksmarterlabs.example', Action:'DnsRequest',
+    AccountName:'jane.doe@hacksmartersoc.example', Action:'DnsRequest',
     Scenario:'Domain IOC match test', TechniqueId:'T1566' },
 ];
 
@@ -2403,12 +2370,12 @@ const CLOUD_ALERTS = [
       'Kubernetes clusters should restrict pod egress to approved destinations',
     ] },
 
-  { id:'dfc-alert-03', severity:'medium', title:'Anonymous public read access enabled on a storage account', resource:'sthacksmarterlabslogs',
+  { id:'dfc-alert-03', severity:'medium', title:'Anonymous public read access enabled on a storage account', resource:'sthacksmartersoclogs',
     type:'Storage account', status:'Active', time:'2026-06-28T07:50:00Z', endTime:'2026-06-28T07:50:00Z',
     tactics:['Exfiltration'], plan:'Defender for Storage', scope:'sub-prod-001', incidentId:'dfc-inc-01',
     description:'Anonymous container-level read access was turned on for a storage account that holds application logs, and blob listing calls from an external address followed within minutes. Data in the account is currently reachable without authentication.',
     entities:[
-      { type:'Storage account', value:'sthacksmarterlabslogs' },
+      { type:'Storage account', value:'sthacksmartersoclogs' },
       { type:'IP address',      value:'203.0.113.44' },
       { type:'Account',         value:'svc-deploy' },
     ],
@@ -2450,7 +2417,7 @@ const CLOUD_ALERTS = [
     description:'A server-level firewall rule was created that permits connections from any source address. The database behind it holds customer export tables, so the change removes the last network control in front of that data.',
     entities:[
       { type:'SQL server', value:'sql-prod-reporting' },
-      { type:'Account',    value:'dba-oncall@hacksmarterlabs.example' },
+      { type:'Account',    value:'dba-oncall@hacksmartersoc.example' },
       { type:'IP range',   value:'0.0.0.0 - 255.255.255.255' },
     ],
     evidence:{ 'Rule name':'temp-report-access', 'Change source':'Portal', 'Databases exposed':'reporting, exports', 'Auditing':'Enabled' },
@@ -2488,10 +2455,10 @@ const CLOUD_ALERTS = [
     description:'A new Owner assignment was created at subscription scope late in the day with no matching change record. The assignment was reviewed with the platform team and confirmed as an approved emergency access grant.',
     entities:[
       { type:'Subscription', value:'sub-prod-001' },
-      { type:'Account',      value:'platform-admin@hacksmarterlabs.example' },
+      { type:'Account',      value:'platform-admin@hacksmartersoc.example' },
       { type:'Role',         value:'Owner' },
     ],
-    evidence:{ 'Principal type':'User', 'Assigned by':'break-glass-01@hacksmarterlabs.example', 'Change record':'Filed retroactively', 'Duration':'Permanent' },
+    evidence:{ 'Principal type':'User', 'Assigned by':'break-glass-01@hacksmartersoc.example', 'Change record':'Filed retroactively', 'Duration':'Permanent' },
     mitigation:[
       'Convert the standing assignment to a time-bound, approval-gated one.',
       'Confirm the break-glass account is covered by alerting on every use.',
@@ -2526,7 +2493,7 @@ const CLOUD_ALERTS = [
     description:'Built-in authentication was disabled on a public-facing web app. The application team confirmed the app moved to its own identity library in this release, so the alert was dismissed as expected behavior.',
     entities:[
       { type:'App Service', value:'app-customer-portal' },
-      { type:'Account',     value:'appdev-lead@hacksmarterlabs.example' },
+      { type:'Account',     value:'appdev-lead@hacksmartersoc.example' },
     ],
     evidence:{ 'Previous setting':'Enabled (Entra ID)', 'Change source':'Deployment pipeline', 'App exposure':'Public endpoint', 'Verified by':'Application team' },
     mitigation:[
@@ -2604,104 +2571,6 @@ const SENTINEL_WORKSPACES = [
   { id:'example-sec-prod',  name:'example-sec-prod',  region:'East US 2',     tier:'Production',  ruleIdx:[0,1,3,4,5,6,7] },
   { id:'example-sec-lab',   name:'example-sec-lab',   region:'West Europe',   tier:'Lab',         ruleIdx:[1,2,5,6] },
   { id:'fabrikam-soc-dev',  name:'fabrikam-soc-dev',  region:'North Europe',  tier:'Development', ruleIdx:[2,3,7] },
-];
-
-const MSSP_TENANTS = [
-  {
-    id: 'tn-1',
-    name: 'Northwind Trading Co.',
-    workspaces: ['Workspace A'],
-    delegatedRoles: ['Sentinel Reader'],
-    status: 'Active'
-  },
-  {
-    id: 'tn-2',
-    name: 'BlueHarbor Logistics Ltd.',
-    workspaces: ['Workspace B', 'Workspace C'],
-    delegatedRoles: ['Sentinel Contributor', 'Sentinel Responder'],
-    status: 'Pending'
-  },
-  {
-    id: 'tn-3',
-    name: 'SeaShell Enterprises Inc.',
-    workspaces: ['Workspace D'],
-    delegatedRoles: ['Sentinel Reader'],
-    status: 'Active'
-  },
-  {
-    id: 'tn-4',
-    name: 'Albatross Shipping Corp.',
-    workspaces: ['Workspace E'],
-    delegatedRoles: ['Sentinel Contributor'],
-    status: 'Pending'
-  }
-];
-
-const MTO_INCIDENTS = [
-  {
-    id: 'mti-01',
-    tenant: 'Northwind Trading Co.',
-    title: 'Alleged Data Exfiltration from Finance Group',
-    severity: 'High',
-    status: 'Resolved',
-    assignedTo: 'Jordan Taylor'
-  },
-  {
-    id: 'mti-02',
-    tenant: 'Northwind Trading Co.',
-    title: 'Suspicious Login from Uncommon IP',
-    severity: 'Medium',
-    status: 'In progress',
-    assignedTo: 'M. Okafor'
-  },
-  {
-    id: 'mti-03',
-    tenant: 'BlueHarbor Logistics Ltd.',
-    title: 'Potential Security Breach in Operations Warehouse',
-    severity: 'High',
-    status: 'Active',
-    assignedTo: 'R. Vance'
-  },
-  {
-    id: 'mti-04',
-    tenant: 'BlueHarbor Logistics Ltd.',
-    title: 'Failed Login Attempt from Internal Machine',
-    severity: 'Low',
-    status: 'Active',
-    assignedTo: 'Unassigned'
-  },
-  {
-    id: 'mti-05',
-    tenant: 'SeaShell Enterprises Inc.',
-    title: 'Repeated Attempts to Access Restricted Files',
-    severity: 'Medium',
-    status: 'Active',
-    assignedTo: 'L. Higginbotham'
-  },
-  {
-    id: 'mti-06',
-    tenant: 'SeaShell Enterprises Inc.',
-    title: 'Data Scrubbing Operation in Progress',
-    severity: 'Informational',
-    status: 'In progress',
-    assignedTo: 'Unassigned'
-  },
-  {
-    id: 'mti-07',
-    tenant: 'Albatross Shipping Corp.',
-    title: 'Multiple Suspicious Activities in Sales Department',
-    severity: 'High',
-    status: 'In progress',
-    assignedTo: 'Z. Wang'
-  },
-  {
-    id: 'mti-08',
-    tenant: 'Albatross Shipping Corp.',
-    title: 'Unrecognized User Access to Restricted Network Zone',
-    severity: 'Medium',
-    status: 'Active',
-    assignedTo: 'V. Patel'
-  }
 ];
 
 const SENTINEL_TABLE_PLANS = [
@@ -2787,13 +2656,13 @@ const SENTINEL_BOOKMARK_SUGGESTIONS = [
     entity:'Sam Lee',
     incident:'INC-1053',
     query:`SigninLogs
-| where UserPrincipalName == "sam.lee@hacksmarterlabs.example"
+| where UserPrincipalName == "sam.lee@hacksmartersoc.example"
 | project TimeGenerated, UserPrincipalName, IPAddress, RiskLevel, ResultType`,
     tags:['Risky sign-in','Identity','AiTM'],
     mitre:'T1078',
     row:{
       TimeGenerated:'2026-06-28T13:27:00Z',
-      UserPrincipalName:'sam.lee@hacksmarterlabs.example',
+      UserPrincipalName:'sam.lee@hacksmartersoc.example',
       IPAddress:'91.219.236.54',
       RiskLevel:'High',
       ResultType:'0',
@@ -2852,7 +2721,7 @@ const DATA_LAKE_KQL_JOB = {
   results:[
     { TimeGenerated:'2026-06-12T00:00:00Z', DnsQuery:'sync-a.bad-demo.example', QueryCount:341, UniqueHosts:2, Verdict:'Beaconing candidate' },
     { TimeGenerated:'2026-06-13T00:00:00Z', DnsQuery:'sync-a.bad-demo.example', QueryCount:328, UniqueHosts:2, Verdict:'Beaconing candidate' },
-    { TimeGenerated:'2026-06-21T00:00:00Z', DnsQuery:'cdn-metrics.hacksmarterlabs.example', QueryCount:411, UniqueHosts:1, Verdict:'Benign updater allowlist review' },
+    { TimeGenerated:'2026-06-21T00:00:00Z', DnsQuery:'cdn-metrics.hacksmartersoc.example', QueryCount:411, UniqueHosts:1, Verdict:'Benign updater allowlist review' },
   ],
 };
 
@@ -3000,9 +2869,9 @@ const SENTINEL_ANOMALY_RULES = [
 ];
 
 const SENTINEL_ANOMALY_HUNTING_ROWS = [
-  { TimeGenerated:'2026-07-06T07:42:00Z', AnomalyRule:'Anomalous sign-in location by user', Entity:'sam.lee@hacksmarterlabs.example', Score:'0.91', RelatedTable:'SigninLogs', Action:'Open identity investigation' },
+  { TimeGenerated:'2026-07-06T07:42:00Z', AnomalyRule:'Anomalous sign-in location by user', Entity:'sam.lee@hacksmartersoc.example', Score:'0.91', RelatedTable:'SigninLogs', Action:'Open identity investigation' },
   { TimeGenerated:'2026-07-06T08:05:00Z', AnomalyRule:'Rare process on endpoint peer group', Entity:'FIN-FS-02', Score:'0.84', RelatedTable:'DeviceProcessEvents', Action:'Correlate with ransomware incident' },
-  { TimeGenerated:'2026-07-06T08:23:00Z', AnomalyRule:'Impossible travel with OAuth grant', Entity:'jane.doe@hacksmarterlabs.example', Score:'0.96', RelatedTable:'CloudAppEvents', Action:'Create high severity incident' },
+  { TimeGenerated:'2026-07-06T08:23:00Z', AnomalyRule:'Impossible travel with OAuth grant', Entity:'jane.doe@hacksmartersoc.example', Score:'0.96', RelatedTable:'CloudAppEvents', Action:'Create high severity incident' },
 ];
 
 // Curated subset of MITRE ATT&CK Enterprise v15 (tactic order matches attack.mitre.org).
@@ -3200,7 +3069,7 @@ const DEFENDER_CLOUD_RECS = [
     control:'Restrict unauthorized network access', resourceType:'Storage account', affected:4,
     description:'Public endpoints expand the routes an attacker can use to reach storage. Restrict connectivity to approved private or virtual-network paths.',
     remediation:['Confirm each application has a private or approved network path.','Disable public network access on the affected storage accounts.','Test application access and review storage diagnostic logs after the change.'],
-    assets:['sthacksmarterlabslogs','stprodcustomer','stfinancearchive','stbuildartifacts'], initiatives:['Cloud security benchmark','PCI DSS 4.0'],
+    assets:['sthacksmartersoclogs','stprodcustomer','stfinancearchive','stbuildartifacts'], initiatives:['Cloud security benchmark','PCI DSS 4.0'],
     riskFactors:['Internet exposure','Sensitive data'], attackPath:'An internet-facing workload can pivot to publicly reachable storage and expose application data.' },
   { id:'R-003', severity:'high', title:'Management ports of virtual machines should be closed',
     control:'Manage access and permissions', resourceType:'Virtual machine', affected:7,
@@ -3252,10 +3121,10 @@ const CLOUD_ASSETS = [
     resourceId:'/subscriptions/sub-prod-001/resourceGroups/rg-prod-aks/providers/Cloud.ContainerService/managedClusters/aks-prod',
     risk:'High', exposure:'Privileged container path', alerts:3, recs:4,
     alertResources:['aks-prod / pod-api-77','aks-prod/node-3','acrprod.azurecr.io/api'] },
-  { id:'azure-sthacksmarterlabslogs', name:'sthacksmarterlabslogs', type:'Storage account', subscription:'sub-prod-001', region:'westeurope',
-    resourceId:'/subscriptions/sub-prod-001/resourceGroups/rg-prod-data/providers/Cloud.Storage/storageAccounts/sthacksmarterlabslogs',
+  { id:'azure-sthacksmartersoclogs', name:'sthacksmartersoclogs', type:'Storage account', subscription:'sub-prod-001', region:'westeurope',
+    resourceId:'/subscriptions/sub-prod-001/resourceGroups/rg-prod-data/providers/Cloud.Storage/storageAccounts/sthacksmartersoclogs',
     risk:'Medium', exposure:'Public network access', alerts:1, recs:2,
-    alertResources:['sthacksmarterlabslogs'] },
+    alertResources:['sthacksmartersoclogs'] },
   { id:'azure-sql-prod-reporting', name:'sql-prod-reporting', type:'SQL server', subscription:'sub-prod-001', region:'northeurope',
     resourceId:'/subscriptions/sub-prod-001/resourceGroups/rg-prod-data/providers/Cloud.Sql/servers/sql-prod-reporting',
     risk:'Medium', exposure:'Wide firewall rule', alerts:1, recs:2,
@@ -3274,268 +3143,6 @@ const COMPLIANCE_FRAMEWORKS = [
   { name:'CIS Azure Foundations Benchmark 2.0',percent:69, passing:118, failing:53 },
 ];
 
-// Data loss prevention model.
-//
-// Policy state and per-rule configured action are separate fields on purpose:
-// the action a rule ENFORCES at runtime is a function of both, and that
-// function is the single most-missed idea in DLP deployment. A rule configured
-// to Block only actually blocks when its policy is enforcing — in simulation
-// the same rule audits, and in simulation-with-tips it degrades to
-// block-with-override. dlpAppliedAction() below is the whole truth table, and
-// the policies tab renders configured-vs-applied side by side so the learner
-// sees the gap rather than being told about it.
-//
-// Action restrictiveness, least to most: allow < audit < block-override < block.
-const DLP_ACTIONS = {
-  'allow':          { label:'Allow',              rank:0, note:'Activity proceeds. Audit data only, no notification.' },
-  'audit':          { label:'Audit only',         rank:1, note:'Activity proceeds. Audited, and may notify or alert.' },
-  'block-override': { label:'Block with override',rank:2, note:'Blocked by default; the user may override with a justification.' },
-  'block':          { label:'Block',              rank:3, note:'Blocked unconditionally.' },
-};
-
-const DLP_POLICY_STATES = {
-  'off':             { label:'Off',                      note:'Inactive. Use while drafting or reviewing a policy.' },
-  'simulation':      { label:'Simulation',               note:'Runs as if enforcing, enforces nothing. Matches land in the simulation view, not in production results.' },
-  'simulation-tips': { label:'Simulation + policy tips', note:'No enforcement, but users see tips and notifications — trains users ahead of enforcement.' },
-  'on':              { label:'On',                       note:'Full enforcement. Configured actions apply.' },
-};
-
-// The runtime truth table. A configured action plus a policy state yields the
-// action actually applied.
-function dlpAppliedAction(configured, state) {
-  if (state === 'off') return null;
-  if (state === 'on') return configured;
-  if (configured === 'allow') return 'allow';
-  if (state === 'simulation-tips') {
-    // Tips give the user something to act on, so a block degrades to a block
-    // the user can override rather than to a silent audit.
-    return (configured === 'block' || configured === 'block-override') ? 'block-override' : 'audit';
-  }
-  return 'audit'; // plain simulation audits everything it would have acted on
-}
-
-const DLP_POLICIES = [
-  { id:'DLP-001', name:'U.S. Financial Data', priority:1, state:'on',
-    scope:'Mail, Document Sites, Personal Drives, Chat', enabled:true,
-    rules:[
-      { name:'Block sharing externally', configuredAction:'block',
-        conditions:['Content contains: Credit card number (count \u2265 1, confidence \u2265 85%)','OR Content contains: U.S. bank account number'],
-        actions:['Block access for external users','Notify user with policy tip','Generate incident report (high severity)'] },
-    ] },
-  { id:'DLP-002', name:'PII protection (U.S.)', priority:2, state:'on',
-    scope:'Mail, Document Sites, Personal Drives, Chat, Endpoint', enabled:true,
-    rules:[
-      { name:'Warn on egress', configuredAction:'block-override',
-        conditions:['Content contains: U.S. Social Security Number (count \u2265 1, confidence \u2265 85%)'],
-        actions:['User override allowed with business justification','Notify compliance officer'] },
-    ] },
-  { id:'DLP-003', name:'Source code protection', priority:3, state:'simulation',
-    scope:'Endpoint DLP', enabled:false,
-    rules:[
-      { name:'Block upload to non-corporate cloud', configuredAction:'block',
-        conditions:['File extension is one of: .cs, .ts, .py, .go','AND Sensitive label = Confidential\\Engineering'],
-        actions:['Block upload to non-allowed cloud services','Audit copy to USB'] },
-    ] },
-  { id:'DLP-004', name:'Health records (HIPAA)', priority:4, state:'simulation-tips',
-    scope:'Mail, Document Sites, Personal Drives', enabled:false,
-    rules:[
-      { name:'Restrict PHI egress', configuredAction:'block',
-        conditions:['Content contains: U.S. Health Insurance Number (count \u2265 1)','OR Content contains: Medical terms dictionary (count \u2265 5)'],
-        actions:['Block external sharing','Notify user with policy tip','Notify privacy office'] },
-    ] },
-];
-
-// Alerts, not "incidents" — an alert is one policy match; the XDR side groups
-// correlated alerts into incidents. Keeping the distinction is the point.
-const DLP_INCIDENTS = [
-  { id:'DLP-1007', severity:'high', status:'Needs review', policy:'U.S. Financial Data',
-    user:'jdoe@hacksmarterlabs.example', location:'Personal Drives', item:'customer-list.xlsx',
-    activity:'External share blocked', sensitiveInfo:['Credit card number','U.S. bank account number'],
-    time:'2026-06-28T15:00:11Z', owner:'', verdict:'', insiderRisk:'Medium',
-    matchCount:14, appliedAction:'block',
-    what:'A workbook holding 14 payment-card values and 3 bank account numbers was shared to an address outside the organization. The highest-priority enforcing policy blocked the share.',
-    who:'jdoe is a Finance analyst with no prior policy matches in the last 90 days.',
-    timeline:['Sensitive info detected in workbook','External sharing attempt blocked','User shown policy tip','Incident report generated'],
-    events:[
-      { time:'2026-06-28T14:58:02Z', activity:'File accessed',   item:'customer-list.xlsx', detail:'Opened from Personal Drives', verdict:'' },
-      { time:'2026-06-28T15:00:11Z', activity:'Share attempted', item:'customer-list.xlsx', detail:'Link created for supplier-portal.example (external)', verdict:'' },
-      { time:'2026-06-28T15:00:11Z', activity:'Action enforced', item:'customer-list.xlsx', detail:'Block applied; policy tip shown to user', verdict:'' },
-    ],
-    actions:['Keep block','Notify manager','Allow override with business justification','Escalate to eDiscovery'] },
-  { id:'DLP-1012', severity:'medium', status:'User override requested', policy:'PII protection (U.S.)',
-    user:'maria.ross@hacksmarterlabs.example', location:'Document Sites', item:'employee-roster.csv',
-    activity:'Download warning acknowledged', sensitiveInfo:['U.S. Social Security Number'],
-    time:'2026-06-28T12:38:00Z', owner:'', verdict:'', insiderRisk:'Low',
-    matchCount:212, appliedAction:'block-override',
-    what:'A roster containing 212 national identity numbers was downloaded after the user supplied a business justification to override the block.',
-    who:'maria.ross is an HR generalist. Roster exports are an expected part of the role, which is what makes the override plausible.',
-    timeline:['PII detected','Policy tip displayed','User entered business justification','Reviewer approval pending'],
-    events:[
-      { time:'2026-06-28T12:36:41Z', activity:'File accessed',   item:'employee-roster.csv', detail:'Opened from the HR document site', verdict:'' },
-      { time:'2026-06-28T12:38:00Z', activity:'Download blocked',item:'employee-roster.csv', detail:'Block with override presented', verdict:'' },
-      { time:'2026-06-28T12:38:52Z', activity:'Override used',   item:'employee-roster.csv', detail:'Justification: "Quarterly benefits reconciliation, approved by O. Brooks"', verdict:'' },
-    ],
-    actions:['Approve override','Reject override','Request more context'] },
-  { id:'DLP-1019', severity:'high', status:'Needs review', policy:'Source code protection',
-    user:'apatel@hacksmarterlabs.example', location:'Endpoint', item:'ingest_pipeline.py',
-    activity:'Upload to personal cloud storage', sensitiveInfo:['Source code','Label: Confidential\\Engineering'],
-    time:'2026-06-29T02:14:30Z', owner:'', verdict:'', insiderRisk:'High',
-    matchCount:1, appliedAction:'audit',
-    what:'A labeled source file was uploaded to a consumer file-sharing site from a managed endpoint at 02:14 local time. The matching policy is in simulation, so nothing was blocked \u2014 the upload succeeded and only an audit record exists.',
-    who:'apatel is an Inventory Planner. Source code egress is well outside the role, and the hour is unusual for this user.',
-    timeline:['Labeled file read from endpoint','Upload to consumer storage observed','Policy in simulation \u2014 audit only, no block','Alert raised for review'],
-    events:[
-      { time:'2026-06-29T02:12:07Z', activity:'File read',       item:'ingest_pipeline.py', detail:'Read from C:\\repos\\ingest\\', verdict:'' },
-      { time:'2026-06-29T02:14:30Z', activity:'Upload observed', item:'ingest_pipeline.py', detail:'POST to consumer-drive.example (not an allowed destination)', verdict:'' },
-      { time:'2026-06-29T02:15:11Z', activity:'Audit recorded',  item:'ingest_pipeline.py', detail:'Simulation mode \u2014 configured Block applied as Audit', verdict:'' },
-    ],
-    actions:['Escalate to insider risk','Move policy to enforce','Contact the user\u2019s manager','Preserve endpoint evidence'] },
-];
-
-const INSIDER_RISK_POLICIES = [
-  { name:'Data leaks by departing users', status:'Active', alerts:3,
-    triggers:['HR connector: termination date within 30 days','Anomalous download volume from SharePoint'] },
-  { name:'General data leaks',           status:'Active', alerts:7,
-    triggers:['Downgrade of sensitivity label','Print of labeled documents'] },
-  { name:'Risky browser usage',          status:'Test mode', alerts:0,
-    triggers:['Egress to consumer file-sharing domains'] },
-];
-
-const INSIDER_RISK_CASES = [
-  { id:'IR-2044', priority:'High', status:'Active', user:'olivia.martin@hacksmarterlabs.example',
-    policy:'Data leaks by departing users', riskScore:86, trigger:'HR termination date within 30 days',
-    summary:'Departing user downloaded 1,284 SharePoint files and copied labeled finance data to USB.',
-    evidence:['Large SharePoint download volume','USB copy of Confidential\\Engineering file','Sensitivity label downgrade','Upload attempt to personal cloud storage'],
-    nextSteps:['Review activity explorer evidence','Interview manager','Create eDiscovery case','Preserve mailbox and OneDrive content'] },
-  { id:'IR-2051', priority:'Medium', status:'Needs triage', user:'jdoe@hacksmarterlabs.example',
-    policy:'General data leaks', riskScore:61, trigger:'Repeated external sharing attempts',
-    summary:'User attempted to share financial data externally after DLP block.',
-    evidence:['DLP incident DLP-1007','Multiple external share attempts','Audit event FileDownloaded'],
-    nextSteps:['Validate business need','Keep DLP block','Monitor for recurrence'] },
-];
-
-const COMMUNICATION_REVIEWS = [
-  { id:'CC-3301', policy:'Regulated financial communications', severity:'medium',
-    user:'trader1@hacksmarterlabs.example', channel:'Teams', status:'Pending reviewer',
-    detected:'Potential promise of guaranteed return', message:'The client will get a guaranteed return if they sign today.' },
-  { id:'CC-3308', policy:'Code of conduct', severity:'low',
-    user:'sales.rep@hacksmarterlabs.example', channel:'Exchange', status:'Resolved',
-    detected:'Potential harassment keyword', message:'Message held for context review and resolved as false positive.' },
-];
-
-const EDISCOVERY_CASES = [
-  { id:'ED-9004', name:'Departing user data leak review', status:'Active',
-    custodians:['olivia.martin@hacksmarterlabs.example'], sources:['Exchange mailbox','OneDrive','Teams chats'],
-    holds:['Mailbox hold','OneDrive hold'], searches:['SharePoint finance downloads','USB copy events'],
-    linkedCase:'IR-2044' },
-  { id:'ED-9011', name:'OAuth consent abuse legal hold', status:'Draft',
-    custodians:['jane.doe@hacksmarterlabs.example'], sources:['Exchange mailbox','Audit logs'],
-    holds:['Mailbox hold pending'], searches:['DocViewer Pro consent and mail access'],
-    linkedCase:'INC-1042' },
-];
-
-const EDISCOVERY_CONTENT_SEARCH = {
-  caseId:'ED-9011',
-  name:'DocViewer Pro consent and mail access',
-  query:'("DocViewer Pro" OR "secure-document-portal") AND received>=2026-06-28',
-  locations:['Jane Doe mailbox','Jane Doe OneDrive','Teams chats for Finance Ops'],
-  conditions:['Date range: Jun 28, 2026 08:00-12:00 UTC','Sender or content contains secure-document-portal','Attachment names include invoice or overdue'],
-  preview:[
-    { location:'Exchange mailbox', item:'Action required: invoice overdue', custodian:'jane.doe@hacksmarterlabs.example',
-      date:'2026-06-28T08:09:00Z', kind:'Email', match:'secure-document-portal[.]xyz link in message body' },
-    { location:'Exchange mailbox', item:'DocViewer Pro permissions granted', custodian:'jane.doe@hacksmarterlabs.example',
-      date:'2026-06-28T08:24:00Z', kind:'Notification', match:'OAuth app consent notification' },
-    { location:'OneDrive', item:'Invoice-June-Overdue.url', custodian:'jane.doe@hacksmarterlabs.example',
-      date:'2026-06-28T08:27:00Z', kind:'Shortcut', match:'Downloaded URL shortcut from phishing workflow' },
-  ],
-  export:['Export report only for triage notes','Export indexed items with deduplicated copies','Preserve export key in case notes; do not place real secrets in lab files'],
-  interpretation:'Use Content search when the analyst needs mailbox, OneDrive, or Teams evidence for an investigation. Use Purview Audit for activity metadata and Graph activity logs for API calls.'
-};
-
-const GRAPH_ACTIVITY_GUIDANCE = [
-  { title:'Where it lives',
-    detail:'Graph activity logs are collected through diagnostic settings, then queried from the configured Log Analytics workspace or routed into Sentinel.' },
-  { title:'What it answers',
-    detail:'Use the logs to see which app, user, operation, request URI, IP address, and result were observed after an OAuth consent or compromised-token event.' },
-  { title:'How to enable in the lab story',
-    detail:'Create a diagnostic setting for Graph activity logs, send it to the SOC workspace, then hunt the GraphActivityLogs fixture table below.' },
-];
-
-const RECORD_LABELS = [
-  { name:'Finance records - 7 years', type:'Retention label', status:'Published',
-    disposition:'Disposition review required', locations:'SharePoint finance sites' },
-  { name:'Legal hold material', type:'Record label', status:'Published',
-    disposition:'Do not delete while active case exists', locations:'Exchange, OneDrive' },
-  { name:'Security logs - 1 year', type:'Retention policy', status:'Published',
-    disposition:'Auto-delete after retention period', locations:'Audit and security log exports' },
-];
-
-const LIFECYCLE_POLICIES = [
-  { name:'Inactive Teams cleanup', status:'Simulation', scope:'Teams',
-    rule:'No owner activity for 180 days', action:'Notify owner, then archive' },
-  { name:'OneDrive stale content review', status:'Active', scope:'OneDrive',
-    rule:'No access for 365 days and unlabeled', action:'Move to review workflow' },
-  { name:'Audit export lifecycle', status:'Active', scope:'Storage account',
-    rule:'Security export older than 365 days', action:'Delete after approval' },
-];
-
-const PURVIEW_SOLUTIONS = [
-  { area:'Core', name:'Classic governance portal', route:'#/governance/classic-governance',
-    detail:'Launch the support-mode classic governance experience for catalog, data health insights, and workflow labs.' },
-  { area:'Data Security', name:'Data Loss Prevention', route:'#/governance/dlp',
-    detail:'Protect sensitive content across Exchange, SharePoint, OneDrive, Teams, and endpoints.' },
-  { area:'Data Security', name:'Information Protection', route:'#/governance/information-protection',
-    detail:'Create sensitivity labels, label policies, and automatic classification behavior.' },
-  { area:'Risk & Compliance', name:'Insider Risk Management', route:'#/governance/insider-risk',
-    detail:'Detect risky user activity and manage investigation cases.' },
-  { area:'Risk & Compliance', name:'Communication Compliance', route:'#/governance/communication-compliance',
-    detail:'Review policy matches in Teams, Exchange, and other communication channels.' },
-  { area:'Risk & Compliance', name:'eDiscovery', route:'#/governance/ediscovery',
-    detail:'Create cases, manage custodians, preserve content, and run searches.' },
-  { area:'Data Governance', name:'Records Management', route:'#/governance/records',
-    detail:'Publish retention and record labels and review disposition workflows.' },
-  { area:'Data Governance', name:'Data Lifecycle Management', route:'#/governance/lifecycle',
-    detail:'Manage aging content, inactive locations, and retention-driven cleanup.' },
-  { area:'Core', name:'Audit', route:'#/governance/audit',
-    detail:'Search 365 audit events by operation, user, workload, and IP address.' },
-];
-
-const CLASSIC_PURVIEW_FEATURES = [
-  { name:'Data Catalog (classic)', route:'#/governance/classic-governance',
-    detail:'Search and browse registered data assets, recent assets, owned assets, and glossary-linked metadata.' },
-  { name:'Data Health Insights (classic)', route:'#/governance/classic-governance',
-    detail:'Review catalog analytics such as sources, assets, glossary terms, ownership, and curation health.' },
-  { name:'Purview Workflow (classic)', route:'#/governance/classic-governance',
-    detail:'Model approval workflows for glossary changes, access requests, and governance review tasks.' },
-];
-
-const PURVIEW_CONNECTED_SOURCES = [
-  { name:'365', status:'Connected', assets:186, icon:'M365' },
-  { name:'Azure', status:'Connected', assets:94, icon:'AZ' },
-  { name:'Amazon Web Services', status:'Ready to connect', assets:0, icon:'AWS' },
-  { name:'Snowflake', status:'Ready to connect', assets:0, icon:'SN' },
-  { name:'Other apps', status:'Ready to connect', assets:0, icon:'APP' },
-];
-
-const SENSITIVITY_LABELS = [
-  { name:'Public', color:'#107c10', protection:'None' },
-  { name:'General', color:'#0078d4', protection:'Header/Footer marking' },
-  { name:'Confidential\\Engineering', color:'#ff8c00', protection:'Encryption (E3 keyset), watermark' },
-  { name:'Highly confidential\\Legal', color:'#a4262c', protection:'Encryption, do-not-forward, expiration' },
-];
-
-const LABEL_POLICIES = [
-  { name:'Default user labeling policy', status:'Published', users:'All users',
-    labels:['Public','General','Confidential\\Engineering'], settings:['Require justification to lower classification','Recommend label when credit-card data is found'] },
-  { name:'Legal restricted documents', status:'Published', users:'Legal department',
-    labels:['Highly confidential\\Legal'], settings:['Apply encryption','Do not forward','Expire access after 30 days'] },
-];
-
-const LABEL_ACTIVITY = [
-  { time:'2026-06-28T13:12:00Z', user:'maria.ross@hacksmarterlabs.example', file:'Q4-forecast.xlsx', label:'Confidential\\Engineering', action:'Applied automatically' },
-  { time:'2026-06-28T12:43:00Z', user:'legal.ops@hacksmarterlabs.example', file:'Litigation-hold.docx', label:'Highly confidential\\Legal', action:'Applied manually' },
-  { time:'2026-06-28T11:58:00Z', user:'jdoe@hacksmarterlabs.example', file:'customer-list.xlsx', label:'General', action:'Downgraded with justification' },
-];
 
 const GUIDED_SCENARIOS = [
   {
@@ -3595,20 +3202,6 @@ const GUIDED_SCENARIOS = [
     ],
   },
   {
-    id:'audit-search',
-    name:'Search the audit log',
-    archetype:'M365 audit investigation',
-    summary:'Use Purview audit events to validate who performed a sensitive operation.',
-    steps:[
-      { route:'#/governance/audit', target:'.card.card-body',
-        title:'Set audit criteria',
-        body:'Audit search narrows activity by operation, user, workload, and time window during an investigation.' },
-      { route:'#/governance/audit', target:'.grid tbody tr:nth-child(2)',
-        title:'Review privileged activity',
-      body:'The result set includes role assignment, file access, consent grant, and identity replication events for cross-checking incident evidence.' },
-    ],
-  },
-  {
     id:'copilot-handoff',
     name:'Copilot handoff',
     archetype:'Embedded to standalone',
@@ -3633,7 +3226,7 @@ const COPILOT_PROMPTS = [
     answer:'Start with DeviceProcessEvents, filter FolderPath for C:\\Users\\Public, remove known installers, then project Timestamp, DeviceName, FileName, SHA256, and AccountName for triage.',
     sessionId:'cs-005' },
   { title:'Expand Jane Doe entities',
-    answer:'Pivot from jane.doe@hacksmarterlabs.example to the phishing URL, OAuth app DocViewer Pro, sign-in IP 76.21.55.4, and recent CloudAppEvents consent activity.',
+    answer:'Pivot from jane.doe@hacksmartersoc.example to the phishing URL, OAuth app DocViewer Pro, sign-in IP 76.21.55.4, and recent CloudAppEvents consent activity.',
     sessionId:'cs-003' },
   { title:'Map this to MITRE',
     answer:'Scanner tuning maps to Discovery. DCSync maps to Credential Access and Persistence. OAuth abuse maps to Initial Access and Persistence. Ransomware posture work maps to Impact prevention.',
@@ -3665,33 +3258,22 @@ const FIELDS = [
 // learner-facing and carry no vendor product names — the same rule the
 // terminology layer applies to visible copy.
 const PORTALS = [
-  { id:'xdr',        name:'XDR Security',      tag:'XDR · alerts, incidents, hunting',                       color:'#0078d4', initial:'XDR' },
-  { id:'siem',       name:'SIEM & SOAR',       tag:'SIEM · analytics rules, hunting, automation',            color:'#0064bf', initial:'SIEM' },
-  { id:'cloud',      name:'Cloud Console',     tag:'CSPM/CWPP · recommendations, compliance',                color:'#5c2d91', initial:'CC' },
-  { id:'governance', name:'Data Governance',   tag:'Data security · DLP, insider risk, audit',               color:'#038387', initial:'DG' },
-  { id:'ai-agent',   name:'AI Security Agent', tag:'Standalone · sessions, promptbooks, plugins, knowledge', color:'#7a7574', initial:'AI' },
-  { id:'identity',   name:'Identity & Access', tag:'Identity · Conditional Access, Identity Protection',     color:'#0b5cab', initial:'IAM' },
-  { id:'workspace',  name:'Workspace Admin',   tag:'Tenant admin · users, licenses, health, reports',        color:'#7719aa', initial:'WA' },
+  { id:'xdr',        name:'XDR Security',      tag:'XDR · alerts, incidents, hunting',                       color:'#4ed1a1', initial:'XDR' },
+  { id:'siem',       name:'SIEM & SOAR',       tag:'SIEM · analytics rules, hunting, automation',            color:'#5aa4ff', initial:'SIEM' },
+  { id:'cloud',      name:'Cloud Console',     tag:'CSPM/CWPP · recommendations, compliance',                color:'#8b7cf6', initial:'CC' },
+  { id:'ai-agent',   name:'AI Security Agent', tag:'Standalone · sessions, plugins, knowledge',              color:'#7a7574', initial:'AI' },
+  { id:'identity',   name:'Identity & Access', tag:'Identity · Access policy, Identity risk',                color:'#6f8cff', initial:'IAM' },
+  { id:'workspace',  name:'Tenant operations',   tag:'Tenant admin · users, licenses, health, reports',        color:'#d16bd1', initial:'WA' },
 ];
 
 // Neutral simulator app launcher. Shown in the outer pane across all workloads;
 // the current app gets highlighted by the renderer.
 const CLOUD_NAV = [
-  { label:'AI Foundry',           icon:'🧠' },
   { label:'Cloud Console',        icon:'🔷' },
-  { label:'AI Agent Studio',      icon:'🤖' },
-  { label:'Data Explorer',       icon:'📊' },
   { label:'XDR Security',         icon:'🛡' },
-  { label:'DevOps',              icon:'🛠' },
   { label:'Identity & Access',    icon:'🆔' },
-  { label:'Data Fabric',          icon:'🧵' },
-  { label:'Code Repository',      icon:'🗃' },
-  { label:'Endpoint Management',  icon:'📱' },
-  { label:'Workspace Admin',      icon:'🏢' },
-  { label:'Workflow Automation',  icon:'🔁' },
-  { label:'Low-Code Platform',    icon:'⚡' },
+  { label:'Tenant operations',      icon:'🏢' },
   { label:'Data Governance',      icon:'📚' },
-  { label:'Code Studio',          icon:'🧩' },
   { label:'SIEM & SOAR',          icon:'🛰' },
 ];
 
@@ -3700,12 +3282,12 @@ const NAV = {
     { route:'#/xdr/home',                  label:'Home',                    icon:'🏠' },
     { section:'Exposure management' },
     { route:'#/xdr/exposure',              label:'Overview',                icon:'🎯' },
-    { route:'#/xdr/secure-score',          label:'Secure score',            icon:'🛡' },
+    { route:'#/xdr/secure-score',          label:'Exposure score',          icon:'🛡' },
     { route:'#/xdr/vulnerabilities',       label:'Vulnerability management', icon:'🩹' },
     { section:'Investigation & response' },
     { subsection:'Incidents & alerts' },
-    { route:'#/xdr/incidents',             label:'Incidents',               icon:'⛓' },
-    { route:'#/xdr/alerts',                label:'Alerts',                  icon:'⚠' },
+    { route:'#/xdr/incidents',             label:'Case queue',              icon:'⛓' },
+    { route:'#/xdr/alerts',                label:'Signals',                 icon:'⚠' },
     { route:'#/xdr/cases',                 label:'Cases',                   icon:'📁' },
     { route:'#/xdr/alert-tuning',          label:'Alert tuning',            icon:'🎚' },
     { subsection:'Hunting' },
@@ -3713,7 +3295,7 @@ const NAV = {
     { route:'#/xdr/custom-detections',     label:'Custom detection rules',  icon:'🧠' },
     { route:'#/xdr/hunting-graph',         label:'Hunting graph (Preview)', icon:'🕸' },
     { subsection:'Actions & submissions' },
-    { route:'#/xdr/action-center',         label:'Action center',           icon:'🧰' },
+    { route:'#/xdr/action-center',         label:'Response queue',          icon:'🧰' },
     { route:'#/xdr/air',                   label:'AIR center',              icon:'🤖' },
     { section:'Threat intelligence' },
     { route:'#/xdr/threat-analytics',      label:'Threat analytics',        icon:'📊' },
@@ -3722,13 +3304,13 @@ const NAV = {
     { section:'Assets' },
     { route:'#/xdr/devices',               label:'Devices',                 icon:'💻' },
     { route:'#/xdr/identities',            label:'Identities',              icon:'🆔' },
-    { route:'#/xdr/identity-protection',   label:'Identity protection',     icon:'🔐' },
+    { route:'#/xdr/identity-protection',   label:'Identity risk',           icon:'🔐' },
     { section:'Endpoints' },
     { route:'#/xdr/endpoints',             label:'Endpoint security ops',   icon:'💻' },
     { route:'#/xdr/asr-policy',            label:'ASR policies',            icon:'🚧' },
     { section:'Email & collaboration' },
     { route:'#/xdr/email-collab',          label:'Email & collaboration',   icon:'✉' },
-    { route:'#/xdr/threat-explorer',       label:'Threat explorer',         icon:'📧' },
+    { route:'#/xdr/threat-explorer',       label:'Mail investigation',      icon:'📧' },
     { section:'Cloud apps' },
     { route:'#/xdr/cloud-apps',            label:'Cloud apps',              icon:'☁' },
     { section:'SIEM & SOAR' },
@@ -3737,42 +3319,31 @@ const NAV = {
     { route:'#/siem/graph',                 label:'Sentinel Graph',          icon:'🕸' },
     { subsection:'Threat management' },
     { route:'#/siem/workbooks',             label:'Workbooks',               icon:'📓' },
-    { route:'#/siem/hunting',               label:'Hunting',                 icon:'🔎' },
+    { route:'#/siem/hunting',               label:'Search & explore',        icon:'🔎' },
     { route:'#/siem/notebooks',             label:'Notebooks',               icon:'📔' },
     { route:'#/siem/mitre',                 label:'MITRE ATT&CK',            icon:'🧭' },
     { subsection:'Content management' },
     { route:'#/siem/content-hub',           label:'Content hub',             icon:'🧱' },
     { route:'#/siem/repositories',          label:'Repositories',            icon:'📚' },
-    { route:'#/siem/community',             label:'Community',               icon:'💬' },
     { subsection:'Configuration' },
     { route:'#/siem/data-connectors',       label:'Data connectors',         icon:'🔌' },
     { route:'#/siem/analytics',             label:'Analytics',               icon:'🧠' },
     { route:'#/siem/watchlist',             label:'Watchlists',              icon:'👁' },
     { route:'#/siem/automation',            label:'Automation',              icon:'⚙' },
-    { section:'Other' },
-    { route:'#/xdr/reports',               label:'Reports',                 icon:'📑' },
-    { route:'#/xdr/learning-hub',          label:'Learning hub',            icon:'🎓' },
-    { route:'#/xdr/trials',                label:'Trials',                  icon:'🧪' },
     { section:'System' },
-    { route:'#/xdr/settings',              label:'Settings',                icon:'⚙' },
-    { route:'#/siem/settings',              label:'SIEM & SOAR',             icon:'🛰' },
-    { route:'#/xdr/device-discovery',      label:'Device discovery',        icon:'📡' },
     { route:'#/xdr/suppression',           label:'Suppression rules',       icon:'🔕' },
-    { route:'#/xdr/notifications',         label:'Email notifications',     icon:'📨' },
-    { route:'#/xdr/mto',                   label:'Multi-tenant management', icon:'👥' },
     // === local-tasks nav:defender ===
   ],
   siem: [
     { section:'General' },
     { route:'#/siem/home',                  label:'Overview (Preview)',      icon:'🏠' },
     { route:'#/siem/logs',                  label:'Logs',                    icon:'📜' },
-    { route:'#/siem/news',                  label:'News & guides',           icon:'📰' },
     { route:'#/siem/search',                label:'Search',                  icon:'🔎' },
     { section:'Threat management' },
-    { route:'#/siem/incidents',             label:'Incidents',               icon:'⛓' },
+    { route:'#/siem/incidents',             label:'Case queue',              icon:'⛓' },
     { route:'#/siem/graph',                 label:'Sentinel Graph',          icon:'🕸' },
     { route:'#/siem/workbooks',             label:'Workbooks',               icon:'📓' },
-    { route:'#/siem/hunting',               label:'Hunting',                 icon:'🔎' },
+    { route:'#/siem/hunting',               label:'Search & explore',        icon:'🔎' },
     { route:'#/siem/hunting/dns',           label:'ASIM DNS (Preview)',      icon:'🌐' },
     { route:'#/siem/hunting/authentication', label:'ASIM Authentication (Preview)', icon:'🔐' },
     { route:'#/siem/hunting/network-session', label:'ASIM Network Session (Preview)', icon:'🛰' },
@@ -3787,72 +3358,42 @@ const NAV = {
     { section:'Content management' },
     { route:'#/siem/content-hub',           label:'Content hub',             icon:'🧱' },
     { route:'#/siem/repositories',          label:'Repositories (Preview)',  icon:'📚' },
-    { route:'#/siem/community',             label:'Community',               icon:'💬' },
     { section:'Configuration' },
-    { route:'#/siem/workspace-manager',     label:'Workspace manager (Preview)', icon:'🧰' },
     { route:'#/siem/data-connectors',       label:'Data connectors',         icon:'🔌' },
     { route:'#/siem/analytics',             label:'Analytics',               icon:'🧠' },
     { route:'#/siem/watchlist',             label:'Watchlist',               icon:'👁' },
     { route:'#/siem/automation',            label:'Automation',              icon:'⚙' },
-    { route:'#/siem/settings',              label:'Settings',                icon:'⚙' },
     // === local-tasks nav:sentinel ===
   ],
   'cloud': [
     { section:'General' },
     { route:'#/cloud/overview',         label:'Overview',                   icon:'🏠' },
-    { route:'#/cloud/setup',            label:'Setup',                      icon:'🧩' },
     { route:'#/cloud/recommendations',  label:'Recommendations',            icon:'✅' },
     { route:'#/cloud/attack-paths',     label:'Attack path analysis',       icon:'🧭' },
     { route:'#/cloud/alerts',           label:'Security alerts',            icon:'⚠' },
     { route:'#/cloud/inventory',        label:'Inventory',                  icon:'📦' },
     { route:'#/cloud/explorer',         label:'Cloud Security Explorer',    icon:'🔎' },
     { route:'#/cloud/workbooks',        label:'Workbooks',                  icon:'📓' },
-    { route:'#/cloud/community',        label:'Community',                  icon:'💬' },
     { route:'#/cloud/diagnose',         label:'Diagnose and solve problems',icon:'🩺' },
     { section:'Cloud Security' },
     { route:'#/cloud/cloud-security',   label:'Cloud Security',             icon:'☁' },
-    { route:'#/cloud/regulatory',       label:'Regulatory compliance',      icon:'📜' },
     { section:'Management' },
-    { route:'#/cloud/environment',      label:'Environment settings',       icon:'⚙' },
     { route:'#/cloud/workflow',         label:'Workflow automation',        icon:'🔁' },
     // === local-tasks nav:defender-cloud ===
-  ],
-  governance: [
-    { section:'Purview' },
-    { route:'#/governance/home',                   label:'Home',                  icon:'🏠' },
-    { route:'#/governance/solutions',              label:'Solutions',             icon:'🧩' },
-    { route:'#/governance/classic-governance',     label:'Classic governance',    icon:'🏛' },
-    { section:'Data security' },
-    { route:'#/governance/dlp',                    label:'Data loss prevention',  icon:'🚫' },
-    { route:'#/governance/information-protection', label:'Information protection',icon:'🔖' },
-    { section:'Risk & compliance' },
-    { route:'#/governance/insider-risk',           label:'Insider risk',          icon:'🕵' },
-    { route:'#/governance/communication-compliance', label:'Communication compliance', icon:'💬' },
-    { route:'#/governance/ediscovery',             label:'eDiscovery',            icon:'🔍' },
-    { route:'#/governance/audit',                  label:'Audit',                 icon:'📜' },
-    { route:'#/governance/graph-activity',         label:'Graph activity logs',   icon:'🧾' },
-    { section:'Data governance' },
-    { route:'#/governance/records',                label:'Records management',    icon:'🗃' },
-    { route:'#/governance/lifecycle',              label:'Data lifecycle',        icon:'⏱' },
-    { section:'Portal' },
-    { route:'#/governance/settings',               label:'Settings',              icon:'⚙' },
-    // === local-tasks nav:purview ===
   ],
   'ai-agent': [
     { route:'#/ai-agent/home',                   label:'Home',                  icon:'🏠' },
     { route:'#/ai-agent/sessions',               label:'Sessions',              icon:'🗂' },
-    { route:'#/ai-agent/promptbooks',            label:'Promptbooks',           icon:'📚' },
     { route:'#/ai-agent/plugins',                label:'Plugins',               icon:'🧩' },
     { route:'#/ai-agent/knowledge',              label:'Knowledge',             icon:'🧠' },
-    { route:'#/ai-agent/settings',               label:'Settings',              icon:'⚙' },
     // === local-tasks nav:copilot ===
   ],
   identity: [
     { section:'Identity' },
     { route:'#/identity/overview',                 label:'Overview',              icon:'🏠' },
     { section:'Protection' },
-    { route:'#/identity/identity-protection',      label:'Identity Protection',  icon:'🛡' },
-    { route:'#/identity/conditional-access',       label:'Conditional Access',   icon:'🔐' },
+    { route:'#/identity/identity-protection',      label:'Identity risk',        icon:'🛡' },
+    { route:'#/identity/conditional-access',       label:'Access policy',        icon:'🔐' },
     // Sign-in logs belong to monitoring, not to the identity object list — the
     // real console puts them at Identity > Monitoring & health > Sign-in logs.
     // A student who learns the wrong path here has to unlearn it later.
@@ -3864,7 +3405,6 @@ const NAV = {
     { route:'#/workspace/home',                label:'Home',                  icon:'🏠' },
     { section:'Your organization' },
     { route:'#/workspace/users',               label:'Users',                 icon:'👥' },
-    { route:'#/workspace/licenses',            label:'Billing › Licenses',    icon:'🪪' },
     { section:'Reports' },
     { route:'#/workspace/usage',               label:'Usage',                 icon:'📊' },
     { section:'Health' },
@@ -3897,15 +3437,15 @@ const ENTRA_CA_GRANTS = [
 // prefixes, ANY-type recon, DNS tunneling).
 const IM_DNS = [
   // Baseline benign traffic from corporate clients.
-  { TimeGenerated:'2026-06-29T07:55:01Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T07:55:01Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.12', SrcHostname:'WKS-01', DstIpAddr:'10.0.0.10', DnsQuery:'github.com',
     DnsQueryTypeName:'A', DnsResponseName:'140.82.114.4' },
-  { TimeGenerated:'2026-06-29T07:55:14Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T07:55:14Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.31', SrcHostname:'WKS-12', DstIpAddr:'10.0.0.10', DnsQuery:'login.identity.example',
     DnsQueryTypeName:'A', DnsResponseName:'20.190.137.40' },
-  { TimeGenerated:'2026-06-29T07:56:02Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T07:56:02Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.31', SrcHostname:'WKS-12', DstIpAddr:'10.0.0.10', DnsQuery:'outlook.office365.com',
     DnsQueryTypeName:'A', DnsResponseName:'52.96.79.18' },
@@ -3913,47 +3453,47 @@ const IM_DNS = [
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.55', SrcHostname:'WKS-21', DstIpAddr:'10.0.0.10', DnsQuery:'raw.githubusercontent.com',
     DnsQueryTypeName:'A', DnsResponseName:'185.199.108.133' },
-  { TimeGenerated:'2026-06-29T07:58:30Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T07:58:30Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.12', SrcHostname:'WKS-01', DstIpAddr:'10.0.0.10', DnsQuery:'docs.security.example',
     DnsQueryTypeName:'A', DnsResponseName:'13.107.42.16' },
-  { TimeGenerated:'2026-06-29T08:00:00Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:00:00Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.41', SrcHostname:'WKS-17', DstIpAddr:'10.0.0.10', DnsQuery:'cdn.jsdelivr.net',
     DnsQueryTypeName:'A', DnsResponseName:'151.101.1.229' },
 
   // NXDOMAIN DGA burst from FIN-03 — tight time window, random labels.
-  { TimeGenerated:'2026-06-29T08:02:01Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:02:01Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.77', SrcHostname:'WKS-FIN-03', DstIpAddr:'10.0.0.10', DnsQuery:'xk93lv2-mzpq.top',
     DnsQueryTypeName:'A', DnsResponseName:'' },
-  { TimeGenerated:'2026-06-29T08:02:04Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:02:04Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.77', SrcHostname:'WKS-FIN-03', DstIpAddr:'10.0.0.10', DnsQuery:'jq8z7nx-rmav.top',
     DnsQueryTypeName:'A', DnsResponseName:'' },
-  { TimeGenerated:'2026-06-29T08:02:07Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:02:07Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.77', SrcHostname:'WKS-FIN-03', DstIpAddr:'10.0.0.10', DnsQuery:'lzpq3rk-x4mq.top',
     DnsQueryTypeName:'A', DnsResponseName:'' },
-  { TimeGenerated:'2026-06-29T08:02:09Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:02:09Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.77', SrcHostname:'WKS-FIN-03', DstIpAddr:'10.0.0.10', DnsQuery:'pq3rkmz-9xq2.top',
     DnsQueryTypeName:'A', DnsResponseName:'' },
-  { TimeGenerated:'2026-06-29T08:02:12Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:02:12Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.77', SrcHostname:'WKS-FIN-03', DstIpAddr:'10.0.0.10', DnsQuery:'rkmz9xq2-pq3l.top',
     DnsQueryTypeName:'A', DnsResponseName:'' },
-  { TimeGenerated:'2026-06-29T08:02:15Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:02:15Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.77', SrcHostname:'WKS-FIN-03', DstIpAddr:'10.0.0.10', DnsQuery:'mz9xq2pq-3lkv.top',
     DnsQueryTypeName:'A', DnsResponseName:'' },
 
   // TOR proxy lookups — clear policy violation indicator.
-  { TimeGenerated:'2026-06-29T08:05:20Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:05:20Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.88', SrcHostname:'WKS-DEV-04', DstIpAddr:'10.0.0.10', DnsQuery:'tor2web.org',
     DnsQueryTypeName:'A', DnsResponseName:'185.220.101.4' },
-  { TimeGenerated:'2026-06-29T08:05:25Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:05:25Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.88', SrcHostname:'WKS-DEV-04', DstIpAddr:'10.0.0.10', DnsQuery:'tor2web.com',
     DnsQueryTypeName:'A', DnsResponseName:'185.220.101.7' },
@@ -3967,11 +3507,11 @@ const IM_DNS = [
     DnsQueryTypeName:'A', DnsResponseName:'' },
 
   // Responses landing in suspicious IP prefixes — match by response_has_any_prefix.
-  { TimeGenerated:'2026-06-29T08:08:14Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:08:14Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.55', SrcHostname:'WKS-21', DstIpAddr:'10.0.0.10', DnsQuery:'updates.legit-looking.io',
     DnsQueryTypeName:'A', DnsResponseName:'45.95.168.241' },
-  { TimeGenerated:'2026-06-29T08:08:20Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:08:20Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
     SrcIpAddr:'10.0.4.31', SrcHostname:'WKS-12', DstIpAddr:'10.0.0.10', DnsQuery:'cdn.suspicious-host.ru',
     DnsQueryTypeName:'A', DnsResponseName:'185.220.102.8' },
@@ -3998,34 +3538,34 @@ const IM_DNS = [
     DnsQueryTypeName:'TXT', DnsResponseName:'"ack=003"' },
 
   // ANY-type recon — historically used for amplification reflection.
-  { TimeGenerated:'2026-06-29T08:13:01Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:13:01Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
-    SrcIpAddr:'198.51.100.22', SrcHostname:'(external)', DstIpAddr:'10.0.0.10', DnsQuery:'hacksmarterlabs.example',
+    SrcIpAddr:'198.51.100.22', SrcHostname:'(external)', DstIpAddr:'10.0.0.10', DnsQuery:'hacksmartersoc.example',
     DnsQueryTypeName:'ANY', DnsResponseName:'(multiple)' },
-  { TimeGenerated:'2026-06-29T08:13:09Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:13:09Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
-    SrcIpAddr:'203.0.113.41', SrcHostname:'(external)', DstIpAddr:'10.0.0.10', DnsQuery:'hacksmarterlabs.example',
+    SrcIpAddr:'203.0.113.41', SrcHostname:'(external)', DstIpAddr:'10.0.0.10', DnsQuery:'hacksmartersoc.example',
     DnsQueryTypeName:'ANY', DnsResponseName:'(multiple)' },
 
   // Plain NXDOMAIN typos — noise that any NXDOMAIN-only rule will surface.
-  { TimeGenerated:'2026-06-29T08:14:22Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:14:22Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.12', SrcHostname:'WKS-01', DstIpAddr:'10.0.0.10', DnsQuery:'microsft.com',
     DnsQueryTypeName:'A', DnsResponseName:'' },
-  { TimeGenerated:'2026-06-29T08:14:48Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:14:48Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Failure', EventResultDetails:'NXDOMAIN',
     SrcIpAddr:'10.0.4.41', SrcHostname:'WKS-17', DstIpAddr:'10.0.0.10', DnsQuery:'githunb.com',
     DnsQueryTypeName:'A', DnsResponseName:'' },
 
   // Internal lookups — confirm parser handles TXT/MX too.
-  { TimeGenerated:'2026-06-29T08:16:10Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+  { TimeGenerated:'2026-06-29T08:16:10Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
-    SrcIpAddr:'10.0.0.5', SrcHostname:'MAIL-01', DstIpAddr:'10.0.0.10', DnsQuery:'corp.hacksmarterlabs.example',
-    DnsQueryTypeName:'MX', DnsResponseName:'mail-01.corp.hacksmarterlabs.example' },
-  { TimeGenerated:'2026-06-29T08:16:42Z', EventProduct:'Hack Smarter Labs DNS Server', EventVendor:'Hack Smarter Labs', EventSchema:'Dns',
+    SrcIpAddr:'10.0.0.5', SrcHostname:'MAIL-01', DstIpAddr:'10.0.0.10', DnsQuery:'corp.hacksmartersoc.example',
+    DnsQueryTypeName:'MX', DnsResponseName:'mail-01.corp.hacksmartersoc.example' },
+  { TimeGenerated:'2026-06-29T08:16:42Z', EventProduct:'Hack Smarter SOC DNS Server', EventVendor:'Hack Smarter SOC', EventSchema:'Dns',
     EventType:'Query', EventSubType:'response', EventResult:'Success', EventResultDetails:'NoError',
-    SrcIpAddr:'10.0.0.5', SrcHostname:'MAIL-01', DstIpAddr:'10.0.0.10', DnsQuery:'_dmarc.hacksmarterlabs.example',
-    DnsQueryTypeName:'TXT', DnsResponseName:'"v=DMARC1; p=reject; rua=mailto:dmarc@hacksmarterlabs.example"' },
+    SrcIpAddr:'10.0.0.5', SrcHostname:'MAIL-01', DstIpAddr:'10.0.0.10', DnsQuery:'_dmarc.hacksmartersoc.example',
+    DnsQueryTypeName:'TXT', DnsResponseName:'"v=DMARC1; p=reject; rua=mailto:dmarc@hacksmartersoc.example"' },
 ];
 
 const ASIM_DNS_SAVED_QUERIES = [
@@ -4062,7 +3602,7 @@ const ASIM_DNS_SAVED_QUERIES = [
 ];
 
 const ASIM_DNS_NOTES = [
-  { title:'Unifying parser', detail:'_Im_Dns calls every source-specific parser (vimDnsHackSmarterLabsOMS, vimDnsCorelightZeek, …) and returns a single normalized result set. Always prefer it over a raw table name.' },
+  { title:'Unifying parser', detail:'_Im_Dns calls every source-specific parser (vimDnsHackSmarterSOCOMS, vimDnsCorelightZeek, …) and returns a single normalized result set. Always prefer it over a raw table name.' },
   { title:'Filter pushdown', detail:'Pass time and IP filters as parameters (starttime, srcipaddr, domain_has_any) — they push down to each source parser instead of running after the union, dramatically improving performance.' },
   { title:'Response duplication', detail:"DNS uses UDP, so request and response segments aren't linked. Most teams only log the client-facing response. Filter EventSubType == 'response' if you ingest multiple segments." },
   { title:'Schema version', detail:'Current ASIM DNS schema is 0.1.7. EventSchemaVersion stays pinned on the rows so downstream content can branch on it.' },
@@ -4070,27 +3610,27 @@ const ASIM_DNS_NOTES = [
 
 // ---------- Defender for Endpoint device inventory + timeline ----------
 const DEVICES = [
-  { avStatus:'Up to date', excluded:false, winVersion:'—', id:'WKS-03', name:'WKS-03', domain:'hacksmarterlabs.example', os:'Windows 11 Enterprise 23H2',
+  { avStatus:'Up to date', excluded:false, winVersion:'—', id:'WKS-03', name:'WKS-03', domain:'hacksmartersoc.example', os:'Windows 11 Enterprise 23H2',
     riskLevel:'High', exposureLevel:'High', healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2025-11-08T12:14:00Z', lastSeen:'2026-06-28T15:02:11Z',
-    primaryUser:'jdoe@hacksmarterlabs.example', ip:'10.20.7.42', tags:['Sales','Win11'], openAlerts:2,
+    primaryUser:'jdoe@hacksmartersoc.example', ip:'10.20.7.42', tags:['Sales','Win11'], openAlerts:2,
     isInternetFacing:true, recommendationCount:3, installedSoftware:42, discoveredVulnerabilities:2 },
-  { avStatus:'Up to date', excluded:false, winVersion:'—', id:'FIN-FS-02', name:'FIN-FS-02', domain:'hacksmarterlabs.example', os:'Windows Server 2022',
+  { avStatus:'Up to date', excluded:false, winVersion:'—', id:'FIN-FS-02', name:'FIN-FS-02', domain:'hacksmartersoc.example', os:'Windows Server 2022',
     riskLevel:'High', exposureLevel:'Medium', healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2024-02-04T09:00:00Z', lastSeen:'2026-06-28T10:22:00Z',
-    primaryUser:'fin-svc@hacksmarterlabs.example', ip:'10.20.3.14', tags:['Finance','FileServer'], openAlerts:2,
+    primaryUser:'fin-svc@hacksmartersoc.example', ip:'10.20.3.14', tags:['Finance','FileServer'], openAlerts:2,
     isInternetFacing:false, recommendationCount:5, installedSoftware:64, discoveredVulnerabilities:4 },
-  { avStatus:'Up to date', excluded:false, winVersion:'—', id:'WKS-01', name:'WKS-01', domain:'hacksmarterlabs.example', os:'Windows 11 Enterprise 23H2',
+  { avStatus:'Up to date', excluded:false, winVersion:'—', id:'WKS-01', name:'WKS-01', domain:'hacksmartersoc.example', os:'Windows 11 Enterprise 23H2',
     riskLevel:'Medium', exposureLevel:'Medium', healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2025-06-22T08:00:00Z', lastSeen:'2026-06-28T14:01:00Z',
-    primaryUser:'svc-scan@hacksmarterlabs.example', ip:'10.20.7.10', tags:['IT','Win11'], openAlerts:1,
+    primaryUser:'svc-scan@hacksmartersoc.example', ip:'10.20.7.10', tags:['IT','Win11'], openAlerts:1,
     isInternetFacing:false, recommendationCount:2, installedSoftware:39, discoveredVulnerabilities:1 },
-  { avStatus:'Not updated', excluded:false, winVersion:'—', id:'WKS-02', name:'WKS-02', domain:'hacksmarterlabs.example', os:'Windows 11 Enterprise 23H2',
+  { avStatus:'Not updated', excluded:false, winVersion:'—', id:'WKS-02', name:'WKS-02', domain:'hacksmartersoc.example', os:'Windows 11 Enterprise 23H2',
     riskLevel:'Medium', exposureLevel:'Low',    healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2025-06-22T08:01:00Z', lastSeen:'2026-06-28T14:16:00Z',
-    primaryUser:'svc-scan@hacksmarterlabs.example', ip:'10.20.7.11', tags:['IT','Win11'], openAlerts:1,
+    primaryUser:'svc-scan@hacksmartersoc.example', ip:'10.20.7.11', tags:['IT','Win11'], openAlerts:1,
     isInternetFacing:false, recommendationCount:1, installedSoftware:37, discoveredVulnerabilities:1 },
-  { avStatus:'Up to date', excluded:true, winVersion:'—', id:'DC01', name:'DC01', domain:'hacksmarterlabs.example', os:'Windows Server 2022 (Domain Controller)',
+  { avStatus:'Up to date', excluded:true, winVersion:'—', id:'DC01', name:'DC01', domain:'hacksmartersoc.example', os:'Windows Server 2022 (Domain Controller)',
     riskLevel:'High', exposureLevel:'Low',    healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Identity + Defender for Endpoint',
     firstSeen:'2023-09-12T00:00:00Z', lastSeen:'2026-06-28T15:00:00Z',
@@ -4100,82 +3640,82 @@ const DEVICES = [
   // --- Windows 10 fleet: spans every health / antivirus / exclusion / version
   // bucket the inventory filter offers, so each facet returns real rows. ---
   { avStatus:'Up to date', excluded:false, winVersion:'22H2',
-    id:'W10-SALES-11', name:'W10-SALES-11', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise 22H2',
+    id:'W10-SALES-11', name:'W10-SALES-11', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise 22H2',
     riskLevel:'Low', exposureLevel:'Low', healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2025-02-10T08:00:00Z', lastSeen:'2026-06-28T14:30:00Z',
-    primaryUser:'mrivera@hacksmarterlabs.example', ip:'10.20.7.51', tags:['Sales','Win10'], openAlerts:0,
+    primaryUser:'mrivera@hacksmartersoc.example', ip:'10.20.7.51', tags:['Sales','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:1, installedSoftware:35, discoveredVulnerabilities:0 },
   { avStatus:'Not updated', excluded:false, winVersion:'21H2',
-    id:'W10-SALES-12', name:'W10-SALES-12', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise 21H2',
+    id:'W10-SALES-12', name:'W10-SALES-12', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise 21H2',
     riskLevel:'Medium', exposureLevel:'Medium', healthStatus:'Misconfigured', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2025-02-10T08:05:00Z', lastSeen:'2026-06-28T13:10:00Z',
-    primaryUser:'tchen@hacksmarterlabs.example', ip:'10.20.7.52', tags:['Sales','Win10'], openAlerts:0,
+    primaryUser:'tchen@hacksmartersoc.example', ip:'10.20.7.52', tags:['Sales','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:4, installedSoftware:36, discoveredVulnerabilities:2 },
   { avStatus:'Disabled', excluded:false, winVersion:'21H1',
-    id:'W10-ENG-04', name:'W10-ENG-04', domain:'hacksmarterlabs.example', os:'Windows 10 Pro 21H1',
+    id:'W10-ENG-04', name:'W10-ENG-04', domain:'hacksmartersoc.example', os:'Windows 10 Pro 21H1',
     riskLevel:'High', exposureLevel:'High', healthStatus:'Misconfigured', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2024-09-01T08:00:00Z', lastSeen:'2026-06-28T11:45:00Z',
-    primaryUser:'dpatel@hacksmarterlabs.example', ip:'10.20.8.14', tags:['Engineering','Win10'], openAlerts:1,
+    primaryUser:'dpatel@hacksmartersoc.example', ip:'10.20.8.14', tags:['Engineering','Win10'], openAlerts:1,
     isInternetFacing:false, recommendationCount:8, installedSoftware:58, discoveredVulnerabilities:6 },
   { avStatus:'Unknown', excluded:false, winVersion:'20H2',
-    id:'W10-ENG-05', name:'W10-ENG-05', domain:'hacksmarterlabs.example', os:'Windows 10 Pro 20H2',
+    id:'W10-ENG-05', name:'W10-ENG-05', domain:'hacksmartersoc.example', os:'Windows 10 Pro 20H2',
     riskLevel:'Medium', exposureLevel:'Medium', healthStatus:'Inactive', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2024-09-01T08:02:00Z', lastSeen:'2026-05-30T09:12:00Z',
-    primaryUser:'dpatel@hacksmarterlabs.example', ip:'10.20.8.15', tags:['Engineering','Win10'], openAlerts:0,
+    primaryUser:'dpatel@hacksmartersoc.example', ip:'10.20.8.15', tags:['Engineering','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:5, installedSoftware:54, discoveredVulnerabilities:4 },
   { avStatus:'Unknown', excluded:false, winVersion:'2004',
-    id:'W10-LAB-02', name:'W10-LAB-02', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise 2004',
+    id:'W10-LAB-02', name:'W10-LAB-02', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise 2004',
     riskLevel:'Medium', exposureLevel:'Low', healthStatus:'Inactive', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2023-06-14T08:00:00Z', lastSeen:'2026-04-02T16:40:00Z',
-    primaryUser:'svc-lab@hacksmarterlabs.example', ip:'10.20.11.22', tags:['Lab','Win10'], openAlerts:0,
+    primaryUser:'svc-lab@hacksmartersoc.example', ip:'10.20.11.22', tags:['Lab','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:6, installedSoftware:28, discoveredVulnerabilities:5 },
   { avStatus:'Not updated', excluded:true, winVersion:'1909',
-    id:'W10-KIOSK-01', name:'W10-KIOSK-01', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise LTSC 1909',
+    id:'W10-KIOSK-01', name:'W10-KIOSK-01', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise LTSC 1909',
     riskLevel:'Medium', exposureLevel:'Medium', healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2023-03-20T08:00:00Z', lastSeen:'2026-06-28T07:55:00Z',
     primaryUser:'(kiosk account)', ip:'10.20.13.9', tags:['Kiosk','Win10','Excluded'], openAlerts:0,
     isInternetFacing:false, recommendationCount:3, installedSoftware:12, discoveredVulnerabilities:3 },
   { avStatus:'Disabled', excluded:true, winVersion:'1903',
-    id:'W10-OT-BRIDGE', name:'W10-OT-BRIDGE', domain:'hacksmarterlabs.example', os:'Windows 10 IoT Enterprise 1903',
+    id:'W10-OT-BRIDGE', name:'W10-OT-BRIDGE', domain:'hacksmartersoc.example', os:'Windows 10 IoT Enterprise 1903',
     riskLevel:'High', exposureLevel:'High', healthStatus:'Misconfigured', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2023-01-11T08:00:00Z', lastSeen:'2026-06-28T08:20:00Z',
     primaryUser:'(machine account)', ip:'10.20.6.40', tags:['OT','Win10','Excluded'], openAlerts:1,
     isInternetFacing:false, recommendationCount:9, installedSoftware:19, discoveredVulnerabilities:7 },
   { avStatus:'Unknown', excluded:false, winVersion:'1809',
-    id:'W10-LEGACY-07', name:'W10-LEGACY-07', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise LTSC 1809',
+    id:'W10-LEGACY-07', name:'W10-LEGACY-07', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise LTSC 1809',
     riskLevel:'High', exposureLevel:'Medium', healthStatus:'Inactive', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2022-08-05T08:00:00Z', lastSeen:'2026-03-18T10:00:00Z',
-    primaryUser:'mfoster@hacksmarterlabs.example', ip:'10.20.11.31', tags:['Legacy','Win10'], openAlerts:0,
+    primaryUser:'mfoster@hacksmartersoc.example', ip:'10.20.11.31', tags:['Legacy','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:11, installedSoftware:24, discoveredVulnerabilities:9 },
   { avStatus:'Disabled', excluded:false, winVersion:'1803',
-    id:'W10-LEGACY-08', name:'W10-LEGACY-08', domain:'hacksmarterlabs.example', os:'Windows 10 Pro 1803',
+    id:'W10-LEGACY-08', name:'W10-LEGACY-08', domain:'hacksmartersoc.example', os:'Windows 10 Pro 1803',
     riskLevel:'High', exposureLevel:'High', healthStatus:'Misconfigured', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2022-08-05T08:04:00Z', lastSeen:'2026-06-27T21:30:00Z',
-    primaryUser:'mfoster@hacksmarterlabs.example', ip:'10.20.11.32', tags:['Legacy','Win10'], openAlerts:1,
+    primaryUser:'mfoster@hacksmartersoc.example', ip:'10.20.11.32', tags:['Legacy','Win10'], openAlerts:1,
     isInternetFacing:false, recommendationCount:13, installedSoftware:26, discoveredVulnerabilities:11 },
   { avStatus:'Unknown', excluded:false, winVersion:'1709',
-    id:'W10-LEGACY-09', name:'W10-LEGACY-09', domain:'hacksmarterlabs.example', os:'Windows 10 Pro 1709',
+    id:'W10-LEGACY-09', name:'W10-LEGACY-09', domain:'hacksmartersoc.example', os:'Windows 10 Pro 1709',
     riskLevel:'High', exposureLevel:'Medium', healthStatus:'Inactive', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2022-02-19T08:00:00Z', lastSeen:'2026-01-09T13:05:00Z',
     primaryUser:'(unassigned)', ip:'10.20.11.33', tags:['Legacy','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:14, installedSoftware:22, discoveredVulnerabilities:12 },
   { avStatus:'Unknown', excluded:false, winVersion:'1703',
-    id:'W10-LEGACY-10', name:'W10-LEGACY-10', domain:'hacksmarterlabs.example', os:'Windows 10 Pro 1703',
+    id:'W10-LEGACY-10', name:'W10-LEGACY-10', domain:'hacksmartersoc.example', os:'Windows 10 Pro 1703',
     riskLevel:'High', exposureLevel:'Medium', healthStatus:'Inactive', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2021-11-30T08:00:00Z', lastSeen:'2025-12-02T09:41:00Z',
     primaryUser:'(unassigned)', ip:'10.20.11.34', tags:['Legacy','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:15, installedSoftware:21, discoveredVulnerabilities:13 },
   { avStatus:'Disabled', excluded:false, winVersion:'1607',
-    id:'W10-LEGACY-11', name:'W10-LEGACY-11', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise LTSB 1607',
+    id:'W10-LEGACY-11', name:'W10-LEGACY-11', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise LTSB 1607',
     riskLevel:'High', exposureLevel:'High', healthStatus:'Inactive', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2021-05-04T08:00:00Z', lastSeen:'2025-10-14T11:22:00Z',
     primaryUser:'(unassigned)', ip:'10.20.11.35', tags:['Legacy','Win10'], openAlerts:0,
     isInternetFacing:false, recommendationCount:17, installedSoftware:18, discoveredVulnerabilities:15 },
   { avStatus:'Up to date', excluded:false, winVersion:'Future',
-    id:'W10-INSIDER-01', name:'W10-INSIDER-01', domain:'hacksmarterlabs.example', os:'Windows 10 Enterprise Insider Preview',
+    id:'W10-INSIDER-01', name:'W10-INSIDER-01', domain:'hacksmartersoc.example', os:'Windows 10 Enterprise Insider Preview',
     riskLevel:'Low', exposureLevel:'Low', healthStatus:'Active', onboardingStatus:'Onboarded',
     sensor:'Defender for Endpoint', firstSeen:'2026-05-20T08:00:00Z', lastSeen:'2026-06-28T14:50:00Z',
-    primaryUser:'itlab@hacksmarterlabs.example', ip:'10.20.11.40', tags:['IT','Insider'], openAlerts:0,
+    primaryUser:'itlab@hacksmartersoc.example', ip:'10.20.11.40', tags:['IT','Insider'], openAlerts:0,
     isInternetFacing:false, recommendationCount:1, installedSoftware:33, discoveredVulnerabilities:0 },
 ];
 
@@ -4187,7 +3727,7 @@ const DEVICES = [
 const DISCOVERED_DEVICES = [
   // --- Computers & Mobile ---
   { id:'DD-001', name:'LAB-VM-07', tab:'computers', type:'Workstation', os:'Windows 10 Pro 22H2',
-    ip:'10.20.7.88', mac:'00-15-5D-3A-11-04', vendor:'Hack Smarter Labs', network:'CORP-LAN',
+    ip:'10.20.7.88', mac:'00-15-5D-3A-11-04', vendor:'Hack Smarter SOC', network:'CORP-LAN',
     onboardingStatus:'Can be onboarded', discoverySource:'Standard', riskLevel:'Medium',
     firstSeen:'2026-05-02T09:12:00Z', lastSeen:'2026-06-28T14:40:00Z', highValue:false,
     protocols:['ARP','SMB','WinRM','LLMNR'], seenBy:['WKS-01','WKS-02'], recommendationCount:4,
@@ -4314,7 +3854,7 @@ const FLEET_OUI = {
   'Sierra Wireless':'00-14-3E',
   'Dell Inc.':'A4-83-E7', 'Dell EMC':'00-1D-09', 'Hewlett Packard Enterprise':'3C-D9-2B',
   'HP Inc.':'3C-52-82', 'Lenovo':'50-7B-9D', 'Apple, Inc.':'F0-18-98', 'Fujitsu':'00-0B-5D',
-  'Hack Smarter Labs':'00-15-5D', 'VMware, Inc.':'00-50-56', 'QEMU/KVM':'52-54-00',
+  'Hack Smarter SOC':'00-15-5D', 'VMware, Inc.':'00-50-56', 'QEMU/KVM':'52-54-00',
   'Super Micro Computer':'00-25-90', 'Intel Corporate':'00-1B-21', 'Raspberry Pi Foundation':'B8-27-EB',
   'Espressif Inc.':'A4-CF-12', 'NetApp':'00-A0-98', 'Synology':'00-11-32', 'QNAP Systems':'00-08-9B',
   'Quantum Corporation':'00-E0-9E', 'Veritas Technologies':'00-1B-4F',
@@ -4386,7 +3926,7 @@ const FLEET_CATALOG = [
     pr:['HTTPS','SSH','SLP','CIM'], ob:'Unsupported', rk:['High','Medium'], hv:0.8,
     note:'Hypervisor. No Defender for Endpoint sensor exists for this platform — protect it with network controls.' },
   { t:'Virtual machine', tab:'computers', p:'VM', sub:'10.20.3', n:{lan:16},
-    v:['VMware, Inc.','QEMU/KVM','Hack Smarter Labs'], os:['Ubuntu Server 22.04 LTS','Windows Server 2019','Debian 12'],
+    v:['VMware, Inc.','QEMU/KVM','Hack Smarter SOC'], os:['Ubuntu Server 22.04 LTS','Windows Server 2019','Debian 12'],
     pr:['SSH','HTTP','ARP'], ob:'Can be onboarded', rk:['Medium','Low'], hv:0.1,
     note:'Guest VM discovered by its own traffic. Onboard it like any other machine.' },
   { t:'Container host', tab:'computers', p:'DOCK', sub:'10.20.3', n:{lan:4},
@@ -4402,7 +3942,7 @@ const FLEET_CATALOG = [
     pr:['DHCP','mDNS','ARP'], ob:'Can be onboarded', rk:['Low','Medium'], hv:0,
     note:'Handset on corporate wireless. Onboardable through the Defender mobile app.' },
   { t:'Tablet', tab:'computers', p:'TAB', sub:'10.20.9', n:{wifi:10},
-    v:['Apple, Inc.','Samsung Electronics','Hack Smarter Labs'], os:['iPadOS 17.5','Android 14','Windows 11 Pro 23H2'],
+    v:['Apple, Inc.','Samsung Electronics','Hack Smarter SOC'], os:['iPadOS 17.5','Android 14','Windows 11 Pro 23H2'],
     pr:['DHCP','mDNS','HTTPS'], ob:'Can be onboarded', rk:['Low','Informational'], hv:0,
     note:'Shared floor tablet. No sensor, no policy, full corporate wireless access.' },
   { t:'Rugged handheld', tab:'computers', p:'RGD', sub:'10.20.9', n:{wifi:6,br:2},
@@ -4594,7 +4134,7 @@ const FLEET_CATALOG = [
     pr:['HTTPS','mDNS','NTP'], ob:'Unsupported', rk:['Low'], hv:0,
     note:'Lobby signage player pulling content from an internet source.' },
   { t:'Interactive whiteboard', tab:'iot', p:'IWB', sub:'10.20.5', n:{lan:3},
-    v:['Hack Smarter Labs','Samsung Electronics'], os:['Windows 10 Team 2022','Tizen 7.0 (Flip)'],
+    v:['Hack Smarter SOC','Samsung Electronics'], os:['Windows 10 Team 2022','Tizen 7.0 (Flip)'],
     pr:['SMB','HTTPS','mDNS'], ob:'Can be onboarded', rk:['Medium'], hv:0,
     note:'Collaboration board. The Windows Team build supports a sensor and is joined to the tenant.' },
   { t:'Audio DSP', tab:'iot', p:'DSP', sub:'10.20.5', n:{lan:2},
@@ -4797,7 +4337,7 @@ const FLEET_CATALOG = [
     v:['Espressif Inc.'], os:['Cleaning robot 4.3'], pr:['MQTT','mDNS'], ob:'Unsupported', rk:['Low'], hv:0,
     note:'Cleaning robot that maps the floor plan and uploads it to a vendor cloud.' },
   { t:'Game console', tab:'iot', p:'CONSOLE', sub:'10.20.9', n:{wifi:2},
-    v:['Sony Corporation','Hack Smarter Labs'], os:['PlayStation 5 firmware 24.06','Xbox OS 10.0'],
+    v:['Sony Corporation','Hack Smarter SOC'], os:['PlayStation 5 firmware 24.06','Xbox OS 10.0'],
     pr:['UPnP','HTTPS','mDNS'], ob:'Unsupported', rk:['Low'], hv:0,
     note:'Console in a recreation area. Shadow IT with an open UPnP stack.' },
   { t:'Wearable', tab:'iot', p:'WEAR', sub:'10.20.9', n:{wifi:4},
@@ -5261,7 +4801,7 @@ const DEVICE_TIMELINE_EVENTS = {
       description:'DCSync — directory replication from a non-DC account.' },
     { kind:'event', time:'2026-06-28T03:44:00Z', table:'DeviceEvents', actionType:'DirectoryServicesReplication',
       title:'Directory replication from svc-backup', description:'Replication request from 10.20.4.55 targeting DC01.',
-      account:'svc-backup', target:'DC01.hacksmarterlabs.example', techniqueId:'T1003', eventType:'Directory' },
+      account:'svc-backup', target:'DC01.hacksmartersoc.example', techniqueId:'T1003', eventType:'Directory' },
     { kind:'technique', time:'2026-06-28T03:42:10Z', techniqueId:'T1098',
       techniqueName:'Account Manipulation', tactic:'Persistence',
       description:'Modification of AdminSDHolder ACL — sticky-permission persistence on Tier-0 objects.' },
@@ -5277,64 +4817,64 @@ const DEVICE_TIMELINE_EVENTS = {
 // Defender portal Identities page: account type, sensitive/privileged flags,
 // risk level, source connectors, organization-wide observation counts.
 const IDENTITIES = [
-  { id:'jane.doe@hacksmarterlabs.example', displayName:'Jane Doe', samName:'jane.doe',
-    upn:'jane.doe@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1102',
+  { id:'jane.doe@hacksmartersoc.example', displayName:'Jane Doe', samName:'jane.doe',
+    upn:'jane.doe@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1102',
     accountType:'User', department:'Finance', title:'Senior Analyst',
     riskLevel:'High', sensitive:false, privileged:false,
     sources:['Entra ID','Defender for Identity'],
     firstSeen:'2024-01-15T08:00:00Z', lastSeen:'2026-06-28T08:30:00Z',
     devicesSeen:3, openAlerts:2,
     notes:'Phishing victim. Granted OAuth consent to DocViewer Pro. AiTM cookie suspected.' },
-  { id:'svc-backup@hacksmarterlabs.example', displayName:'svc-backup', samName:'svc-backup',
-    upn:'svc-backup@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1144',
+  { id:'svc-backup@hacksmartersoc.example', displayName:'svc-backup', samName:'svc-backup',
+    upn:'svc-backup@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1144',
     accountType:'Service', department:'IT Operations', title:'Backup service account',
     riskLevel:'High', sensitive:true, privileged:true,
     sources:['Entra ID','Defender for Identity'],
     firstSeen:'2023-09-12T00:00:00Z', lastSeen:'2026-06-28T03:44:00Z',
     devicesSeen:2, openAlerts:2,
     notes:'Suspected compromised. Performed AdminSDHolder modification + DCSync.' },
-  { id:'MSOL_AzureSync@hacksmarterlabs.example', displayName:'MSOL_AzureSync', samName:'MSOL_AzureSync',
-    upn:'MSOL_AzureSync@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1206',
+  { id:'MSOL_AzureSync@hacksmartersoc.example', displayName:'MSOL_AzureSync', samName:'MSOL_AzureSync',
+    upn:'MSOL_AzureSync@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1206',
     accountType:'Service', department:'Entra Connect', title:'Directory synchronization (Entra Connect)',
     riskLevel:'Informational', sensitive:true, privileged:true,
     sources:['Entra ID','Defender for Identity'],
     firstSeen:'2023-08-01T00:00:00Z', lastSeen:'2026-06-28T15:00:00Z',
     devicesSeen:1, openAlerts:1,
     notes:'Entra Connect sync account. Directory replication is EXPECTED — Suspected DCSync alerts on this principal are a benign true positive when sourced from the Entra Connect server.' },
-  { id:'sam.lee@hacksmarterlabs.example', displayName:'Sam Lee', samName:'sam.lee',
-    upn:'sam.lee@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1203',
+  { id:'sam.lee@hacksmartersoc.example', displayName:'Sam Lee', samName:'sam.lee',
+    upn:'sam.lee@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1203',
     accountType:'User', department:'Engineering', title:'Software engineer',
     riskLevel:'Medium', sensitive:false, privileged:false,
     sources:['Entra ID'],
     firstSeen:'2024-04-10T00:00:00Z', lastSeen:'2026-06-28T13:27:00Z',
     devicesSeen:2, openAlerts:1,
     notes:'Risky sign-in from NL (unfamiliar location).' },
-  { id:'maria.ross@hacksmarterlabs.example', displayName:'Maria Ross', samName:'maria.ross',
-    upn:'maria.ross@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1208',
+  { id:'maria.ross@hacksmartersoc.example', displayName:'Maria Ross', samName:'maria.ross',
+    upn:'maria.ross@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1208',
     accountType:'User', department:'Sales', title:'Account executive',
     riskLevel:'High', sensitive:false, privileged:false,
     sources:['Entra ID','Defender for Identity'],
     firstSeen:'2024-02-20T00:00:00Z', lastSeen:'2026-06-28T06:40:00Z',
     devicesSeen:2, openAlerts:1,
     notes:'AiTM phishing detected — Entra ID Protection flagged High sign-in risk.' },
-  { id:'jdoe@hacksmarterlabs.example', displayName:'jdoe (local)', samName:'jdoe',
-    upn:'jdoe@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1812',
+  { id:'jdoe@hacksmartersoc.example', displayName:'jdoe (local)', samName:'jdoe',
+    upn:'jdoe@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-1812',
     accountType:'User', department:'Sales', title:'Workstation user (WKS-03)',
     riskLevel:'Medium', sensitive:false, privileged:false,
     sources:['Defender for Identity','Defender for Endpoint'],
     firstSeen:'2025-11-08T12:14:00Z', lastSeen:'2026-06-28T15:00:00Z',
     devicesSeen:1, openAlerts:0,
     notes:'Local-interactive sign-ins on WKS-03 with one failed-then-success pair.' },
-  { id:'fin-svc@hacksmarterlabs.example', displayName:'fin-svc', samName:'fin-svc',
-    upn:'fin-svc@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-2207',
+  { id:'fin-svc@hacksmartersoc.example', displayName:'fin-svc', samName:'fin-svc',
+    upn:'fin-svc@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-2207',
     accountType:'Service', department:'Finance', title:'Finance file-server service account',
     riskLevel:'High', sensitive:false, privileged:true,
     sources:['Entra ID','Defender for Identity'],
     firstSeen:'2024-09-01T00:00:00Z', lastSeen:'2026-06-28T10:20:00Z',
     devicesSeen:2, openAlerts:2,
     notes:'Used to launch locker.exe + vssadmin shadow-copy deletion on FIN-FS-02.' },
-  { id:'krbtgt@hacksmarterlabs.example', displayName:'krbtgt', samName:'krbtgt',
-    upn:'krbtgt@hacksmarterlabs.example', sid:'S-1-5-21-1180699209-877415012-3182924384-502',
+  { id:'krbtgt@hacksmartersoc.example', displayName:'krbtgt', samName:'krbtgt',
+    upn:'krbtgt@hacksmartersoc.example', sid:'S-1-5-21-1180699209-877415012-3182924384-502',
     accountType:'Service', department:'Active Directory', title:'KDC service account',
     riskLevel:'Informational', sensitive:true, privileged:true,
     sources:['Defender for Identity'],
@@ -5349,22 +4889,22 @@ const IDENTITIES = [
 // expected behavior). Pair with svc-backup's DCSync alert (true positive)
 // so the analyst learns to distinguish by WHO + FROM WHERE.
 const IDENTITY_TIMELINE = {
-  'MSOL_AzureSync@hacksmarterlabs.example': [
+  'MSOL_AzureSync@hacksmartersoc.example': [
     { kind:'alert', time:'2026-06-28T03:45:00Z', alertId:'A105',
       title:'Suspected DCSync attack (replication of directory services)',
       severity:'high', source:'Defender for Identity',
-      description:'Directory replication initiated by MSOL_AzureSync from AAD-CONNECT-01.hacksmarterlabs.example targeting DC01.',
+      description:'Directory replication initiated by MSOL_AzureSync from AAD-CONNECT-01.hacksmartersoc.example targeting DC01.',
       classification:'Benign true positive',
       classificationWhy:'The MSOL_AzureSync account is the Entra Connect directory-sync principal. Its job is to replicate AD objects to the cloud, so it WILL perform DRSGetNCChanges (DCSync) by design. The source host (AAD-CONNECT-01) is the registered Entra Connect server. The detection is accurate (a true DCSync occurred), but the activity is expected → classify as Benign true positive, not False positive (the behavior really happened) and not True positive (no adversary).',
       classifyNote:'Suppression rule scope: source computer = AAD-CONNECT-01, account = MSOL_*.' },
     { kind:'event', time:'2026-06-28T03:44:55Z', actionType:'DirectoryServicesReplication',
       title:'Directory replication from AAD-CONNECT-01', description:'MSOL_AzureSync replicated naming context DC=example,DC=org from DC01.',
-      sourceHost:'AAD-CONNECT-01', target:'DC01.hacksmarterlabs.example', techniqueId:'T1003', techniqueName:'OS Credential Dumping' },
+      sourceHost:'AAD-CONNECT-01', target:'DC01.hacksmartersoc.example', techniqueId:'T1003', techniqueName:'OS Credential Dumping' },
     { kind:'event', time:'2026-06-28T03:44:50Z', actionType:'LogonSuccess',
       title:'Network logon (MSOL_AzureSync) on DC01', description:'Kerberos network logon from AAD-CONNECT-01 (10.20.6.20).',
-      sourceHost:'AAD-CONNECT-01', target:'DC01.hacksmarterlabs.example', techniqueId:'T1078', techniqueName:'Valid Accounts' },
+      sourceHost:'AAD-CONNECT-01', target:'DC01.hacksmartersoc.example', techniqueId:'T1078', techniqueName:'Valid Accounts' },
   ],
-  'svc-backup@hacksmarterlabs.example': [
+  'svc-backup@hacksmartersoc.example': [
     { kind:'alert', time:'2026-06-28T03:44:00Z', alertId:'A102',
       title:'Suspected DCSync attack (replication of directory services)',
       severity:'high', source:'Defender for Identity',
@@ -5380,9 +4920,9 @@ const IDENTITY_TIMELINE = {
       classificationWhy:'AdminSDHolder ACL writes are extremely rare in normal operations and are a textbook persistence technique (T1098). Classify as True positive and revert the ACL.' },
     { kind:'event', time:'2026-06-28T03:44:00Z', actionType:'DirectoryServicesReplication',
       title:'Directory replication request from svc-backup', description:'Replication request from 10.20.4.55 (file-server subnet) — not a domain controller and not Entra Connect.',
-      sourceHost:'10.20.4.55', target:'DC01.hacksmarterlabs.example', techniqueId:'T1003', techniqueName:'OS Credential Dumping' },
+      sourceHost:'10.20.4.55', target:'DC01.hacksmartersoc.example', techniqueId:'T1003', techniqueName:'OS Credential Dumping' },
   ],
-  'jane.doe@hacksmarterlabs.example': [
+  'jane.doe@hacksmartersoc.example': [
     { kind:'alert', time:'2026-06-28T08:23:00Z', alertId:'A202',
       title:'Anomalous OAuth consent grant', severity:'medium', source:'Defender for Cloud Apps',
       description:'OAuth consent granted to DocViewer Pro with Mail.ReadWrite + Files.Read.All. Consent followed a click on a known phishing URL.',
@@ -5397,7 +4937,7 @@ const IDENTITY_TIMELINE = {
       title:'Sign-in success from 76.21.55.4 (US)', description:'Token issued for Office365, MFA prompt satisfied — likely AiTM cookie replay.',
       techniqueId:'T1078', techniqueName:'Valid Accounts' },
   ],
-  'maria.ross@hacksmarterlabs.example': [
+  'maria.ross@hacksmartersoc.example': [
     { kind:'alert', time:'2026-06-28T06:40:00Z', alertId:'A401',
       title:'Adversary-in-the-middle phishing session detected', severity:'high',
       source:'Entra ID Protection',
@@ -5405,7 +4945,7 @@ const IDENTITY_TIMELINE = {
       classification:'True positive',
       classificationWhy:'AiTM bypasses traditional MFA. Containment: revoke refresh tokens, reset password, hunt for OAuth consent / mail-rule additions on her mailbox.' },
   ],
-  'sam.lee@hacksmarterlabs.example': [
+  'sam.lee@hacksmartersoc.example': [
     { kind:'alert', time:'2026-06-28T13:27:00Z', alertId:'A601',
       title:'Risky sign-in from unfamiliar location', severity:'medium',
       source:'Entra ID Protection',
@@ -5413,7 +4953,7 @@ const IDENTITY_TIMELINE = {
       classification:'Pending',
       classificationWhy:'Could be travel or VPN — verify with the user before classifying. If unconfirmed, treat as True positive and trigger CA risk-based remediation.' },
   ],
-  'fin-svc@hacksmarterlabs.example': [
+  'fin-svc@hacksmartersoc.example': [
     { kind:'alert', time:'2026-06-28T10:18:30Z', alertId:'A301',
       title:'Multiple endpoints encrypted by suspected ransomware', severity:'high',
       source:'Defender for Endpoint',
@@ -5569,12 +5109,16 @@ const COPILOT_TRANSCRIPTS = [
   }
 ];
 
-// --- T03: out/t03-copilot-promptbooks.js ---
-const COPILOT_PROMPTBOOKS = [
+// --- T03: AI-assisted playbook scenarios ---
+// Prompt-chain raw material reused by the "Run AI-Assisted Playbook" action on
+// siem/automation (see runAiAssistedPlaybook() in app.js). Was originally the
+// standalone "promptbooks" surface under ai-agent — merged into Playbooks per
+// Alex's 2026-08-21 directive (docs/DEMICROSOFTING_PROGRESS.md Sprint 2).
+const AI_ASSISTED_PLAYBOOKS = [
   {
     id: 'pb-01',
     name: 'Incident investigation',
-    source: 'Hack Smarter Labs',
+    source: 'Hack Smarter SOC',
     description: 'Step-by-step triage of an incident.',
     inputs: ['Incident ID'],
     prompts: ['Summarize incident <ID>', 'List impacted entities', 'List related alerts', 'Suggest response actions', 'Draft an executive summary']
@@ -5582,7 +5126,7 @@ const COPILOT_PROMPTBOOKS = [
   {
     id: 'pb-02',
     name: 'Suspicious script analysis',
-    source: 'Hack Smarter Labs',
+    source: 'Hack Smarter SOC',
     description: 'Analyze suspicious scripts for potential threats.',
     inputs: [],
     prompts: ['Identify the purpose of <script>', 'Check against known malware patterns', 'Examine network activity related to <script>', 'Suggest next steps']
@@ -5590,7 +5134,7 @@ const COPILOT_PROMPTBOOKS = [
   {
     id: 'pb-03',
     name: 'Threat actor profile',
-    source: 'Hack Smarter Labs',
+    source: 'Hack Smarter SOC',
     description: 'Develop a profile of the threat actor based on attack patterns.',
     inputs: ['Device name'],
     prompts: ['List recent activity by <device>', 'Identify common tactics and techniques used', 'Suggest potential motivations']
@@ -5598,7 +5142,7 @@ const COPILOT_PROMPTBOOKS = [
   {
     id: 'pb-04',
     name: 'Vulnerability impact assessment',
-    source: 'Hack Smarter Labs',
+    source: 'Hack Smarter SOC',
     description: 'Assess the risk of a vulnerability exploit.',
     inputs: [],
     prompts: ['Describe the vulnerability', 'Estimate potential damage', 'Suggest remediation steps']
@@ -5606,7 +5150,7 @@ const COPILOT_PROMPTBOOKS = [
   {
     id: 'pb-05',
     name: 'User compromise assessment',
-    source: 'Hack Smarter Labs',
+    source: 'Hack Smarter SOC',
     description: 'Evaluate the risk of user data breaches.',
     inputs: [],
     prompts: ['Identify potential access vectors', 'Determine impacted users and data', 'Suggest containment actions']
@@ -5614,7 +5158,7 @@ const COPILOT_PROMPTBOOKS = [
   {
     id: 'pb-06',
     name: 'Email threat triage',
-    source: 'Hack Smarter Labs',
+    source: 'Hack Smarter SOC',
     description: 'Triage incoming emails for potential threats.',
     inputs: ['Incident ID'],
     prompts: ['Summarize email content <ID>', 'Check against known phishing patterns', 'Analyze sender behavior', 'Suggest actions']
@@ -5713,10 +5257,10 @@ const COPILOT_PLUGINS = [
   },
   {
     id: 'pl-10',
-    name: 'Promptbook Runner - Guided session builder',
+    name: 'AI-Assisted Playbook Runner - Guided session builder',
     category: 'Custom',
     status: 'On',
-    description: 'Runs local promptbooks and records the resulting canned session.',
+    description: 'Runs AI-assisted playbooks from SIEM & SOAR automation and records the resulting canned session.',
     setupNote: 'Stores generated sessions in browser storage.'
   },
   {
@@ -5728,40 +5272,6 @@ const COPILOT_PLUGINS = [
     setupNote: 'Use it to compare custom plugin ordering against first-party plugins.'
   }
 ];
-
-// --- T05: out/t05-copilot-capacity.js ---
-const COPILOT_USAGE = [
-  { date: '2026-06-15', unitsUsed: 4.9, sessions: 7 },
-  { date: '2026-06-16', unitsUsed: 4.8, sessions: 6 },
-  { date: '2026-06-17', unitsUsed: 4.3, sessions: 5 },
-  { date: '2026-06-18', unitsUsed: 4.5, sessions: 5 },
-  { date: '2026-06-19', unitsUsed: 4.2, sessions: 4 },
-  { date: '2026-06-20', unitsUsed: 3.8, sessions: 6 },
-  { date: '2026-06-21', unitsUsed: 3.9, sessions: 6 },
-  { date: '2026-06-22', unitsUsed: 4.7, sessions: 8 },
-  { date: '2026-06-23', unitsUsed: 5.1, sessions: 9 },
-  { date: '2026-06-24', unitsUsed: 4.7, sessions: 8 },
-  { date: '2026-06-25', unitsUsed: 4.3, sessions: 7 },
-  { date: '2026-06-26', unitsUsed: 3.9, sessions: 6 },
-  { date: '2026-06-27', unitsUsed: 4.1, sessions: 7 },
-  { date: '2026-06-28', unitsUsed: 3.5, sessions: 5 }
-];
-
-const COPILOT_CAPACITY = {
-  provisionedSCU: 6,
-  overageAllowed: true,
-  region: 'Europe',
-  owners: ['R. Vance', 'M. Okafor']
-};
-
-const COPILOT_SETTINGS_DEFAULTS = {
-  ...COPILOT_CAPACITY,
-  ownerRole: 'Contributor',
-  dataSharing: true,
-  logging: true,
-  tenant: 'Hack Smarter Labs',
-  dailyLimit: 8,
-};
 
 // --- T06: out/t06-tvm.js ---
 const TVM_SOFTWARE = [
@@ -5906,11 +5416,11 @@ const TVM_EXPOSURE_TREND = [
 // authenticates through workload identity federation.
 const MC_CONNECTORS = [
   {
-    id: '/subscriptions/8a41c7d2-5e93-4b16-9f70-2c6d05ea38b1/resourceGroups/rg-security-prod/providers/Cloud.Security/securityConnectors/hacksmarterlabs-aws-prod',
-    name: 'hacksmarterlabs-aws-prod',
+    id: '/subscriptions/8a41c7d2-5e93-4b16-9f70-2c6d05ea38b1/resourceGroups/rg-security-prod/providers/Cloud.Security/securityConnectors/hacksmartersoc-aws-prod',
+    name: 'hacksmartersoc-aws-prod',
     cloud: 'AWS',
     accountId: '481512376904',
-    accountAlias: 'hacksmarterlabs-production',
+    accountAlias: 'hacksmartersoc-production',
     scope: 'Single account',
     regions: ['us-east-1', 'eu-west-1'],
     authentication: 'Assume role',
@@ -5922,20 +5432,20 @@ const MC_CONNECTORS = [
     lastSync: '2026-06-15T12:00:00.000Z'
   },
   {
-    id: '/subscriptions/8a41c7d2-5e93-4b16-9f70-2c6d05ea38b1/resourceGroups/rg-security-prod/providers/Cloud.Security/securityConnectors/hacksmarterlabs-gcp-prod',
-    name: 'hacksmarterlabs-gcp-prod',
+    id: '/subscriptions/8a41c7d2-5e93-4b16-9f70-2c6d05ea38b1/resourceGroups/rg-security-prod/providers/Cloud.Security/securityConnectors/hacksmartersoc-gcp-prod',
+    name: 'hacksmartersoc-gcp-prod',
     cloud: 'GCP',
-    accountId: 'hacksmarterlabs-prod-4821',
+    accountId: 'hacksmartersoc-prod-4821',
     projectNumber: '638274195063',
     organizationId: '419028375162',
     scope: 'Single project',
     regions: ['us-central1', 'europe-west3'],
     authentication: 'Workload identity federation',
-    principal: 'defender-cspm@hacksmarterlabs-prod-4821.iam.gserviceaccount.com',
+    principal: 'defender-cspm@hacksmartersoc-prod-4821.iam.gserviceaccount.com',
     deployment: 'Cloud Shell bootstrap — workload identity pool defender-for-cloud',
     plans: ['CSPM','Containers','Databases'],
     health: 'Warning',
-    healthDetail: 'Databases plan is degraded: the Cloud SQL Admin API is not enabled on hacksmarterlabs-prod-4821, so Cloud SQL instances in europe-west3 are not being assessed.',
+    healthDetail: 'Databases plan is degraded: the Cloud SQL Admin API is not enabled on hacksmartersoc-prod-4821, so Cloud SQL instances in europe-west3 are not being assessed.',
     lastSync: '2026-06-14T18:30:00.000Z'
   }
 ];
@@ -5949,8 +5459,8 @@ const MC_RESOURCES = [
     id: 'res-a-bbbb2222-7',
     cloud: 'GCP',
     type: 'Container cluster',
-    name: 'gke-hacksmarterlabs-payments-euw3',
-    resourceId: 'projects/proj-aaaa1111/locations/europe-west3/clusters/gke-hacksmarterlabs-payments-euw3',
+    name: 'gke-hacksmartersoc-payments-euw3',
+    resourceId: 'projects/proj-aaaa1111/locations/europe-west3/clusters/gke-hacksmartersoc-payments-euw3',
     region: 'europe-west3',
     riskLevel: 'High',
     exposure: 'Control plane authorized networks allow 0.0.0.0/0',
@@ -5974,8 +5484,8 @@ const MC_RESOURCES = [
     id: 'res-c-bbbb2222-3',
     cloud: 'GCP',
     type: 'Compute instance',
-    name: 'hacksmarterlabs-prod-web-uc1-a3',
-    resourceId: 'projects/proj-aaaa1111/zones/us-central1-a/instances/hacksmarterlabs-prod-web-uc1-a3',
+    name: 'hacksmartersoc-prod-web-uc1-a3',
+    resourceId: 'projects/proj-aaaa1111/zones/us-central1-a/instances/hacksmartersoc-prod-web-uc1-a3',
     region: 'us-central1',
     riskLevel: 'Low',
     exposure: 'Behind external HTTPS load balancer',
@@ -5986,8 +5496,8 @@ const MC_RESOURCES = [
     id: 'res-d-bbbb2222-4',
     cloud: 'GCP',
     type: 'Compute instance',
-    name: 'hacksmarterlabs-prod-batch-uc1-b7',
-    resourceId: 'projects/proj-aaaa1111/zones/us-central1-b/instances/hacksmarterlabs-prod-batch-uc1-b7',
+    name: 'hacksmartersoc-prod-batch-uc1-b7',
+    resourceId: 'projects/proj-aaaa1111/zones/us-central1-b/instances/hacksmartersoc-prod-batch-uc1-b7',
     region: 'us-central1',
     riskLevel: 'None',
     exposure: 'Private, no external IP',
@@ -5998,8 +5508,8 @@ const MC_RESOURCES = [
     id: 'res-e-bbbb2222-6',
     cloud: 'GCP',
     type: 'Cloud SQL instance',
-    name: 'hacksmarterlabs-prod-users-sql',
-    resourceId: 'projects/proj-aaaa1111/instances/hacksmarterlabs-prod-users-sql',
+    name: 'hacksmartersoc-prod-users-sql',
+    resourceId: 'projects/proj-aaaa1111/instances/hacksmartersoc-prod-users-sql',
     region: 'europe-west3',
     riskLevel: 'High',
     exposure: 'Public IP with authorized network 0.0.0.0/0',
@@ -6010,8 +5520,8 @@ const MC_RESOURCES = [
     id: 'res-f-bbbb2222-8',
     cloud: 'GCP',
     type: 'Compute instance',
-    name: 'hacksmarterlabs-prod-api-uc1-a2',
-    resourceId: 'projects/proj-aaaa1111/zones/us-central1-a/instances/hacksmarterlabs-prod-api-uc1-a2',
+    name: 'hacksmartersoc-prod-api-uc1-a2',
+    resourceId: 'projects/proj-aaaa1111/zones/us-central1-a/instances/hacksmartersoc-prod-api-uc1-a2',
     region: 'us-central1',
     riskLevel: 'Low',
     exposure: 'Private, SSH through Identity-Aware Proxy only',
@@ -6022,8 +5532,8 @@ const MC_RESOURCES = [
     id: 'res-g-bbbb2222-0',
     cloud: 'GCP',
     type: 'Storage bucket',
-    name: 'hacksmarterlabs-prod-datalake-uc1',
-    resourceId: 'projects/_/buckets/hacksmarterlabs-prod-datalake-uc1',
+    name: 'hacksmartersoc-prod-datalake-uc1',
+    resourceId: 'projects/_/buckets/hacksmartersoc-prod-datalake-uc1',
     region: 'us-central1',
     riskLevel: 'None',
     exposure: 'Uniform bucket-level access, no public members',
@@ -6060,8 +5570,8 @@ const MC_RESOURCES = [
     id: 'res-j-bbbb2222-2',
     cloud: 'GCP',
     type: 'Container cluster',
-    name: 'gke-hacksmarterlabs-prod-euw3',
-    resourceId: 'projects/proj-aaaa1111/locations/europe-west3/clusters/gke-hacksmarterlabs-prod-euw3',
+    name: 'gke-hacksmartersoc-prod-euw3',
+    resourceId: 'projects/proj-aaaa1111/locations/europe-west3/clusters/gke-hacksmartersoc-prod-euw3',
     region: 'europe-west3',
     riskLevel: 'Medium',
     exposure: 'Workload identity bound to cluster-admin',
@@ -6072,8 +5582,8 @@ const MC_RESOURCES = [
     id: 'res-k-bbbb2222-10',
     cloud: 'AWS',
     type: 'S3 bucket',
-    name: 'hacksmarterlabs-prod-artifacts-euw1',
-    resourceId: 'arn:aws:s3:::hacksmarterlabs-prod-artifacts-euw1',
+    name: 'hacksmartersoc-prod-artifacts-euw1',
+    resourceId: 'arn:aws:s3:::hacksmartersoc-prod-artifacts-euw1',
     region: 'eu-west-1',
     riskLevel: 'Low',
     exposure: 'Bucket policy grants cross-account read',
@@ -6084,8 +5594,8 @@ const MC_RESOURCES = [
     id: 'res-l-bbbb2222-9',
     cloud: 'AWS',
     type: 'S3 bucket',
-    name: 'hacksmarterlabs-prod-backups-use1',
-    resourceId: 'arn:aws:s3:::hacksmarterlabs-prod-backups-use1',
+    name: 'hacksmartersoc-prod-backups-use1',
+    resourceId: 'arn:aws:s3:::hacksmartersoc-prod-backups-use1',
     region: 'us-east-1',
     riskLevel: 'Low',
     exposure: 'Block public access enabled, versioning on',
@@ -6100,7 +5610,7 @@ const MC_ALERTS = [
     cloud: 'GCP',
     title: 'Unusual access event on container cluster',
     severity: 'High',
-    resource: 'gke-hacksmarterlabs-prod-euw3',
+    resource: 'gke-hacksmartersoc-prod-euw3',
     type: 'Kubernetes workload',
     status: 'Active',
     time: '2026-06-28T12:42:00Z',
@@ -6111,7 +5621,7 @@ const MC_ALERTS = [
     scope: 'proj-aaaa1111',
     incidentId: 'dfc-inc-03',
     entities: [
-      { type: 'Container cluster', value: 'gke-hacksmarterlabs-prod-euw3' },
+      { type: 'Container cluster', value: 'gke-hacksmartersoc-prod-euw3' },
       { type: 'Account',           value: 'ops-shared-admin' },
       { type: 'Role',              value: 'cluster-admin' },
     ],
@@ -6216,7 +5726,7 @@ const DEFENDER_CLOUD_JIT = {
   ports: ['3389', '22'],
   duration: '3 hours',
   requestState: 'Approved',
-  requestor: 'cloud-admin@hacksmarterlabs.example',
+  requestor: 'cloud-admin@hacksmartersoc.example',
   note: 'Lab-only request surface; no real network access is opened.',
 };
 
@@ -6338,27 +5848,27 @@ const AUDIT_COPILOT_EVENTS = [
 ];
 
 const AUDIT_LOG = [
-  { time:'2026-06-28T15:00:11Z', user:'jdoe@hacksmarterlabs.example', op:'FileDownloaded',
+  { time:'2026-06-28T15:00:11Z', user:'jdoe@hacksmartersoc.example', op:'FileDownloaded',
     workload:'OneDrive', item:'/personal/jdoe/customer-list.xlsx', ip:'76.21.55.4' },
-  { time:'2026-06-28T14:55:02Z', user:'admin@hacksmarterlabs.example', op:'Add member to role',
+  { time:'2026-06-28T14:55:02Z', user:'admin@hacksmartersoc.example', op:'Add member to role',
     workload:'AzureAD', item:'Role: Global Administrator', ip:'10.10.0.5' },
-  { time:'2026-06-28T14:20:33Z', user:'svc-backup@hacksmarterlabs.example', op:'DirectoryServicesReplication',
-    workload:'AAD Connect', item:'DC01.hacksmarterlabs.example', ip:'10.20.4.55' },
-  { time:'2026-06-28T08:23:11Z', user:'jane.doe@hacksmarterlabs.example', op:'Consent to application',
+  { time:'2026-06-28T14:20:33Z', user:'svc-backup@hacksmartersoc.example', op:'DirectoryServicesReplication',
+    workload:'AAD Connect', item:'DC01.hacksmartersoc.example', ip:'10.20.4.55' },
+  { time:'2026-06-28T08:23:11Z', user:'jane.doe@hacksmartersoc.example', op:'Consent to application',
     workload:'AzureAD', item:'DocViewer Pro', ip:'76.21.55.4' },
-  { time:'2026-06-28T13:27:00Z', user:'sam.lee@hacksmarterlabs.example', op:'UserLoggedIn',
+  { time:'2026-06-28T13:27:00Z', user:'sam.lee@hacksmartersoc.example', op:'UserLoggedIn',
     workload:'AzureAD', item:'Risky sign-in', ip:'91.219.236.54' },
-  { time:'2026-06-28T10:19:45Z', user:'fin-svc@hacksmarterlabs.example', op:'FileModified',
+  { time:'2026-06-28T10:19:45Z', user:'fin-svc@hacksmartersoc.example', op:'FileModified',
     workload:'SharePoint', item:'/sites/finance/budget.locked', ip:'10.30.8.22' },
-  { time:'2026-07-04T09:35:00Z', user:'m.okafor@hacksmarterlabs.example', op:'CopilotInteraction',
+  { time:'2026-07-04T09:35:00Z', user:'m.okafor@hacksmartersoc.example', op:'CopilotInteraction',
     workload:'SecurityCopilot', item:'Reviewed DLP policy settings for new users.', ip:'10.10.0.8' },
-  { time:'2026-07-05T13:25:00Z', user:'r.vance@hacksmarterlabs.example', op:'CopilotInteraction',
+  { time:'2026-07-05T13:25:00Z', user:'r.vance@hacksmartersoc.example', op:'CopilotInteraction',
     workload:'SecurityCopilot', item:'Set up audit trails for all Office 365 tenants.', ip:'10.10.0.8' },
-  { time:'2026-07-06T10:45:00Z', user:'m.okafor@hacksmarterlabs.example', op:'CopilotInteraction',
+  { time:'2026-07-06T10:45:00Z', user:'m.okafor@hacksmartersoc.example', op:'CopilotInteraction',
     workload:'Word', item:'Saved final draft for board presentation on OneDrive.', ip:'10.10.0.9' },
-  { time:'2026-06-30T11:45:00Z', user:'r.vance@hacksmarterlabs.example', op:'CopilotInteraction',
+  { time:'2026-06-30T11:45:00Z', user:'r.vance@hacksmartersoc.example', op:'CopilotInteraction',
     workload:'Teams', item:'Integrated Office 365 DLP policies with compliance features.', ip:'10.10.0.8' },
-  { time:'2026-07-01T08:00:00Z', user:'m.okafor@hacksmarterlabs.example', op:'CopilotInteraction',
+  { time:'2026-07-01T08:00:00Z', user:'m.okafor@hacksmartersoc.example', op:'CopilotInteraction',
     workload:'Outlook', item:'Created a calendar event reminder for next month.', ip:'10.10.0.9' },
 ];
 
@@ -6625,8 +6135,8 @@ function getCopilotSession(sessionId) {
   return getCopilotSessions().find(session => session.id === sessionId);
 }
 
-function getCopilotPromptbooks() {
-  return [...COPILOT_PROMPTBOOKS, ...readStoredJson('hsl.ai-agent.promptbooks.custom', [])];
+function getAiAssistedPlaybooks() {
+  return AI_ASSISTED_PLAYBOOKS;
 }
 
 function getCopilotPlugins() {
@@ -6641,9 +6151,6 @@ function getCopilotKnowledge() {
   return [...COPILOT_KNOWLEDGE, ...readStoredJson('hsl.ai-agent.knowledge.custom', [])];
 }
 
-function getCopilotSettings() {
-  return { ...COPILOT_SETTINGS_DEFAULTS, ...readStoredJson('hsl.ai-agent.settings', {}) };
-}
 // === end local-tasks fixtures ===
 
 // ===================== Entra admin center — tenant directory =====================
@@ -6652,15 +6159,15 @@ function getCopilotSettings() {
 // appears in IDENTITIES (Defender for Identity onboarded) or in the alert /
 // incident fixtures, so cross-portal pivots line up.
 const ENTRA_TENANT = {
-  name:'Hack Smarter Labs',
-  domain:'hacksmarterlabs.example',
+  name:'Hack Smarter SOC',
+  domain:'hacksmartersoc.example',
   tenantId:'8f4a2c19-6b30-4d77-9a51-c2e8b4d70f13',
   license:'Entra ID P2',
   seatsUsed:24,
   seatsTotal:50,
   region:'North America',
   syncStatus:'Healthy',
-  syncServer:'AAD-CONNECT-01.hacksmarterlabs.example',
+  syncServer:'AAD-CONNECT-01.hacksmartersoc.example',
   lastSync:'2026-06-28T15:00:00Z',
   secureScore:68,
   secureScoreMax:100,
@@ -6669,169 +6176,169 @@ const ENTRA_TENANT = {
 // Directory users. `xdrIdentity` links to an IDENTITIES row when the principal
 // is onboarded to Defender for Identity (drives the row click-through).
 const ENTRA_USERS = [
-  { upn:'jane.doe@hacksmarterlabs.example', displayName:'Jane Doe', jobTitle:'Senior Analyst', department:'Finance',
+  { upn:'jane.doe@hacksmartersoc.example', displayName:'Jane Doe', jobTitle:'Senior Analyst', department:'Finance',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2024-01-15T08:00:00Z',
     lastSignIn:'2026-06-28T08:30:00Z', mfa:'Authenticator', sspr:true,
     riskState:'At risk', riskLevel:'High', riskDetail:'Consent grant to DocViewer Pro after AiTM phish',
     roles:[], licenses:['365 E5'], devices:3, groups:6,
-    xdrIdentity:'jane.doe@hacksmarterlabs.example', incidentId:'INC-1042' },
-  { upn:'maria.ross@hacksmarterlabs.example', displayName:'Maria Ross', jobTitle:'Account Executive', department:'Sales',
+    xdrIdentity:'jane.doe@hacksmartersoc.example', incidentId:'INC-1042' },
+  { upn:'maria.ross@hacksmartersoc.example', displayName:'Maria Ross', jobTitle:'Account Executive', department:'Sales',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2024-02-20T00:00:00Z',
     lastSignIn:'2026-06-28T06:44:00Z', mfa:'SMS', sspr:true,
     riskState:'Confirmed compromised', riskLevel:'High', riskDetail:'AiTM token replay from a second ASN',
     roles:[], licenses:['365 E5'], devices:2, groups:4,
-    xdrIdentity:'maria.ross@hacksmarterlabs.example', incidentId:'INC-1051' },
-  { upn:'sam.lee@hacksmarterlabs.example', displayName:'Sam Lee', jobTitle:'Software Engineer', department:'Engineering',
+    xdrIdentity:'maria.ross@hacksmartersoc.example', incidentId:'INC-1051' },
+  { upn:'sam.lee@hacksmartersoc.example', displayName:'Sam Lee', jobTitle:'Software Engineer', department:'Engineering',
     userType:'Member', enabled:true, source:'Cloud only', created:'2024-04-10T00:00:00Z',
     lastSignIn:'2026-06-28T13:33:00Z', mfa:'Authenticator', sspr:true,
     riskState:'At risk', riskLevel:'High', riskDetail:'Unfamiliar properties + anonymous IP + impossible travel',
     roles:[], licenses:['365 E5'], devices:2, groups:5,
-    xdrIdentity:'sam.lee@hacksmarterlabs.example', incidentId:'INC-1053' },
-  { upn:'liam.chen@hacksmarterlabs.example', displayName:'Liam Chen', jobTitle:'Field Technician', department:'IT Operations',
+    xdrIdentity:'sam.lee@hacksmartersoc.example', incidentId:'INC-1053' },
+  { upn:'liam.chen@hacksmartersoc.example', displayName:'Liam Chen', jobTitle:'Field Technician', department:'IT Operations',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2024-06-03T00:00:00Z',
     lastSignIn:'2026-06-28T04:12:00Z', mfa:'Not registered', sspr:false,
     riskState:'At risk', riskLevel:'Medium', riskDetail:'Password spray — 8 failed attempts from 203.0.113.74',
     roles:[], licenses:['365 E3'], devices:1, groups:3,
     xdrIdentity:null, incidentId:'INC-1053' },
-  { upn:'nina.patel@hacksmarterlabs.example', displayName:'Nina Patel', jobTitle:'Billing Specialist', department:'Finance',
+  { upn:'nina.patel@hacksmartersoc.example', displayName:'Nina Patel', jobTitle:'Billing Specialist', department:'Finance',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2024-03-11T00:00:00Z',
     lastSignIn:'2026-06-28T07:55:00Z', mfa:'Authenticator', sspr:true,
     riskState:'At risk', riskLevel:'Medium', riskDetail:'Suspicious inbox rule forwarding invoices externally',
     roles:[], licenses:['365 E5'], devices:1, groups:4,
     xdrIdentity:null, incidentId:'INC-1042' },
-  { upn:'evan.brooks@hacksmarterlabs.example', displayName:'Evan Brooks', jobTitle:'HR Generalist', department:'Human Resources',
+  { upn:'evan.brooks@hacksmartersoc.example', displayName:'Evan Brooks', jobTitle:'HR Generalist', department:'Human Resources',
     userType:'Member', enabled:true, source:'Cloud only', created:'2025-01-22T00:00:00Z',
     lastSignIn:'2026-06-27T16:20:00Z', mfa:'Authenticator', sspr:true,
     riskState:'Remediated', riskLevel:'Low', riskDetail:'Clicked payroll-calendar phish; password reset completed',
     roles:[], licenses:['365 E3'], devices:1, groups:3,
     xdrIdentity:null, incidentId:null },
-  { upn:'olivia.kim@hacksmarterlabs.example', displayName:'Olivia Kim', jobTitle:'Security Operations Lead', department:'Security Operations',
+  { upn:'olivia.kim@hacksmartersoc.example', displayName:'Olivia Kim', jobTitle:'Security Operations Lead', department:'Security Operations',
     userType:'Member', enabled:true, source:'Cloud only', created:'2023-10-05T00:00:00Z',
     lastSignIn:'2026-06-28T14:40:00Z', mfa:'Passkey (FIDO2)', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'PIM activation of Security Administrator (CHG-4821, approved)',
     roles:['Security Administrator (PIM eligible)'], licenses:['365 E5'], devices:2, groups:8,
     xdrIdentity:null, incidentId:null },
-  { upn:'jordan.wong@hacksmarterlabs.example', displayName:'Jordan Wong', jobTitle:'Travel Coordinator', department:'Operations',
+  { upn:'jordan.wong@hacksmartersoc.example', displayName:'Jordan Wong', jobTitle:'Travel Coordinator', department:'Operations',
     userType:'Member', enabled:true, source:'Cloud only', created:'2025-03-14T00:00:00Z',
     lastSignIn:'2026-06-28T09:05:00Z', mfa:'SMS', sspr:true,
     riskState:'At risk', riskLevel:'Low', riskDetail:'Consented to the Hack Smarter Travel enterprise app (verified publisher)',
     roles:[], licenses:['365 E3'], devices:1, groups:2,
     xdrIdentity:null, incidentId:null },
-  { upn:'jdoe@hacksmarterlabs.example', displayName:'jdoe (local)', jobTitle:'Workstation user (WKS-03)', department:'Sales',
+  { upn:'jdoe@hacksmartersoc.example', displayName:'jdoe (local)', jobTitle:'Workstation user (WKS-03)', department:'Sales',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2025-11-08T12:14:00Z',
     lastSignIn:'2026-06-28T15:00:00Z', mfa:'Not registered', sspr:false,
     riskState:'At risk', riskLevel:'Medium', riskDetail:'Failed-then-success local interactive logons on WKS-03',
     roles:[], licenses:['365 E3'], devices:1, groups:2,
-    xdrIdentity:'jdoe@hacksmarterlabs.example', incidentId:'INC-1038' },
-  { upn:'dpatel@hacksmarterlabs.example', displayName:'Dev Patel', jobTitle:'Platform Engineer', department:'Engineering',
+    xdrIdentity:'jdoe@hacksmartersoc.example', incidentId:'INC-1038' },
+  { upn:'dpatel@hacksmartersoc.example', displayName:'Dev Patel', jobTitle:'Platform Engineer', department:'Engineering',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2024-05-19T00:00:00Z',
     lastSignIn:'2026-06-28T11:02:00Z', mfa:'Passkey (FIDO2)', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'',
     roles:[], licenses:['365 E5'], devices:2, groups:5,
     xdrIdentity:null, incidentId:null },
-  { upn:'mfoster@hacksmarterlabs.example', displayName:'Morgan Foster', jobTitle:'Manufacturing Supervisor', department:'Operations',
+  { upn:'mfoster@hacksmartersoc.example', displayName:'Morgan Foster', jobTitle:'Manufacturing Supervisor', department:'Operations',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2023-11-30T00:00:00Z',
     lastSignIn:'2026-06-28T05:48:00Z', mfa:'Not registered', sspr:false,
     riskState:'None', riskLevel:'None', riskDetail:'Legacy Win10 endpoints; MFA registration outstanding',
     roles:[], licenses:['365 E3'], devices:2, groups:3,
     xdrIdentity:null, incidentId:null },
-  { upn:'olivia.martin@hacksmarterlabs.example', displayName:'Olivia Martin', jobTitle:'Regional Sales Manager', department:'Sales',
+  { upn:'olivia.martin@hacksmartersoc.example', displayName:'Olivia Martin', jobTitle:'Regional Sales Manager', department:'Sales',
     userType:'Member', enabled:true, source:'Cloud only', created:'2024-08-02T00:00:00Z',
     lastSignIn:'2026-06-28T10:11:00Z', mfa:'Authenticator', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'Insider risk case IR-2044 — departing employee policy',
     roles:[], licenses:['365 E5'], devices:1, groups:4,
     xdrIdentity:null, incidentId:null },
-  { upn:'m.okafor@hacksmarterlabs.example', displayName:'Michael Okafor', jobTitle:'Threat Analyst', department:'Security Operations',
+  { upn:'m.okafor@hacksmartersoc.example', displayName:'Michael Okafor', jobTitle:'Threat Analyst', department:'Security Operations',
     userType:'Member', enabled:true, source:'Cloud only', created:'2024-12-01T00:00:00Z',
     lastSignIn:'2026-06-28T13:50:00Z', mfa:'Passkey (FIDO2)', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'',
     roles:['Security Reader'], licenses:['365 E5','Security Copilot'], devices:1, groups:6,
     xdrIdentity:null, incidentId:null },
-  { upn:'r.vance@hacksmarterlabs.example', displayName:'Rachel Vance', jobTitle:'SOC Manager', department:'Security Operations',
+  { upn:'r.vance@hacksmartersoc.example', displayName:'Rachel Vance', jobTitle:'SOC Manager', department:'Security Operations',
     userType:'Member', enabled:true, source:'Cloud only', created:'2023-09-18T00:00:00Z',
     lastSignIn:'2026-06-28T12:35:00Z', mfa:'Passkey (FIDO2)', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'',
     roles:['Security Operator','Security Administrator (PIM eligible)'], licenses:['365 E5','Security Copilot'], devices:2, groups:9,
     xdrIdentity:null, incidentId:null },
-  { upn:'tchen@hacksmarterlabs.example', displayName:'Tara Chen', jobTitle:'Corporate Counsel', department:'Legal',
+  { upn:'tchen@hacksmartersoc.example', displayName:'Tara Chen', jobTitle:'Corporate Counsel', department:'Legal',
     userType:'Member', enabled:true, source:'Cloud only', created:'2024-07-07T00:00:00Z',
     lastSignIn:'2026-06-27T18:02:00Z', mfa:'Authenticator', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'eDiscovery reviewer on CASE-2406-1042',
     roles:['eDiscovery Manager'], licenses:['365 E5'], devices:1, groups:3,
     xdrIdentity:null, incidentId:null },
-  { upn:'mrivera@hacksmarterlabs.example', displayName:'Marco Rivera', jobTitle:'Marketing Manager', department:'Marketing',
+  { upn:'mrivera@hacksmartersoc.example', displayName:'Marco Rivera', jobTitle:'Marketing Manager', department:'Marketing',
     userType:'Member', enabled:true, source:'Cloud only', created:'2025-02-11T00:00:00Z',
     lastSignIn:'2026-06-28T09:41:00Z', mfa:'Authenticator', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'',
     roles:[], licenses:['365 E3'], devices:1, groups:2,
     xdrIdentity:null, incidentId:null },
-  { upn:'j.reyes@hacksmarterlabs.example', displayName:'Jordan Reyes', jobTitle:'Controller', department:'Finance',
+  { upn:'j.reyes@hacksmartersoc.example', displayName:'Jordan Reyes', jobTitle:'Controller', department:'Finance',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2023-12-04T00:00:00Z',
     lastSignIn:'2026-06-28T08:12:00Z', mfa:'Authenticator', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'Owner of the Finance file share on FIN-FS-02',
     roles:[], licenses:['365 E5'], devices:1, groups:5,
     xdrIdentity:null, incidentId:null },
-  { upn:'lee.helpdesk@hacksmarterlabs.example', displayName:'Helpdesk (Lee)', jobTitle:'Service Desk Technician', department:'IT Operations',
+  { upn:'lee.helpdesk@hacksmartersoc.example', displayName:'Helpdesk (Lee)', jobTitle:'Service Desk Technician', department:'IT Operations',
     userType:'Member', enabled:true, source:'Windows Server AD (synced)', created:'2024-10-21T00:00:00Z',
     lastSignIn:'2026-06-28T07:30:00Z', mfa:'Authenticator', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'',
     roles:['Helpdesk Administrator'], licenses:['365 E3'], devices:1, groups:4,
     xdrIdentity:null, incidentId:null },
-  { upn:'admin.tier0@hacksmarterlabs.example', displayName:'Tier-0 Admin', jobTitle:'Enterprise Administrator', department:'IT Operations',
+  { upn:'admin.tier0@hacksmartersoc.example', displayName:'Tier-0 Admin', jobTitle:'Enterprise Administrator', department:'IT Operations',
     userType:'Member', enabled:true, source:'Cloud only', created:'2023-08-01T00:00:00Z',
     lastSignIn:'2026-06-28T14:05:00Z', mfa:'Passkey (FIDO2)', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'Break-glass-adjacent admin; excluded from risk-based CA by design',
     roles:['Global Administrator'], licenses:['365 E5'], devices:1, groups:7,
     xdrIdentity:null, incidentId:null },
-  { upn:'cloudadmin@hacksmarterlabs.example', displayName:'Cloud Admin', jobTitle:'Cloud Platform Administrator', department:'IT Operations',
+  { upn:'cloudadmin@hacksmartersoc.example', displayName:'Cloud Admin', jobTitle:'Cloud Platform Administrator', department:'IT Operations',
     userType:'Member', enabled:true, source:'Cloud only', created:'2023-08-01T00:00:00Z',
     lastSignIn:'2026-06-28T11:47:00Z', mfa:'Authenticator', sspr:true,
     riskState:'None', riskLevel:'None', riskDetail:'',
     roles:['Global Administrator'], licenses:['365 E5'], devices:1, groups:6,
     xdrIdentity:null, incidentId:null },
-  { upn:'svc-backup@hacksmarterlabs.example', displayName:'svc-backup', jobTitle:'Backup service account', department:'IT Operations',
+  { upn:'svc-backup@hacksmartersoc.example', displayName:'svc-backup', jobTitle:'Backup service account', department:'IT Operations',
     userType:'Service principal', enabled:false, source:'Windows Server AD (synced)', created:'2023-09-12T00:00:00Z',
     lastSignIn:'2026-06-28T03:44:00Z', mfa:'Not registered', sspr:false,
     riskState:'Confirmed compromised', riskLevel:'High', riskDetail:'AdminSDHolder DACL write + DCSync from 10.20.4.55 — account disabled',
     roles:['Backup Operators (on-prem)'], licenses:[], devices:2, groups:3,
-    xdrIdentity:'svc-backup@hacksmarterlabs.example', incidentId:'INC-1019' },
-  { upn:'fin-svc@hacksmarterlabs.example', displayName:'fin-svc', jobTitle:'Finance file-server service account', department:'Finance',
+    xdrIdentity:'svc-backup@hacksmartersoc.example', incidentId:'INC-1019' },
+  { upn:'fin-svc@hacksmartersoc.example', displayName:'fin-svc', jobTitle:'Finance file-server service account', department:'Finance',
     userType:'Service principal', enabled:true, source:'Windows Server AD (synced)', created:'2024-09-01T00:00:00Z',
     lastSignIn:'2026-06-28T10:20:00Z', mfa:'Not registered', sspr:false,
     riskState:'At risk', riskLevel:'High', riskDetail:'Launched locker.exe and vssadmin shadow-copy deletion on FIN-FS-02',
     roles:['Finance Share Owners'], licenses:[], devices:2, groups:2,
-    xdrIdentity:'fin-svc@hacksmarterlabs.example', incidentId:'INC-1050' },
-  { upn:'MSOL_AzureSync@hacksmarterlabs.example', displayName:'MSOL_AzureSync', jobTitle:'Directory synchronization (Entra Connect)', department:'Entra Connect',
+    xdrIdentity:'fin-svc@hacksmartersoc.example', incidentId:'INC-1050' },
+  { upn:'MSOL_AzureSync@hacksmartersoc.example', displayName:'MSOL_AzureSync', jobTitle:'Directory synchronization (Entra Connect)', department:'Entra Connect',
     userType:'Service principal', enabled:true, source:'Windows Server AD (synced)', created:'2023-08-01T00:00:00Z',
     lastSignIn:'2026-06-28T15:00:00Z', mfa:'Not registered', sspr:false,
     riskState:'Dismissed', riskLevel:'Informational', riskDetail:'DCSync from AAD-CONNECT-01 is expected — benign true positive',
     roles:['Directory Synchronization Accounts'], licenses:[], devices:1, groups:1,
-    xdrIdentity:'MSOL_AzureSync@hacksmarterlabs.example', incidentId:'INC-1019' },
-  { upn:'svc-scan@hacksmarterlabs.example', displayName:'svc-scan', jobTitle:'Vulnerability scanner service account', department:'Security Operations',
+    xdrIdentity:'MSOL_AzureSync@hacksmartersoc.example', incidentId:'INC-1019' },
+  { upn:'svc-scan@hacksmartersoc.example', displayName:'svc-scan', jobTitle:'Vulnerability scanner service account', department:'Security Operations',
     userType:'Service principal', enabled:true, source:'Windows Server AD (synced)', created:'2024-02-02T00:00:00Z',
     lastSignIn:'2026-06-28T09:00:00Z', mfa:'Not registered', sspr:false,
     riskState:'None', riskLevel:'Informational', riskDetail:'Runs scanner.exe on WKS-01/02 — source of the suppression-rule lab',
     roles:[], licenses:[], devices:3, groups:1,
     xdrIdentity:null, incidentId:null },
-  { upn:'legacy.batch@hacksmarterlabs.example', displayName:'legacy-batch', jobTitle:'Nightly batch job', department:'Finance',
+  { upn:'legacy.batch@hacksmartersoc.example', displayName:'legacy-batch', jobTitle:'Nightly batch job', department:'Finance',
     userType:'Service principal', enabled:true, source:'Windows Server AD (synced)', created:'2023-08-15T00:00:00Z',
     lastSignIn:'2026-06-28T02:00:00Z', mfa:'Not registered', sspr:false,
     riskState:'At risk', riskLevel:'Medium', riskDetail:'Still authenticating with legacy protocols — blocked by CA002',
     roles:[], licenses:[], devices:1, groups:1,
     xdrIdentity:null, incidentId:null },
-  { upn:'krbtgt@hacksmarterlabs.example', displayName:'krbtgt', jobTitle:'KDC service account', department:'Active Directory',
+  { upn:'krbtgt@hacksmartersoc.example', displayName:'krbtgt', jobTitle:'KDC service account', department:'Active Directory',
     userType:'Service principal', enabled:false, source:'Windows Server AD (not synced)', created:'2023-08-01T00:00:00Z',
     lastSignIn:'2026-06-25T00:00:00Z', mfa:'Not registered', sspr:false,
     riskState:'None', riskLevel:'Informational', riskDetail:'Tier-0 KDC account — watched for Golden Ticket / password rotation',
     roles:[], licenses:[], devices:0, groups:1,
-    xdrIdentity:'krbtgt@hacksmarterlabs.example', incidentId:'INC-1019' },
+    xdrIdentity:'krbtgt@hacksmartersoc.example', incidentId:'INC-1019' },
   { upn:'partner.auditor@fabrikam.com', displayName:'Priya Raman (Fabrikam)', jobTitle:'External auditor', department:'—',
     userType:'Guest', enabled:true, source:'B2B invitation', created:'2026-05-04T00:00:00Z',
     lastSignIn:'2026-06-26T14:20:00Z', mfa:'Authenticator', sspr:false,
     riskState:'None', riskLevel:'None', riskDetail:'Guest scoped to the Finance audit SharePoint site',
     roles:[], licenses:[], devices:0, groups:1,
     xdrIdentity:null, incidentId:null },
-  { upn:'svc-partner@hacksmarterlabs.example', displayName:'svc-partner', jobTitle:'Partner data feed', department:'Sales',
+  { upn:'svc-partner@hacksmartersoc.example', displayName:'svc-partner', jobTitle:'Partner data feed', department:'Sales',
     userType:'Service principal', enabled:true, source:'Cloud only', created:'2025-06-10T00:00:00Z',
     lastSignIn:'2026-06-28T06:00:00Z', mfa:'Not registered', sspr:false,
     riskState:'None', riskLevel:'None', riskDetail:'Certificate credential expires 2026-09-01',
@@ -6841,19 +6348,19 @@ const ENTRA_USERS = [
 
 // Privileged role assignments surfaced on the Entra overview (PIM view).
 const ENTRA_ROLE_ASSIGNMENTS = [
-  { role:'Global Administrator',        active:2, eligible:0, members:['admin.tier0@hacksmarterlabs.example','cloudadmin@hacksmarterlabs.example'],
+  { role:'Global Administrator',        active:2, eligible:0, members:['admin.tier0@hacksmartersoc.example','cloudadmin@hacksmartersoc.example'],
     note:'Two permanent assignments — Product guidance recommends 2–4 with phishing-resistant MFA.' },
-  { role:'Security Administrator',      active:0, eligible:2, members:['olivia.kim@hacksmarterlabs.example','r.vance@hacksmarterlabs.example'],
+  { role:'Security Administrator',      active:0, eligible:2, members:['olivia.kim@hacksmartersoc.example','r.vance@hacksmartersoc.example'],
     note:'PIM eligible only. Olivia Kim activated for 45 minutes under CHG-4821.' },
-  { role:'Security Operator',           active:1, eligible:0, members:['r.vance@hacksmarterlabs.example'],
+  { role:'Security Operator',           active:1, eligible:0, members:['r.vance@hacksmartersoc.example'],
     note:'Standing assignment used for Defender XDR response actions.' },
-  { role:'Security Reader',             active:1, eligible:0, members:['m.okafor@hacksmarterlabs.example'],
+  { role:'Security Reader',             active:1, eligible:0, members:['m.okafor@hacksmartersoc.example'],
     note:'Read-only analyst access across Defender and Sentinel.' },
-  { role:'Helpdesk Administrator',      active:1, eligible:0, members:['lee.helpdesk@hacksmarterlabs.example'],
+  { role:'Helpdesk Administrator',      active:1, eligible:0, members:['lee.helpdesk@hacksmartersoc.example'],
     note:'Can reset passwords for non-admin users — a common attacker target.' },
-  { role:'eDiscovery Manager',          active:1, eligible:0, members:['tchen@hacksmarterlabs.example'],
+  { role:'eDiscovery Manager',          active:1, eligible:0, members:['tchen@hacksmartersoc.example'],
     note:'Purview eDiscovery (Premium) case owner.' },
-  { role:'Directory Synchronization Accounts', active:1, eligible:0, members:['MSOL_AzureSync@hacksmarterlabs.example'],
+  { role:'Directory Synchronization Accounts', active:1, eligible:0, members:['MSOL_AzureSync@hacksmartersoc.example'],
     note:'Service role. Replication is expected — do not treat its DCSync as malicious.' },
 ];
 
@@ -6871,15 +6378,15 @@ const ENTRA_RISK_DETECTION_SUMMARY = [
 
 // Recent risky sign-ins across the tenant (feeds the overview activity card).
 const ENTRA_RECENT_SIGNINS = [
-  { time:'2026-06-28T13:33:00Z', user:'sam.lee@hacksmarterlabs.example',    app:'Azure Portal',                 ip:'91.219.236.54',  location:'Amsterdam, NL', result:'Blocked by CA', risk:'High',   ca:'CA003 - Risky sign-in MFA' },
-  { time:'2026-06-28T13:27:00Z', user:'sam.lee@hacksmarterlabs.example',    app:'Exchange Online',              ip:'91.219.236.54',  location:'Amsterdam, NL', result:'Success',       risk:'High',   ca:'Not applied' },
-  { time:'2026-06-28T10:20:00Z', user:'fin-svc@hacksmarterlabs.example',    app:'Windows SMB (on-prem)',        ip:'10.20.4.55',     location:'Redmond, US',   result:'Success',       risk:'High',   ca:'Not applied' },
-  { time:'2026-06-28T09:05:00Z', user:'jordan.wong@hacksmarterlabs.example',  app:'Hack Smarter Travel',               ip:'76.21.55.4',     location:'Seattle, US',   result:'Success',       risk:'Low',    ca:'CA001 satisfied' },
-  { time:'2026-06-28T08:30:00Z', user:'jane.doe@hacksmarterlabs.example',   app:'DocViewer Pro',                ip:'185.199.111.12', location:'Ashburn, US',   result:'Success',       risk:'High',   ca:'Not applied' },
-  { time:'2026-06-28T06:44:00Z', user:'maria.ross@hacksmarterlabs.example', app:'SharePoint Online',            ip:'185.199.111.12', location:'Ashburn, US',   result:'Interrupted',   risk:'High',   ca:'CA003 - Risky sign-in MFA' },
-  { time:'2026-06-28T04:12:00Z', user:'liam.chen@hacksmarterlabs.example',  app:'365 portal',         ip:'203.0.113.74',   location:'Unknown',       result:'Failure',       risk:'Medium', ca:'Not applied' },
-  { time:'2026-06-28T03:44:00Z', user:'svc-backup@hacksmarterlabs.example', app:'Windows LDAP (on-prem)',       ip:'10.20.4.55',     location:'Redmond, US',   result:'Success',       risk:'High',   ca:'Not applied' },
-  { time:'2026-06-28T02:00:00Z', user:'legacy.batch@hacksmarterlabs.example', app:'IMAP4 (legacy auth)',        ip:'10.20.9.10',     location:'Redmond, US',   result:'Blocked by CA', risk:'Medium', ca:'CA002 - Block legacy auth' },
+  { time:'2026-06-28T13:33:00Z', user:'sam.lee@hacksmartersoc.example',    app:'Azure Portal',                 ip:'91.219.236.54',  location:'Amsterdam, NL', result:'Blocked by CA', risk:'High',   ca:'CA003 - Risky sign-in MFA' },
+  { time:'2026-06-28T13:27:00Z', user:'sam.lee@hacksmartersoc.example',    app:'Exchange Online',              ip:'91.219.236.54',  location:'Amsterdam, NL', result:'Success',       risk:'High',   ca:'Not applied' },
+  { time:'2026-06-28T10:20:00Z', user:'fin-svc@hacksmartersoc.example',    app:'Windows SMB (on-prem)',        ip:'10.20.4.55',     location:'Redmond, US',   result:'Success',       risk:'High',   ca:'Not applied' },
+  { time:'2026-06-28T09:05:00Z', user:'jordan.wong@hacksmartersoc.example',  app:'Hack Smarter Travel',               ip:'76.21.55.4',     location:'Seattle, US',   result:'Success',       risk:'Low',    ca:'CA001 satisfied' },
+  { time:'2026-06-28T08:30:00Z', user:'jane.doe@hacksmartersoc.example',   app:'DocViewer Pro',                ip:'185.199.111.12', location:'Ashburn, US',   result:'Success',       risk:'High',   ca:'Not applied' },
+  { time:'2026-06-28T06:44:00Z', user:'maria.ross@hacksmartersoc.example', app:'SharePoint Online',            ip:'185.199.111.12', location:'Ashburn, US',   result:'Interrupted',   risk:'High',   ca:'CA003 - Risky sign-in MFA' },
+  { time:'2026-06-28T04:12:00Z', user:'liam.chen@hacksmartersoc.example',  app:'365 portal',         ip:'203.0.113.74',   location:'Unknown',       result:'Failure',       risk:'Medium', ca:'Not applied' },
+  { time:'2026-06-28T03:44:00Z', user:'svc-backup@hacksmartersoc.example', app:'Windows LDAP (on-prem)',       ip:'10.20.4.55',     location:'Redmond, US',   result:'Success',       risk:'High',   ca:'Not applied' },
+  { time:'2026-06-28T02:00:00Z', user:'legacy.batch@hacksmartersoc.example', app:'IMAP4 (legacy auth)',        ip:'10.20.9.10',     location:'Redmond, US',   result:'Blocked by CA', risk:'Medium', ca:'CA002 - Block legacy auth' },
 ];
 
 // The four sign-in log types a real identity platform separates. Only the
@@ -6904,74 +6411,74 @@ const SIGNIN_LOG_TYPES = [
 //
 // `id` values are stable so a view can address specific rows by selector.
 const SIGNIN_LOG_EVENTS = [
-  { id:'SL-020', time:'2026-06-28T09:14:22Z', user:'m.okafor@hacksmarterlabs.example', display:'Miriam Okafor',
+  { id:'SL-020', time:'2026-06-28T09:14:22Z', user:'m.okafor@hacksmartersoc.example', display:'Miriam Okafor',
     app:'365 portal', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-2104 (managed)',
     client:'Browser — Edge 139', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied' },
-  { id:'SL-019', time:'2026-06-28T09:09:41Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-019', time:'2026-06-28T09:09:41Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Not prompted',
     risk:'High', ca:'Not applied', flag:'success' },
-  { id:'SL-018', time:'2026-06-28T09:08:55Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-018', time:'2026-06-28T09:08:55Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'High', ca:'Not applied', flag:'fail' },
-  { id:'SL-017', time:'2026-06-28T09:08:02Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-017', time:'2026-06-28T09:08:02Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'High', ca:'Not applied', flag:'fail' },
-  { id:'SL-016', time:'2026-06-28T09:07:10Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-016', time:'2026-06-28T09:07:10Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'Medium', ca:'Not applied', flag:'fail' },
-  { id:'SL-015', time:'2026-06-28T09:06:19Z', user:'t.arnold@hacksmarterlabs.example', display:'Tom Arnold',
+  { id:'SL-015', time:'2026-06-28T09:06:19Z', user:'t.arnold@hacksmartersoc.example', display:'Tom Arnold',
     app:'Exchange Online', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-1877 (managed)',
     client:'Outlook desktop', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied' },
-  { id:'SL-014', time:'2026-06-28T09:05:44Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-014', time:'2026-06-28T09:05:44Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'Medium', ca:'Not applied', flag:'fail' },
-  { id:'SL-013', time:'2026-06-28T09:04:51Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-013', time:'2026-06-28T09:04:51Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'Medium', ca:'Not applied', flag:'fail' },
-  { id:'SL-012', time:'2026-06-28T09:03:58Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-012', time:'2026-06-28T09:03:58Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'Low', ca:'Not applied', flag:'fail' },
-  { id:'SL-011', time:'2026-06-28T09:03:04Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-011', time:'2026-06-28T09:03:04Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'Low', ca:'Not applied', flag:'fail' },
-  { id:'SL-010', time:'2026-06-28T09:02:11Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-010', time:'2026-06-28T09:02:11Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'185.220.101.24', location:'Bucharest, RO', device:'Unmanaged — not registered',
     client:'Browser — Chrome 141', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'Low', ca:'Not applied', flag:'fail' },
-  { id:'SL-009', time:'2026-06-28T08:58:37Z', user:'r.beck@hacksmarterlabs.example', display:'Rina Beck',
+  { id:'SL-009', time:'2026-06-28T08:58:37Z', user:'r.beck@hacksmartersoc.example', display:'Rina Beck',
     app:'SharePoint Online', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-2290 (managed)',
     client:'Browser — Edge 139', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied' },
-  { id:'SL-008', time:'2026-06-28T08:41:16Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-008', time:'2026-06-28T08:41:16Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-2291 (managed)',
     client:'Browser — Edge 139', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied', flag:'baseline' },
   // The control case: one failure then a success, same managed laptop, same
   // office IP. A student who calls this an attack has learned the pattern
   // without the context, which is the mistake Module 01 is built to prevent.
-  { id:'SL-007', time:'2026-06-28T08:23:11Z', user:'t.arnold@hacksmarterlabs.example', display:'Tom Arnold',
+  { id:'SL-007', time:'2026-06-28T08:23:11Z', user:'t.arnold@hacksmartersoc.example', display:'Tom Arnold',
     app:'365 portal', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-1877 (managed)',
     client:'Browser — Edge 139', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied' },
-  { id:'SL-006', time:'2026-06-28T08:22:49Z', user:'t.arnold@hacksmarterlabs.example', display:'Tom Arnold',
+  { id:'SL-006', time:'2026-06-28T08:22:49Z', user:'t.arnold@hacksmartersoc.example', display:'Tom Arnold',
     app:'365 portal', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-1877 (managed)',
     client:'Browser — Edge 139', result:'Failure', code:'50126', detail:'Invalid username or password', mfa:'Not reached',
     risk:'None', ca:'Not applied' },
-  { id:'SL-005', time:'2026-06-27T17:02:30Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-005', time:'2026-06-27T17:02:30Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'Exchange Online', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-2291 (managed)',
     client:'Outlook desktop', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied', flag:'baseline' },
-  { id:'SL-004', time:'2026-06-27T08:37:05Z', user:'j.santos@hacksmarterlabs.example', display:'Julia Santos',
+  { id:'SL-004', time:'2026-06-27T08:37:05Z', user:'j.santos@hacksmartersoc.example', display:'Julia Santos',
     app:'365 portal', ip:'91.63.14.22', location:'Berlin, DE', device:'HSL-LT-2291 (managed)',
     client:'Browser — Edge 139', result:'Success', code:'0', detail:'Sign-in successful', mfa:'Authenticator',
     risk:'None', ca:'CA001 satisfied', flag:'baseline' },
@@ -6995,9 +6502,9 @@ const ENTRA_RECOMMENDATIONS = [
 // ===================== 365 admin center =====================
 // Supporting tenant-administration fixtures. These reuse ENTRA_USERS for the
 // directory itself so identity, licensing, Defender, and Purview pivots all
-// refer to the same fictional Hack Smarter Labs principals.
+// refer to the same fictional Hack Smarter SOC principals.
 const M365_ADMIN_TENANT = {
-  name:'Hack Smarter Labs', domain:'hacksmarterlabs.example', view:'Dashboard view',
+  name:'Hack Smarter SOC', domain:'hacksmartersoc.example', view:'Dashboard view',
   release:'Standard release', region:'North America',
 };
 
@@ -7029,7 +6536,7 @@ const M365_MESSAGE_CENTER = [
     impact:'Action required', tag:'Admin impact', category:'Prevent or fix issues', relevance:'High',
     published:'2026-07-31', updated:'2026-08-01', timing:'August 2026', due:'2026-08-15',
     platform:'Web', orgStatus:'Action recommended', monthlyUsers:20,
-    whatWhy:'Hack Smarter Labs should review users who have not registered a strong authentication method before the next registration campaign.',
+    whatWhy:'Hack Smarter SOC should review users who have not registered a strong authentication method before the next registration campaign.',
     rollout:'The tenant review is available now. The fictional campaign begins August 18 and is evaluated in phases through August 29.',
     orgImpact:'Three active members in the lab directory have no registered MFA method. They can be prompted during sign-in and might contact the help desk.',
     actions:['Review the unregistered-user list in Entra.', 'Notify the help desk about the registration prompt.', 'Confirm break-glass accounts are excluded from the campaign.'],
@@ -7061,8 +6568,61 @@ const M365_MESSAGE_CENTER = [
 
 const M365_SETUP_TASKS = [
   { title:'Protect admin accounts with phishing-resistant MFA', category:'Sign-in security', status:'In progress', route:'#/identity/conditional-access' },
-  { title:'Review data loss prevention coverage', category:'Data protection', status:'Available', route:'#/governance/dlp' },
   { title:'Review service health notification preferences', category:'Operations', status:'Available', route:'#/workspace/service-health' },
-  { title:'Validate 365 license assignments', category:'Licensing', status:'Available', route:'#/workspace/licenses' },
 ];
 // === end 365 admin center ===
+
+// === Lab clock =============================================================
+// The whole incident narrative below (alerts, incidents, raw-log evidence,
+// device/identity telemetry) is written as one fictional day, 2026-06-27 to
+// 2026-06-28. Hardcoding that day means it drifts further into the past every
+// time this lab is reopened, and eventually a student filtering Advanced
+// Hunting to "the last 24 hours" would see nothing at all.
+//
+// LAB_ANCHOR is what the dataset calls "now" (the end of the incident day).
+// LAB_TIME_OFFSET_MS shifts every 2026-06-27/28 timestamp in the tables below
+// forward by the same amount, so the exact same story — same gaps between
+// alert and evidence, same order of events — always lands in the recent past
+// relative to whenever the page loads. It is computed once per page load, not
+// on a timer, so timestamps stay stable for the length of a session.
+const LAB_ANCHOR = '2026-06-28T18:09:00Z';
+const LAB_TIME_OFFSET_MS = Date.now() - Date.parse(LAB_ANCHOR);
+
+// Finds every 2026-06-27 / 2026-06-28 date (bare or full ISO datetime)
+// anywhere inside a string — including ones embedded in prose or CSV text —
+// and shifts it by LAB_TIME_OFFSET_MS. Non-matching text passes through
+// unchanged, so this is safe to run over fields that aren't dates at all.
+function shiftLabDateText(text) {
+  return String(text).replace(/2026-06-2[78](T[0-9:.]+Z)?/g, (match, time) => {
+    const shifted = new Date(Date.parse(match) + LAB_TIME_OFFSET_MS);
+    return time ? shifted.toISOString().replace(/\.000Z$/, 'Z') : shifted.toISOString().slice(0, 10);
+  });
+}
+
+// Recursively rewrites every string field of a data structure in place via
+// shiftLabDateText. Arrays and plain objects only — SEED_ALERTS, INCIDENTS,
+// and friends are plain JSON-shaped data, not class instances.
+function shiftLabDatesDeep(node, seen = new Set()) {
+  if (!node || typeof node !== 'object' || seen.has(node)) return node;
+  seen.add(node);
+  for (const key of Object.keys(node)) {
+    const value = node[key];
+    if (typeof value === 'string') node[key] = shiftLabDateText(value);
+    else if (value && typeof value === 'object') shiftLabDatesDeep(value, seen);
+  }
+  return node;
+}
+
+// Every top-level dataset that carries a 2026-06-27/28 timestamp. (TI_IMPORT_CSV
+// also has two — it's a raw CSV string, shifted at its one render site instead.)
+[
+  SEED_ALERTS, INCIDENTS, MOCK_QUERY_RESULTS, ASIM_AUTHENTICATION_ROWS, ASIM_NETWORK_SESSION_ROWS,
+  INCIDENT_ACTIVITIES, ATTACK_STORIES, CLOUD_ALERTS, CLOUD_INCIDENTS, DEVICE_TIMELINE_EVENTS,
+  ENTRA_USERS, SIGNIN_LOG_EVENTS, DISCOVERED_DEVICES, DEVICES, IDENTITY_TIMELINE,
+  ENTRA_IDENTITY_INVESTIGATIONS, ENTRA_RECENT_SIGNINS, IDENTITIES, AUDIT_LOG,
+  CLOUD_APP_INVESTIGATIONS, THREAT_INTEL_INDICATORS, DEVICE_LIVE_RESPONSE, MC_ALERTS,
+  SYNTHETIC_TRANSACTIONS, CASE_MANAGEMENT, SENTINEL_BOOKMARK_SUGGESTIONS,
+  DEVICE_DISCOVERY_SETTINGS, DEVICE_INVESTIGATION_PACKAGES, COPILOT_SESSIONS, MC_ATTACK_PATHS,
+  DEFAULT_SUPPRESSION_RULE, ENTRA_TENANT,
+].forEach(node => shiftLabDatesDeep(node));
+// === end lab clock ===

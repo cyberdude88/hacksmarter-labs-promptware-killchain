@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # One command to bring the Hack Smarter Labs range up locally.
 #
-# The range is a single static app: ui/ served on 8777. There is no portal,
+# The range is a single static app served on 8777. There is no portal,
 # no login, no curriculum — you land directly in the security workspace.
 # Port 8777 is deliberately clear of the SC-200 lab (8765) and the academy
 # portal/simulator pair (8768/8767) so all three can run side by side.
+#
+# Serves the prebuilt ~/promptware-kill-chain app (a standalone AI-triage
+# range), not this repo's ui/ — ui/ has in-progress uncommitted work and is
+# left alone. Rebuild the range with `npm run build` in
+# ~/promptware-kill-chain when its src changes.
 #
 #   bin/dev.sh          start, print the URL
 #   bin/dev.sh stop     stop
@@ -13,6 +18,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RANGE_PORT=8777
+RANGE_DIR="/home/alex/promptware-kill-chain/dist"
 
 is_up() {
   (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null && { exec 3>&-; return 0; } || return 1
@@ -54,7 +60,7 @@ stop_one() {
 case "${1:-start}" in
   start)
     echo "Starting the Hack Smarter Labs range:"
-    serve "$RANGE_PORT" "$ROOT/ui" range
+    serve "$RANGE_PORT" "$RANGE_DIR" range
     cat <<EOF2
 
   Range   http://127.0.0.1:$RANGE_PORT/

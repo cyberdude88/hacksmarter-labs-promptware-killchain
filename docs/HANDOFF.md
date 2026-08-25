@@ -1926,3 +1926,238 @@ paste reconstruction, typed-colon suppression, successful Fact 2 submission, ele
 slots plus three fixed dots, and dashed-mask generation. Syntax, whitespace, module
 render, and state-isolation checks pass; the full render baseline remains 128/129 with
 only the pre-existing `purview/audit` failure.
+
+## De-Microsofting comment/identifier cleanup + Home header and dashboard restyle (2026-08-23)
+
+Two unrelated passes in one session, both scoped to `ui/index.html`, `ui/app.js`,
+`ui/views.js`, `ui/styles.css`, and `ui/helpdesk.js`.
+
+**De-Microsofting leftovers.** `bin/neutral-check.js` only scrubs rendered/visible text
+via `neutralizeTerminology()`; it does not touch HTML comments or CSS class/id names,
+which a browser never renders but which still literally said `Sentinel`/`Defender`/
+`Azure`. Fixed: 7 HTML comments in `ui/index.html` (`SENTINEL ANALYTICS RULE WIZARD` →
+`SIEM ANALYTICS RULE WIZARD`, four `DEFENDER FOR CLOUD ...` → `CLOUD SECURITY ...`,
+etc.), one comment in `ui/views.js`, and a full rename of the hidden/dead legacy
+`pane-azure` id/class family (`pane-azure`/`toggle-azure`/`sidenav-azure`/`no-azure`,
+the `hsl.pane.azure` localStorage key, and the `azurePane`/`azCollapsed` JS vars) to
+`pane-cloud`/`toggle-cloud`/etc. across `index.html`, `app.js`, and `styles.css` — this
+matches the `cloud` naming the codebase already uses for the equivalent live concept
+(`CLOUD_NAV`). Deliberately **not** touched: the hundreds of raw `Azure`/`Defender`/
+`Sentinel` strings in `ui/data.js`/`ui/views.js` fixture data — those are intentional
+raw source that `neutralizeTerminology()` scrubs before render (still 124/124 clean),
+and rewriting that is a different, much larger job than a comment/id cleanup.
+
+**Header restructure.** Killed the waffle button (`#btn-waffle`) and its
+`#panel-switcher` "Cloud Systems switcher" panel — confirmed genuinely redundant
+before removing: `renderHomeHub()` (opened by clicking the logo) already unions every
+route across all `PORTALS` via `buildNavBuckets()`, a strict superset of what the
+6-portal waffle switcher offered. Removed the now-dead `renderSwitcher()`,
+`CLOUD_APP_ROUTE`, and `CLOUD_HIGHLIGHT` from `app.js`. **Gotcha for the next agent:**
+`ui/helpdesk.js` wrote into `CLOUD_HIGHLIGHT.helpdesk` and `CLOUD_APP_ROUTE['IT Service
+Desk']` as top-level statements at load time (the same load-order trap the existing
+`PORTAL_CONTEXT` comment in `app.js` warns about) — deleting the objects without also
+fixing those two lines throws `ReferenceError: CLOUD_HIGHLIGHT is not defined` on every
+page load. Fixed by deleting those two dead-write lines in `helpdesk.js`. If you ever
+delete another cross-file global, grep `ui/helpdesk.js` specifically before you do —
+it's the one file that mutates other files' top-level objects at script-load time.
+`.topbar` changed from a fixed 3-column grid (`410px 1fr 370px`, which is what forced
+the search bar into a huge stretched "band") to flex, with search now a compact
+`flex: 0 1 320px` field living directly inside `.topbar-left` next to the logo, styled
+as a bottom-border field instead of a filled pill. Responsive breakpoints at 1100px and
+820px updated to match (see `.home-layout`/`.topbar-search` media queries).
+
+**Home dashboard hierarchy.** `VIEWS['xdr/home']`'s 4-tile equal-weight `.kpi-strip` is
+replaced by `.home-hero`: one dominant 52px "Active incidents" number with three
+smaller supporting stats beside it. The two-col/three-col grid of 5 equal bordered
+`.card` boxes below it is replaced by `.home-layout`: a `2fr/1fr` primary-work-queue +
+lighter-weight sidebar split (incidents table + threat campaigns unboxed on the left;
+latest alerts/exposure score/next steps divided by a single rule on the right, no card
+chrome). New CSS lives right after the old `.kpi`/`.kpi-strip` rules in `styles.css`
+(kept — still used by 34 other `kpi-strip` instances elsewhere in the app, e.g. hunting
+status cards, which were intentionally left alone as a different, denser-data context
+than a landing dashboard). This was scoped to the Home view only, not a global
+`.card`/`.two-col`/`.three-col` rewrite — Alex's ask was read as "fix the flagship
+dashboard now," not "reskin all ~124 views," which would be a much bigger, separate
+pass if wanted later.
+
+Verified: `node bin/neutral-check.js` clean (124/124), `node --check` clean on
+`app.js`/`views.js`/`helpdesk.js`, and a real Chrome pass (via claude-in-chrome) —
+console clean after the `CLOUD_HIGHLIGHT` fix, search input/dropdown/theme-toggle/home-hub
+all functional, home hero + primary/sidebar layout render correctly, and the header
+reflows sanely down to 900px width.
+
+### Unrelated finding, not acted on: `#/xdr/incident` is not a per-incident route
+`openIncidentPage(id)` (`app.js`) stashes the id in `sessionStorage['hsl.incident.id']`
+and navigates to the **static** hash `#/xdr/incident` — every incident renders at the
+exact same URL. `VIEWS['xdr/incident']` (`views.js:1554`) reads the id back out of
+`sessionStorage`, falling back to `INCIDENTS[0]` if nothing's stashed. Practical
+consequence: the incident detail URL is not bookmarkable/shareable/deep-linkable, and
+a stale or cleared `sessionStorage` silently shows the wrong (first) incident instead
+of erroring. Flagged for whoever picks this up next; not fixed this session since it
+wasn't part of the ask and changing routing behavior needs its own verification pass.
+
+## Home dashboard decluttering + full Purview/governance workload removal (2026-08-23)
+
+Session driven by Alex walking the live app page by page (`http://127.0.0.1:8777/`)
+and calling out clutter that doesn't map to a transferable SOC-analyst skill. Two
+things landed; a longer list is queued below for whoever picks this up next —
+**read that list before doing anything else**, it's specific enough to execute
+directly.
+
+**Done: Home dashboard device-type breakdown collapsed by default.**
+`VIEWS['xdr/home']`'s `renderDiscoveredDevicesCard()` (`ui/views.js`, search
+`Distribution by device type`) dumped all 132 device-type classifications open on
+the landing page. Wrapped in the existing `<details class="dfc-additional-recs">`
+collapse idiom (same ▸/▾ pattern already used at `.dfc-additional-recs` in
+`styles.css:5142`) so it's collapsed by default; expands to the same scrollable
+list. Verified in Chrome.
+
+**Done: `governance/*` (Purview/Data Governance) workload removed entirely.**
+Alex's call: not a transferable SOC-analyst skill for this course's current scope
+(`docs/inherited/LATEST_PROGRESS.md`: "General SOC Analyst training—not SC-200
+certification training", user's current direction is priority #1 over legacy
+scope docs). Removed:
+- `ui/views.js`: the whole `VIEWS['governance/*']` block (13 view functions,
+  `home`/`classic-governance`/`solutions`/`ai-hub`/`dlp`/`insider-risk`/
+  `communication-compliance`/`graph-activity`/`ediscovery`/`records`/`lifecycle`/
+  `information-protection`/`audit`) plus its `governance:` entry in the
+  `registerSecondaryNavViews()` workload-notes map, plus 3 cross-links from other
+  views (a "Purview Audit" tile off the mail-response study card, a `pivots` array
+  entry, and an admin-centers "Compliance" tile — that last one now `toast()`s
+  "outside lab scope" like its Exchange/Teams/SharePoint siblings instead of
+  navigating).
+- `ui/data.js`: the `governance` `PORTALS` entry, the whole `NAV.governance` array,
+  the entire dead DLP/Purview data block (`DLP_ACTIONS` through `LABEL_ACTIVITY` —
+  `DLP_POLICIES`, `DLP_INCIDENTS`, `dlpAppliedAction()`, `INSIDER_RISK_POLICIES`,
+  `INSIDER_RISK_CASES`, `COMMUNICATION_REVIEWS`, `EDISCOVERY_CASES`,
+  `GRAPH_ACTIVITY_GUIDANCE`, `RECORD_LABELS`, `LIFECYCLE_POLICIES`,
+  `PURVIEW_SOLUTIONS`, `CLASSIC_PURVIEW_FEATURES`, `PURVIEW_CONNECTED_SOURCES`,
+  `SENSITIVITY_LABELS`, `LABEL_POLICIES`, `LABEL_ACTIVITY` — confirmed zero
+  outside references before deleting), the `audit-search` guided-scenario coach
+  mark (home-page card "Search the audit log"), and the dead
+  `#/governance/dlp` row in `M365_SETUP_TASKS`.
+- `ui/app.js`: the `governance` key in `PORTAL_CONTEXT` and `PORTAL_BUCKET`.
+- Bonus fix found along the way: `render()` in `ui/app.js` had a
+  `cleanPortal = wl === 'governance'` special case that hid the entire left
+  sidenav (`.shell.clean-portal` → `grid-template-columns: 1fr`, `.pane { display:
+  none }`) for every `governance/*` route — Alex hit this via
+  `#/governance/classic-governance` mid-session and called it a bug ("must not
+  happen on ANY of those pages"). Fixed by deleting the whole `cleanPortal`
+  branch so governance rendered like every other workload — moot now since the
+  workload is gone, but if anything similar reappears, `cleanPortal` no longer
+  exists anywhere in `app.js`.
+
+Verified: `node --check` clean on all three files, `node bin/render_all.js` →
+`views: 111/111 render clean ... dead NAV routes: 0`, zero remaining
+`#/governance` string matches anywhere in `ui/`, and a real Chrome pass (home
+page + hard reload) with a clean console.
+
+### Queued from the same session — not yet done, execute in a fresh context
+
+Alex fired these in quick succession near the end of the session before asking to
+checkpoint. All are nav/content trims in the same spirit as the governance
+removal above (cut what doesn't teach a transferable SOC-analyst skill), but none
+were executed yet. Recommended order: Community first (clean, no dependencies),
+then the plain nav-declutter list, then Content hub and Workspace manager (both
+have a real dependency — read the caveat before touching them), then resolve the
+two open questions.
+
+1. **Every page labeled "Community" (💬) — explicit, repeated instruction, do
+   this one first.** Remove `#/siem/community` (in `NAV.siem` and in
+   `NAV.xdr`'s `ADMIN_SUBGROUPS` "Reporting & platform settings" list, both in
+   `ui/data.js`/`ui/app.js`) and `#/cloud/community` (`NAV.cloud`). Also delete
+   their `VIEWS['siem/community']`/`VIEWS['cloud/community']` stub definitions
+   (`SECONDARY_SURFACES` entries in `ui/views.js`, the `renderSecondarySurface()`
+   pattern — same shape as the `siem/repositories` stub) and the
+   `SECONDARY_SURFACES['siem/repositories']` cross-link that points at
+   `#/siem/community` as a "supporting surface" pointer. Do **not** touch
+   `#/governance/communication-compliance` — that's a different feature
+   ("Communication compliance") that happens to reuse the same 💬 icon; it's
+   already gone as part of the governance removal above, not a Community page.
+
+2. **Plain nav removals (explicit "remove"), all thin stub pages, low risk:**
+   - `#/siem/news` "News & guides" (`NAV.siem`)
+   - `#/xdr/trials` "Trials" (`NAV.xdr`, `ADMIN_SUBGROUPS`)
+   - `#/xdr/learning-hub` "Learning hub" (`NAV.xdr`, `ADMIN_SUBGROUPS`)
+   Each is a `renderSecondarySurface()`/stub-style view — check `SECONDARY_SURFACES`
+   in `ui/views.js` for cross-links the way the Community entry has one, and check
+   `render_all.js` afterward for dead-route/orphan fallout the same way this
+   session did.
+
+3. **Content hub — Alex said "no content hub" (remove/declutter), but it is
+   load-bearing, unlike #1/#2 above.** `VIEWS['siem/content-hub']`
+   (`ui/views.js`) gates the Syslog-via-AMA data-connector lab:
+   `installSentinelSolution('syslog')` sets `solutionInstalled`, and
+   `openSyslogAmaConnector()` in `ui/app.js` (~line 3696) refuses to proceed
+   with a toast ("Install the Syslog solution from Content hub first") if it
+   isn't set. Simplest fix in the spirit of "no content hub in the nav": remove
+   the `#/siem/content-hub` nav entries (`NAV.siem`, `NAV.xdr`'s "Data
+   connectors" cross-link) but keep the route/view itself reachable via the
+   existing in-page link from `#/siem/data-connectors` (same pattern
+   `siem/repositories` already used — off-nav but link-reachable) so the
+   ingestion lab doesn't dead-end. A more thorough fix would fold the "install
+   the solution" step directly into the Data connectors page and delete Content
+   hub outright, but that's a small feature redesign, not a nav trim — check
+   with Alex before doing that version.
+
+4. **Workspace manager — same caution as Content hub.** `#/siem/workspace-manager`
+   (`NAV.siem`, `ADMIN_SUBGROUPS`) backs a "load a cross-workspace `Workspace()`
+   query into Advanced hunting" feature referenced twice in `ui/views.js`
+   (search `Workspace() query loaded from Workspace manager`, ~lines 5081 and
+   5252 pre-this-session numbering). Confirm whether anything still points users
+   there before deleting the view, not just the nav entry — a dangling
+   "Open Workspace manager" button would be a worse regression than the one just
+   fixed on the governance page.
+
+5. **Tenant/helpdesk admin trims (explicit, from the `ADMIN_SUBGROUPS` "Tenant &
+   workspace" and "Support & service desk" buckets in `ui/app.js`):**
+   - `#/helpdesk/event-viewer` "Event log viewer" — remove.
+   - `#/workspace/setup` "Setup" — remove. **Not** `#/cloud/setup` (Defender for
+     Cloud onboarding) — that's a different, arguably-legit cloud-security-skill
+     page in a different workload; Alex's list was entirely `workspace/*` items
+     (message center, service health, billing/licenses) so `#/workspace/setup`
+     is the one meant.
+   - `#/workspace/message-center` "Message center" — remove.
+   - `#/workspace/service-health` "Service health" — remove.
+   - `#/workspace/licenses` "Billing › Licenses" — remove. Check
+     `M365_SETUP_TASKS`/`VIEWS['workspace/users']` (`ui/views.js`, ~line 11135
+     pre-session numbering, "Product licenses can be managed here...") for
+     cross-links the same way the governance/dlp entry in `M365_SETUP_TASKS` had
+     one.
+   - Inventory (`#/cloud/inventory`) is explicitly **out of scope for removal** —
+     Alex confirmed it's useful ("inventory...yes").
+
+### Open questions raised, not yet decided — ask Alex before acting
+
+- **Is the whole "Support & service desk" (`helpdesk/*`) bucket in scope for a
+  "general SOC Analyst" course at all?** It's DNS/DHCP/Group Policy/printers/
+  PowerShell/server-manager — sysadmin/helpdesk skills, not SOC triage/hunting.
+  Alex asked "is Support & service desk necessary either?" and "knowledge base
+  even useful?" (`#/helpdesk/knowledge-base`) but didn't give a remove
+  instruction for the bucket as a whole, only for `event-viewer` within it (see
+  §5 above). Get an explicit answer before touching the rest of `helpdesk/*` —
+  it's a much bigger call (a whole workload, ~17 routes) than the trims above.
+- **"AIR center can merge with Automation"** — Alex's suggestion, not yet scoped.
+  Need to identify what AIR center currently is in this app (likely
+  `#/xdr/action-center` — Defender's Automated Investigation & Response surface)
+  versus `#/siem/automation` (Sentinel's playbook/automation-rule page), read
+  both `VIEWS[...]` definitions, and figure out whether "merge" means a nav
+  consolidation (one page, tabs) or just co-locating them under one nav section.
+  Not investigated this session.
+
+### Informational, answered inline in chat but worth keeping here
+
+Alex asked where network logs / IDS-IPS / firewall alerts / system logs "live" in
+this app, mid-session, before the checkpoint request — answer for continuity:
+- **Firewall/IDS/IPS-style logs**: `CommonSecurityLog` table (CEF format,
+  `DeviceVendor:'Hack Smarter SOC Firewall'` fixture rows in `ui/data.js`
+  ~line 1552 pre-session), reachable via Advanced hunting KQL and via the
+  Syslog-via-AMA ingestion lab gated behind Content hub (see §3 above).
+- **Normalized network-session view (ASIM)**: `#/siem/hunting/network-session`
+  ("ASIM Network Session (Preview)" in nav) — firewall/proxy sessions normalized
+  to one schema regardless of source vendor.
+- **Endpoint-level network telemetry**: `DeviceNetworkEvents` table, queryable
+  from `#/xdr/hunting` (Advanced hunting) alongside `DeviceProcessEvents` etc.
+- **Sign-in logs**: already exist at `#/identity/sign-in-logs` (`NAV.identity`,
+  `ADMIN_SUBGROUPS` "Directory & access") — Alex asked "if there are sign-in
+  logs"; confirmed yes, nothing to build.
