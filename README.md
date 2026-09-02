@@ -3,6 +3,8 @@
 A single-page, offline SOC cyber range. No sign-in, no curriculum, no portal —
 you land directly in the security workspace and work incidents.
 
+Start here for Codex sessions: [CODEX.md](/home/alex/hacksmarter-labs/CODEX.md)
+
 ```bash
 bin/dev.sh start      # serves ui/ on http://127.0.0.1:8777/
 bin/dev.sh stop

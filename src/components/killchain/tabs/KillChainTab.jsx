@@ -183,13 +183,14 @@ export default function KillChainTab() {
               <button
                 className="btn btn-primary"
                 onClick={addToIncidentReport}
-                disabled={assignedEvidence.length === 0 || !selectedAnswer}
+                disabled={assignedEvidence.length === 0 || (question ? !selectedAnswer : false)}
               >
                 Add to Incident Report
               </button>
               <span className="dim small">
-                Requires filed evidence and an answer. Adds this stage's answer to the incident
-                report and completes {stage.title}.
+                {question
+                  ? "Requires filed evidence and an answer. Adds this stage's answer to the incident report and completes " + stage.title + "."
+                  : 'Requires filed evidence. Completes ' + stage.title + '.'}
               </span>
               {nextStage && (
                 <button
